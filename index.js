@@ -2,9 +2,9 @@ const he = require('he')
 
 class Component {
   constructor (props = {}, state = {}) {
-    this.props = Component.clean(props)
+    this.props = props
     this.state = state
-    this.componentid = Math.random().toString(16).slice(2)
+    this.componentid = Component.createid(2)
 
     Component.registry[this.componentid] = this
   }
@@ -26,9 +26,13 @@ class Component {
   static match (el, s) {
     while (!el.matches) {
       el = el.parentNode
-      if (el.tagName === 'html') return el
+      if (el.tagName === 'html') return null
     }
     return el.matches(s) ? el : el.closest(s)
+  }
+
+  static createid (s = 2, e) {
+    return Math.random().toString(16).slice(s, e)
   }
 
   get id () {
