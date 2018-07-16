@@ -1,17 +1,19 @@
 # SYNOPSIS
 A minimalist composable component inspired by React.
 
-# MOTIVATION
-`Web Components` have weird opinions & caveats. React is `85,000 Lines Of
-Code` and has a lot of features i'm not interested in. Also not all UIs
-built with the web stack are intended to run in a browser (electron, etc).
-
 # GOALS
-- Inder a minute or two to grock, `< ~100LOC`.
-- Easy to compose components.
-- One-way binding.
-- Single source event dispatch.
+- Less than a minute or two to grock the entire codebase, `~100LOC`.
+- Preact/React style component composition.
+- One-way binding. Pipeline data though connected components.
+- Single source event dispatch. No event rebinding needed.
 - Routing agnostic.
+
+# NON-GOALS
+- Re-rendering performance. The "vdom everywhere" approach makes code
+easy to reason about at a high level, but ends up being a compromise
+when performance is actually important. In this case I prefer to target
+exact nodes and manage updates manually.
+- JSX
 
 # USAGE
 ```bash
@@ -61,6 +63,10 @@ class Container extends Component {
       height: 200px;
       width: 200px;
     `
+  }
+
+  mount (el) {
+    console.log('mounted!')
   }
 
   click (e) {
