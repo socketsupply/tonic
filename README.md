@@ -123,10 +123,10 @@ const container = new BoxContainer({ n: 100 })
 container.attach(document.body)
 ```
 
-Or insert the component into the document...
+Or insert the component into another node...
 
 ```js
-container.insert([element], [position])
+container.insert([node], [position])
 ```
 
 - `beforebegin`: Before the element itself.
