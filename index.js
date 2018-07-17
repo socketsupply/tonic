@@ -1,12 +1,12 @@
 const he = require('he')
 
-class Component {
+class Tonic {
   constructor (props = {}, state = {}) {
     this.props = props
     this.state = state
-    this.componentid = Component.createid(2)
+    this.componentid = Tonic.createid(2)
 
-    Component.registry[this.componentid] = this
+    Tonic.registry[this.componentid] = this
   }
 
   static clean (o) {
@@ -16,7 +16,7 @@ class Component {
       if (typeof o[key] === 'string') {
         o[key] = he.escape(o[key])
       } else if (typeof o[key] === 'object') {
-        Component.clean(o[key])
+        Tonic.clean(o[key])
       }
     })
 
@@ -52,7 +52,7 @@ class Component {
   }
 
   rerender () {
-    const component = Component.registry[this.componentid]
+    const component = Tonic.registry[this.componentid]
 
     const tmp = document.createElement('tmp')
     tmp.innerHTML = this.toString()
@@ -64,11 +64,11 @@ class Component {
   }
 
   dispatch (e) {
-    const match = Component.match(e.target, '[data-componentid]')
+    const match = Tonic.match(e.target, '[data-componentid]')
     if (!match) return
 
     const id = match.dataset.componentid
-    const component = Component.registry[id]
+    const component = Tonic.registry[id]
     if (!component) return
 
     if (component[e.type]) {
@@ -80,7 +80,7 @@ class Component {
     el.innerHTML = this.toString()
 
     ;[...el.querySelectorAll('[data-componentid]')].forEach(c => {
-      const component = Component.registry[c.dataset.componentid]
+      const component = Tonic.registry[c.dataset.componentid]
       if (component && component.mount) component.mount(c)
     })
 
@@ -91,10 +91,10 @@ class Component {
   }
 
   toString () {
-    const o = Component.clean(this.props)
-    return Component.html`${this.render(o)}`
+    const o = Tonic.clean(this.props)
+    return Tonic.html`${this.render(o)}`
   }
 }
 
-Component.registry = {}
-module.exports = Component
+Tonic.registry = {}
+module.exports = Tonic

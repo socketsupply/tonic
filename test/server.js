@@ -1,6 +1,6 @@
 const http = require('http')
 const test = require('tape')
-const Component = require('..')
+const Tonic = require('..')
 
 const hostname = '127.0.0.1'
 const port = 3000
@@ -17,7 +17,7 @@ test('setup', t => {
     res.statusCode = 200
     res.setHeader('Content-Type', 'text/plain')
 
-    class Quxx extends Component {
+    class Quxx extends Tonic {
       render (props) {
         return `<div>${props.n}</div>`
       }
@@ -25,7 +25,7 @@ test('setup', t => {
 
     const quxx = new Quxx({ n: 100 })
 
-    res.end(quxx.render({ n: Component.createid(2) }))
+    res.end(quxx.render({ n: Tonic.createid(2) }))
   })
 
   server.listen(port, hostname, () => {

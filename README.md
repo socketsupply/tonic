@@ -21,19 +21,19 @@ exact nodes and manage updates manually.
 Install using npm, yarn, etc.
 
 ```bash
-npm install hxoht/component
+npm install hxoht/tonic
 ```
 
 Import the component constructor.
 
 ```js
-const Component = require('component')
+const Tonic = require('tonic')
 ```
 
-Create a class that extends `Component`.
+Create a class that extends `Tonic`.
 
 ```js
-class Box extends Component {
+class Box extends Tonic {
   //
   // You can listen to any valid dom event by creating a method
   // with the corresponding name. The method will receive the
@@ -68,7 +68,7 @@ const box = new Box()
 Create a main component that will contain the `box` component.
 
 ```js
-class BoxContainer extends Component {
+class BoxContainer extends Tonic {
   //
   // A constructor is not required.
   //
@@ -137,11 +137,11 @@ http.createServer((req, res) => {
 The following built-in methods are static and can be overridden
 by assigning new functions to the property name.
 
-### `Component.html`
+### `Tonic.html`
 A [tagged template][0] function that will tidy the html returned by
 the render function.
 
-### `Component.clean`
+### `Tonic.clean`
 A sanitation function that uses [he][1] to escape strings found in
 object literals. This helps prevent XSS.
 

@@ -1,5 +1,5 @@
 const test = require('tape')
-const Component = require('..')
+const Tonic = require('..')
 
 test('sanity', t => {
   t.ok(true)
@@ -7,7 +7,7 @@ test('sanity', t => {
 })
 
 test('attach to dom', t => {
-  class Div extends Component {
+  class Div extends Tonic {
     render () {
       return '<div></div>'
     }
@@ -22,7 +22,7 @@ test('attach to dom', t => {
 })
 
 test('compose', t => {
-  class Span extends Component {
+  class Span extends Tonic {
     constructor (props) {
       super(props)
     }
@@ -42,7 +42,7 @@ test('compose', t => {
     }
   }
 
-  class Div extends Component {
+  class Div extends Tonic {
     constructor (props) {
       super(props)
     }

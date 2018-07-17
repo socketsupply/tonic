@@ -1,6 +1,6 @@
-const Component = require('.')
+const Tonic = require('.')
 
-class Box extends Component {
+class Box extends Tonic {
   constructor (props) {
     super(props)
 
@@ -31,7 +31,7 @@ class Box extends Component {
 
 const box = new Box()
 
-class Container extends Component {
+class Container extends Tonic {
   constructor (props) {
     super(props)
 
