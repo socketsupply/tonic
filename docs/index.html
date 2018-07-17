@@ -1,0 +1,257 @@
+<html>
+  <head>
+    <title>Tonic: Component Based Architecture</title>
+    <link href="https://fonts.googleapis.com/css?family=EB+Garamond|Source+Code+Pro:500,700" rel="stylesheet">
+
+    <style>
+      * {
+        box-sizing: border-box;
+      }
+      body {
+        font: 20px 'EB Garamond', serif;
+        padding: 100px 0;
+        margin: 0;
+      }
+      main {
+        width: 700px;
+        margin: 0 auto;
+        padding: 10px;
+      }
+      .wrapper {
+      }
+      a {
+        color: #00d2d2;
+        text-decoration: none;
+        border-bottom: 1px solid #eaeaea;
+      }
+      a:hover {
+        border-bottom: 1px solid #00d2d2;
+      }
+      img {
+        margin: 0 auto;
+        display: block;
+      }
+      img.accent {
+        margin: 40px auto 90px auto;
+      }
+      h1, h2 {
+        text-transform: uppercase;
+        text-align: center;
+      }
+      h1 {
+        font: 26px 'Source Code Pro', monospace;
+        font-weight: 700;
+        letter-spacing: 1px;
+        margin-top: 50px;
+      }
+      h1:after {
+        content: "";
+        width: 50px;
+        height: 20px;
+        display: block;
+        margin: 0 auto;
+        border-bottom: 4px double black;
+      }
+      h2 {
+        font: 18px 'Source Code Pro', monospace;
+        font-weight: 500;
+        letter-spacing: 1px;
+        padding: 15px;
+        margin: 40px 0 30px 0;
+        border-bottom: 1px solid black;
+        border-top: 1px solid black;
+      }
+      p {
+        margin: 40px 0;
+      }
+      p.center {
+        text-align: center;
+      }
+      p.large {
+        font-size: 24px;
+        margin-bottom: 80px;
+      }
+      ul {
+        list-style: none;
+        line-height: 24px;
+        padding: 0;
+        margin-top: 40px;
+      }
+      ul li:before {
+        content: "▫";
+        display: inline-block;
+        margin-left: -25px;
+        margin-right: 15px;
+        color: #00d2d2;
+      }
+      li {
+        margin-bottom: 10px;
+      }
+      pre {
+        padding: 0 30px;
+        background-color: #f8f8f8;
+      }
+      pre code {
+        padding: 0;
+        border: 0;
+      }
+      code {
+        font: 16px 'Inconsolata', monospace;
+        padding: 8px;
+        background-color: #f8f8f8;
+      }
+    </style>
+  </head>
+
+  <body>
+    <main>
+      <div class="wrapper">
+        <img src="tonic.svg" width="200">
+        <p class="center large">A minimalist composable component inspired by React.</p>
+        <img class="accent" src="vials.gif" width="200">
+
+        <h1>GOALS</h1>
+        <ul>
+          <li>Less than a minute or two to grock the whole codebase, ~100 lines.</li>
+          <li>Preact/React style component composition.</li>
+          <li>One-way binding. Pipeline data though connected components.</li>
+          <li>Single source event dispatch. No event rebinding needed.</li>
+          <li>Routing agnostic (not all UIs are intended to run in a browser).</li>
+          <li>Server and client side rendering.</li>
+        </ul>
+
+        <h1>NON-GOALS</h1>
+        <ul>
+          <li>Re-rendering performance. The "vdom everywhere" approach makes code easy to reason about at a high level, but ends up being a compromise when performance is actually important. In this case I prefer to target exact nodes and manage updates manually.</li>
+          <li>JSX</li>
+          <li>Magic</li>
+        </ul>
+
+        <h1>USAGE</h1>
+        <p>Install using npm, yarn, etc.</p>
+        <code>npm install hxoht/tonic</code>
+
+        <p>Import the component constructor.</p>
+        <code>const Tonic = require('tonic')</code>
+
+        <p>Create a class that extends <code>Tonic.</code></p>
+        <pre>
+          <code>
+class Box extends Tonic {
+  //
+  // You can listen to any valid dom event by creating a method
+  // with the corresponding name. The method will receive the
+  // event object.
+  //
+  mouseover (e) {
+    const r = Math.random().toString(16).slice(2, 8)
+    e.target.style.backgroundColor = r
+  }
+
+  mouseout (e) {
+    e.target.style.backgroundColor = 'fff'
+  }
+
+  //
+  // Render must return one root element (which can contain as
+  // many elements as you want). The root must have ${this.id}
+  // if you want to listen to dom or lifecycle events.
+  //
+  render (props) {
+    return `
+      <div ${this.id()} style="${this.style}">
+        Box (${props.n})
+      </div>
+    `
+  }
+}
+
+const box = new Box()
+          </code>
+        </pre>
+
+        <p>Create a main component that will contain the box component.</p>
+        <pre>
+          <code>
+class BoxContainer extends Tonic {
+  //
+  // A constructor is not required.
+  //
+  constructor (props) {
+    super(props)
+
+    //
+    // This is also optional, for demonstration purposes.
+    //
+    this.style = `
+      border: 1px solid blue;
+      height: 200px;
+      width: 200px;
+    `
+  }
+
+  //
+  // The mount event is fired once the root element is attached
+  // to the dom.
+  //
+  mount (el) {
+    console.log('mounted!')
+  }
+
+  click (e) {
+    //
+    // Set state on a component instance or on this instance,
+    // ie, this.setProps(...) will re-render all child components.
+    //
+    box.setProps({ n: Math.random().toString(16).slice(2, 4) })
+  }
+
+  //
+  // Calling the render method of a component will return its
+  // html.
+  //
+  render (props) {
+    return `
+      <div ${this.id} style="${this.style}">
+        Container ${box.render(props)}
+      </div>
+    `
+  }
+}
+          </code>
+        </pre>
+
+        <h2>CLIENT SIDE RENDERING</h2>
+        <p>The root component can be attached to any node.</p>
+        <pre>
+          <code>
+const container = new BoxContainer({ n: 100 })
+container.attach(document.body)
+          </code>
+        </pre>
+
+        <h2>SERVER SIDE RENDERING</h2>
+        <p>The render method returns a string.</p>
+        <pre>
+          <code>
+http.createServer((req, res) => {
+  const container = new BoxContainer({ n: 100 })
+  res.end(container.render())
+})
+          </code>
+        </pre>
+
+        <h1>EXTENDING</h1>
+        <p>The following built-in methods are static and can be overridden by assigning new functions to the property name.</p>
+
+        <code>Tonic.html</code>
+        <p>A tagged template function that will tidy the html returned by the render function.</p>
+
+        <code>Tonic.clean</code>
+        <p>A sanitation function that uses he to escape strings found in object literals. This helps prevent XSS.</p>
+      </div>
+      <p class="center">&EmptyVerySmallSquare;</p>
+      <p class="center">View on <a href="">Github</a></p>
+    </main>
+  </body>
+</html>
