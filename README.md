@@ -123,6 +123,17 @@ const container = new BoxContainer({ n: 100 })
 container.attach(document.body)
 ```
 
+Or insert the component into the document...
+
+```js
+container.insert([element], [position])
+```
+
+- `beforebegin`: Before the element itself.
+- `afterbegin`: Just inside the element, before its first child.
+- `beforeend`: Just inside the element, after its last child (*default*).
+- `afterend`: After the element itself.
+
 ## SERVER SIDE RENDERING
 The render method returns a string.
 

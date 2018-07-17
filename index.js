@@ -5,7 +5,6 @@ class Tonic {
     this.props = props
     this.state = state
     this.componentid = Tonic.createid(2)
-
     Tonic.registry[this.componentid] = this
   }
 
@@ -19,7 +18,6 @@ class Tonic {
         Tonic.clean(o[key])
       }
     })
-
     return o
   }
 
@@ -71,13 +69,16 @@ class Tonic {
     const component = Tonic.registry[id]
     if (!component) return
 
-    if (component[e.type]) {
-      component[e.type](e)
-    }
+    if (component[e.type]) component[e.type](e)
   }
 
-  attach (el) {
-    el.innerHTML = this.toString()
+  insert (el, pos = 'beforeend') {
+    this.attach(el, pos)
+  }
+
+  attach (el, pos) {
+    const s = this.toString()
+    pos ? el.insertAdjacentHTML(pos, s) : (el.innerHTML = s)
 
     ;[...el.querySelectorAll('[data-componentid]')].forEach(c => {
       const component = Tonic.registry[c.dataset.componentid]
