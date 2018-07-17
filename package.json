@@ -4,7 +4,9 @@
   "description": "A composable component inspired by React.",
   "main": "events.js",
   "scripts": {
-    "test": "browserify --bare test.js | tape-run --node"
+    "test": "npm run test:browser && npm run test:server",
+    "test:browser": "browserify --bare ./test/client.js | tape-run --node",
+    "test:server": "node ./test/server.js"
   },
   "author": "",
   "license": "ISC",

@@ -6,7 +6,8 @@ A minimalist composable component inspired by React.
 - Preact/React style component composition.
 - One-way binding. Pipeline data though connected components.
 - Single source event dispatch. No event rebinding needed.
-- Routing agnostic.
+- Routing agnostic (not all UIs are intended to run in a browser).
+- Server and client side rendering.
 
 # NON-GOALS
 - Re-rendering performance. The "vdom everywhere" approach makes code
@@ -33,22 +34,10 @@ Create a class that extends `Component`.
 
 ```js
 class Box extends Component {
-  constructor (props) {
-    super(props)
-
-    //
-    // This is optional, for demonstration purposes.
-    //
-    this.style = `
-      border: 1px solid red;
-      height: 100px;
-      width: 100px;
-    `
-  }
-  
   //
-  // You can listen to any valid javascript event by
-  // creating a method with the corresponding name.
+  // You can listen to any valid dom event by creating a method
+  // with the corresponding name. The method will receive the
+  // event object.
   //
   mouseover (e) {
     const r = Math.random().toString(16).slice(2, 8)
@@ -80,9 +69,15 @@ Create a main component that will contain the `box` component.
 
 ```js
 class BoxContainer extends Component {
+  //
+  // A constructor is not required.
+  //
   constructor (props) {
     super(props)
 
+    //
+    // This is also optional, for demonstration purposes.
+    //
     this.style = `
       border: 1px solid blue;
       height: 200px;
@@ -120,9 +115,19 @@ class BoxContainer extends Component {
 }
 ```
 
+## CLIENT SIDE RENDERING
+
 The root component can be attached to any node.
 
 ```js
 const container = new BoxContainer({ n: 100 })
 container.attach(document.body)
+```
+
+## SERVER SIDE RENDERING
+```js
+http.createServer((req, res) => {
+  const container = new BoxContainer({ n: 100 })
+  res.end(container.render())
+})
 ```

@@ -1,5 +1,5 @@
 const test = require('tape')
-const Component = require('.')
+const Component = require('..')
 
 test('sanity', t => {
   t.ok(true)
