@@ -2,7 +2,7 @@
 A minimalist composable component inspired by React.
 
 # GOALS
-- Less than a minute or two to grock the entire codebase, `~100` lines.
+- Less than a minute or two to grock the whole codebase, `~100` lines.
 - Preact/React style component composition.
 - One-way binding. Pipeline data though connected components.
 - Single source event dispatch. No event rebinding needed.
@@ -131,3 +131,18 @@ http.createServer((req, res) => {
   res.end(container.render())
 })
 ```
+
+# EXTENDING
+The following built-in methods are static and can be overridden
+by assigning new functions to the property name.
+
+### `Component.html`
+A [tagged template][0] function that will tidy the html returned by
+the render function.
+
+### `Component.clean`
+A sanitation function that uses [he][1] to escape strings found in
+object literals. This helps prevent XSS.
+
+[0]:https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Template_literals
+[1]:https://github.com/mathiasbynens/he

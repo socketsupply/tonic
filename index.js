@@ -39,7 +39,7 @@ class Component {
     return `data-componentid="${this.componentid}"`
   }
 
-  html ([s, ...strings], ...values) {
+  static html ([s, ...strings], ...values) {
     return values
       .reduce((a, b) => a.concat(b, strings.shift()), [s])
       .filter(s => s && (s !== true || s === 0))
@@ -88,7 +88,7 @@ class Component {
 
   toString () {
     const o = Component.clean(this.props)
-    return this.html`${this.render(o)}`
+    return Component.html`${this.render(o)}`
   }
 }
 
