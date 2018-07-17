@@ -48,6 +48,10 @@ class Component {
 
   setProps (o) {
     this.props = o
+    this.rerender()
+  }
+
+  rerender () {
     const component = Component.registry[this.componentid]
 
     const tmp = document.createElement('tmp')

@@ -116,7 +116,6 @@ class BoxContainer extends Component {
 ```
 
 ## CLIENT SIDE RENDERING
-
 The root component can be attached to any node.
 
 ```js
@@ -125,6 +124,8 @@ container.attach(document.body)
 ```
 
 ## SERVER SIDE RENDERING
+The render method returns a string.
+
 ```js
 http.createServer((req, res) => {
   const container = new BoxContainer({ n: 100 })
