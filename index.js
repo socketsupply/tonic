@@ -80,12 +80,20 @@ class Tonic {
     const s = this.toString()
     pos ? el.insertAdjacentHTML(pos, s) : (el.innerHTML = s)
 
-    ;[...el.querySelectorAll('[data-componentid]')].forEach(c => {
+    const ids = [...document.body.querySelectorAll('[data-componentid]')]
+
+    ids.forEach(c => {
       const component = Tonic.registry[c.dataset.componentid]
-      if (component && component.mount) component.mount(c)
+      if (component && component.mount && !component.mounted) {
+        component.mount(c)
+        component.mounted = true
+      }
     })
 
-    for (const key in el) {
+    if (Tonic.listening) return
+    Tonic.listening = true
+
+    for (const key in document.body) {
       if (key.search('on') !== 0) continue
       el.addEventListener(key.slice(2), this.dispatch)
     }
