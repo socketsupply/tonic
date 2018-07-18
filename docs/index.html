@@ -1,5 +1,6 @@
 <html>
   <head>
+    <meta charset="utf-8">
     <title>Tonic: Component Based Architecture</title>
     <link href="https://fonts.googleapis.com/css?family=EB+Garamond|Source+Code+Pro:500,700" rel="stylesheet">
 
@@ -89,7 +90,7 @@
       p.large {
         font-size: 24px;
         letter-spacing: 2px;
-        font-weight: 800;
+        font-weight: 900;
       }
 
       p.large i {
@@ -124,6 +125,7 @@
       pre code {
         padding: 0;
         border: 0;
+        line-height: 22px;
       }
 
       code {
@@ -166,31 +168,36 @@
           </div>
         </div>
 
+        <p class="center">An (incomplete) example component.</p>
         <pre><code>
 class Box extends Tonic {
   <i>//
-  // You can listen to any valid dom event by creating a method
-  // with the corresponding name. The method will receive the
-  // event object and <b>target</b> will be whatever was clicked on
-  // inside the component.
+  // You can listen to any dom event by creating a method with
+  // the corresponding name. The method will receive the plain
+  // old Javascript event object.
   //</i>
   mouseover (e) {
-    const r = Math.random().toString(16).slice(2, 8)
-    e.target.style.backgroundColor = r
+    e.target.style.backgroundColor = '#aaa'
   }
 
+  <i>// 
+  // You can test if the element that was clicked matches a
+  // selector by using the <b>Tonic.match()</b> method.
+  //</i>
   mouseout (e) {
-    e.target.style.backgroundColor = 'fff'
+    if (!Tonic.match(e.target, '.box')) return
+
+    e.target.style.backgroundColor = '#fff'
   }
 
   <i>//
   // Render <b>must return one root element</b> (which can contain as
-  // many elements as you want). The root must have ${this.id}
+  // many elements as you want). The root must have <b>${this.id}</b>
   // if you want to listen to dom or lifecycle events.
   //</i>
   render (props) {
     return `
-      &lt;div ${this.id} style="${this.style}"&gt;
+      &lt;div ${this.id} style="${this.style}"&gt; class="box"
         Box (${props.n})
       &lt;/div&gt;
     `
@@ -201,6 +208,9 @@ const box = new Box()</code>
 
 </pre>
 
+        <p class="center">
+          Another component that uses the instance of the <b>box</b> component.
+        </p>
         <pre><code>
 class BoxContainer extends Tonic {
   <i>//
@@ -210,8 +220,10 @@ class BoxContainer extends Tonic {
     super(props)
 
     <i>//
-    // An example of adding some styles. Examine the
-    // render function for how they are used.
+    // One way of adding styles (check the render function
+    // for how it's used). Since it's just a string it could
+    // be rendered into a style tag and could even be read-in
+    // from a separate file.
     //</i>
     this.style = `
       border: 1px solid blue;
@@ -231,14 +243,15 @@ class BoxContainer extends Tonic {
   click (e) {
     <i>//
     // Set state on a component instance or on this instance,
-    // ie, setProps() will cause a cascading re-render.
+    // <b>setProps()</b> will cause a downward cascade of re-rendering.
     //</i>
-    box.setProps({ n: Math.random().toString(16).slice(2, 4) })
+    box.setProps({ n: someRandomNumber })
   }
 
   <i>//
   // Calling the render method of a component will return its
-  // html.
+  // html. Since it's just a string, it could be read-in from
+  // another file.
   //</i>
   render (props) {
     return `
@@ -271,7 +284,28 @@ http.createServer((req, res) => {
 
 </pre>
 
+        <p class="center">Questions &amp; Answers.</p>
+        <pre><code>
+<b>Q. Is this a framework?</b>
+A. No. But it can be used with one.
+
+<b>Q. My framework has modules, what about those?</b>
+A. Use Browserify, Webpack, or even the <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/import">web</a>.
+
+<b>Q. What about routing?</b>
+A. There are lots of routers to choose from.
+
+<b>Q. How fast is this?</b>
+A. Fast enough. If you need something faster you don't
+   need a component class, you need to either manage dom
+   nodes directly or use a 2d or 3d graphics engine.
+
+<b>Q. Can I use this in production?</b>
+A. If you need to ask, the answer is no.
+</code>
+</pre>
       </div>
+
       <p class="center">More details on <a href="https://github.com/hxoht/tonic">Github</a></p>
     </main>
   </body>
