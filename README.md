@@ -41,8 +41,7 @@ class Box extends Tonic {
   // old Javascript event object.
   //
   mouseover (e) {
-    const r = Math.random().toString(16).slice(2, 8)
-    e.target.style.backgroundColor = r
+    e.target.style.backgroundColor = '#aaa'
   }
 
   // 
@@ -52,7 +51,7 @@ class Box extends Tonic {
   mouseout (e) {
     if (!Tonic.match(e.target, '.box')) return
 
-    e.target.style.backgroundColor = 'fff'
+    e.target.style.backgroundColor = '#fff'
   }
 
   //
@@ -108,7 +107,7 @@ class BoxContainer extends Tonic {
     // Set state on a component instance or on this instance,
     // <b>setProps()</b> will cause a downward cascade of re-rendering.
     //
-    box.setProps({ n: Math.random().toString(16).slice(2, 4) })
+    box.setProps({ n: someRandomNumber })
   }
 
   //
