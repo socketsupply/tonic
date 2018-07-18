@@ -7,51 +7,68 @@
       * {
         box-sizing: border-box;
       }
+
       body {
         font: 20px 'EB Garamond', serif;
-        padding: 100px 0;
+        padding: 80px 0;
         margin: 0;
       }
+
       main {
         width: 700px;
         margin: 0 auto;
-        padding: 10px;
+        position: relative;
+        z-index: 2;
       }
-      .wrapper {
+
+      .back {
+        position: absolute;
+        top: 0px;
+        height: 530px;
+        right: 0;
+        left: 0;
+        background: #383837;
+        z-index: 1;
       }
+
+      .row {
+        margin-top: 200px;
+        display: table;
+      }
+
+      .col {
+        width: 50%;
+        display: table-cell;
+        padding: 10px 40px;
+      }
+
       a {
-        color: #00d2d2;
+        color: #999;
         text-decoration: none;
         border-bottom: 1px solid #eaeaea;
       }
+
       a:hover {
-        border-bottom: 1px solid #00d2d2;
+        border-bottom: 1px solid #999;
       }
+
       img {
         margin: 0 auto;
         display: block;
       }
-      img.accent {
-        margin: 40px auto 90px auto;
-      }
+
       h1, h2 {
         text-transform: uppercase;
         text-align: center;
       }
+
       h1 {
         font: 26px 'Source Code Pro', monospace;
         font-weight: 700;
         letter-spacing: 1px;
         margin-top: 50px;
       }
-      h1:after {
-        content: "";
-        width: 50px;
-        height: 20px;
-        display: block;
-        margin: 0 auto;
-        border-bottom: 4px double black;
-      }
+
       h2 {
         font: 18px 'Source Code Pro', monospace;
         font-weight: 500;
@@ -64,85 +81,99 @@
       p {
         margin: 40px 0;
       }
+
       p.center {
         text-align: center;
       }
+
       p.large {
         font-size: 24px;
-        margin-bottom: 80px;
+        letter-spacing: 2px;
+        font-weight: 800;
       }
+
+      p.large i {
+        color: white;
+      }
+
       ul {
         list-style: none;
         line-height: 24px;
         padding: 0;
-        margin-top: 40px;
       }
-      ul li:before {
-        content: "▫";
-        display: inline-block;
-        margin-left: -25px;
-        margin-right: 15px;
-        color: #00d2d2;
-      }
+
       li {
-        margin-bottom: 10px;
+        margin-bottom: 20px;
+        text-align: center;
       }
+
+      li:after {
+        display: block;
+        content: "—";
+        margin-top: 0px;
+        font-size: 12px;
+        color: #999;
+      }
+
       pre {
         padding: 0 30px;
         background-color: #f8f8f8;
+        border-bottom: 1px solid #999;
       }
+
       pre code {
         padding: 0;
         border: 0;
       }
+
       code {
         font: 16px 'Inconsolata', monospace;
         padding: 8px;
         background-color: #f8f8f8;
       }
+
+      i {
+        color: #adadad;
+      }
     </style>
   </head>
 
   <body>
+    <div class="back"></div>
+
     <main>
       <div class="wrapper">
+        <img class="accent" src="drink.svg" width="150">
         <img src="tonic.svg" width="200">
-        <p class="center large">A minimalist composable component inspired by React.</p>
-        <img class="accent" src="vials.gif" width="200">
+        <p class="center large">
+          <i>A little class for mixing behavior, layout, and style.</i>
+        </p>
 
-        <h1>GOALS</h1>
-        <ul>
-          <li>Less than a minute or two to grock the whole codebase, ~100 lines.</li>
-          <li>Preact/React style component composition.</li>
-          <li>One-way binding. Pipeline data though connected components.</li>
-          <li>Single source event dispatch. No event rebinding needed.</li>
-          <li>Routing agnostic (not all UIs are intended to run in a browser).</li>
-          <li>Server and client side rendering.</li>
-        </ul>
+        <div class="row">
+          <div class="col">
+            <ul>
+              <li>Qucikly read and understand the whole module, ~100 lines.</li>
+              <li>React-like component composition.</li>
+              <li>One-way binding. Pipe data though connected components.</li>
+            </ul>
+          </div>
+          <div class="col">
+            <ul>
+              <li>Evented, single source dispatch. No event rebinding.</li>
+              <li>Routing agnostic (not all UIs are intended to run in a browser).</li>
+              <li>Server and client side rendering.</li>           
+            </ul>
+          </div>
+        </div>
 
-        <h1>NON-GOALS</h1>
-        <ul>
-          <li>Re-rendering performance. The "vdom everywhere" approach makes code easy to reason about at a high level, but ends up being a compromise when performance is actually important. In this case I prefer to target exact nodes and manage updates manually.</li>
-          <li>JSX</li>
-          <li>Magic</li>
-        </ul>
-
-        <h1>USAGE</h1>
-        <p>Install using npm, yarn, etc.</p>
-        <code>npm install hxoht/tonic</code>
-
-        <p>Import the component constructor.</p>
-        <code>const Tonic = require('tonic')</code>
-
-        <p>Create a class that extends <code>Tonic.</code></p>
-        <pre>
-          <code>
+        <pre><code>
 class Box extends Tonic {
-  //
+  <i>//
   // You can listen to any valid dom event by creating a method
   // with the corresponding name. The method will receive the
-  // event object.
-  //
+  // event object and <b>target</b> will be whatever was clicked on
+  // inside the component.
+  //</i>
   mouseover (e) {
     const r = Math.random().toString(16).slice(2, 8)
     e.target.style.backgroundColor = r
@@ -152,37 +183,36 @@ class Box extends Tonic {
     e.target.style.backgroundColor = 'fff'
   }
 
-  //
-  // Render must return one root element (which can contain as
+  <i>//
+  // Render <b>must return one root element</b> (which can contain as
   // many elements as you want). The root must have ${this.id}
   // if you want to listen to dom or lifecycle events.
-  //
+  //</i>
   render (props) {
     return `
-      <div ${this.id()} style="${this.style}">
+      &lt;div ${this.id} style="${this.style}"&gt;
         Box (${props.n})
-      </div>
+      &lt;/div&gt;
     `
   }
 }
 
-const box = new Box()
-          </code>
-        </pre>
+const box = new Box()</code>
 
-        <p>Create a main component that will contain the box component.</p>
-        <pre>
-          <code>
+</pre>
+
+        <pre><code>
 class BoxContainer extends Tonic {
-  //
+  <i>//
   // A constructor is not required.
-  //
+  //</i>
   constructor (props) {
     super(props)
 
-    //
-    // This is also optional, for demonstration purposes.
-    //
+    <i>//
+    // An example of adding some styles. Examine the
+    // render function for how they are used.
+    //</i>
     this.style = `
       border: 1px solid blue;
       height: 200px;
@@ -190,68 +220,59 @@ class BoxContainer extends Tonic {
     `
   }
 
-  //
-  // The mount event is fired once the root element is attached
+  <i>//
+  // The <b>mount</b> event is fired once the root element is attached
   // to the dom.
-  //
+  //</i>
   mount (el) {
-    console.log('mounted!')
+    console.log('Mounted! The dom node is ready to use.')
   }
 
   click (e) {
-    //
+    <i>//
     // Set state on a component instance or on this instance,
-    // ie, this.setProps(...) will re-render all child components.
-    //
+    // ie, setProps() will cause a cascading re-render.
+    //</i>
     box.setProps({ n: Math.random().toString(16).slice(2, 4) })
   }
 
-  //
+  <i>//
   // Calling the render method of a component will return its
   // html.
-  //
+  //</i>
   render (props) {
     return `
-      <div ${this.id} style="${this.style}">
+      &lt;div ${this.id} style="${this.style}"&gt;
         Container ${box.render(props)}
-      </div>
+      &lt;/div&gt;
     `
   }
-}
-          </code>
-        </pre>
+}</code>
 
-        <h2>CLIENT SIDE RENDERING</h2>
-        <p>The root component can be attached to any node.</p>
-        <pre>
-          <code>
+</pre>
+
+        <p class="center">Components can be attached to any node.</p>
+        <pre><code>
+<i>//
+// Your app may create and attach one or more components
+// to any node at any time.
+//</i>
 const container = new BoxContainer({ n: 100 })
-container.attach(document.body)
-          </code>
-        </pre>
+container.insert(document.body)</code>
 
-        <h2>SERVER SIDE RENDERING</h2>
-        <p>The render method returns a string.</p>
-        <pre>
-          <code>
+</pre>
+
+        <p class="center">The render method will return a string.</p>
+        <pre><code>
 http.createServer((req, res) => {
   const container = new BoxContainer({ n: 100 })
   res.end(container.render())
-})
-          </code>
-        </pre>
+})</code>
 
-        <h1>EXTENDING</h1>
-        <p>The following built-in methods are static and can be overridden by assigning new functions to the property name.</p>
+</pre>
 
-        <code>Tonic.html</code>
-        <p>A tagged template function that will tidy the html returned by the render function.</p>
-
-        <code>Tonic.clean</code>
-        <p>A sanitation function that uses he to escape strings found in object literals. This helps prevent XSS.</p>
       </div>
-      <p class="center">&EmptyVerySmallSquare;</p>
-      <p class="center">View on <a href="">Github</a></p>
+      <p class="center">More details on <a href="https://github.com/hxoht/tonic">Github</a></p>
     </main>
   </body>
 </html>

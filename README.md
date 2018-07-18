@@ -123,10 +123,11 @@ const container = new BoxContainer({ n: 100 })
 container.attach(document.body)
 ```
 
-Or insert the component into another node...
+Alternatively, you can insert the componet (where `element` is a valid dom
+node, something like `document.body`)...
 
 ```js
-container.insert([node], [position])
+container.insert([element], [position])
 ```
 
 - `beforebegin`: Before the element itself.
