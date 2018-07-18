@@ -1,19 +1,20 @@
 # SYNOPSIS
-A minimalist composable component inspired by React.
+A minimalist [composable component][A] inspired by React.
 
 # GOALS
-- Less than a minute or two to grock the whole codebase, `~100` lines.
-- Preact/React style component composition.
-- One-way binding. Pipeline data though connected components.
-- Single source event dispatch. No event rebinding needed.
+- Quickly read and understand the whole codebase; `~100` lines.
+- React-like component composition.
+- One-way binding; pipe data though connected components.
+- Single source event dispatch; no event rebinding needed.
 - Routing agnostic (not all UIs are intended to run in a browser).
 - Server and client side rendering.
 
 # NON-GOALS
-- Re-rendering performance. The "vdom everywhere" approach makes code
-easy to reason about at a high level, but ends up being a compromise
-when performance is actually important. In this case I prefer to target
-exact nodes and manage updates manually.
+- Re-rendering performance is not important in all cases. `innerHTML`
+is fast enough for most cases. And while the "vdom everywhere" approach
+might make code easy to reason about at a high level, it ends up being
+a compromise when performance actually matters. When programming for
+performance, target exact nodes and manage updates explicitly.
 - JSX
 - Magic
 
@@ -55,7 +56,7 @@ class Box extends Tonic {
   //
   render (props) {
     return `
-      <div ${this.id()} style="${this.style}">
+      <div ${this.id} style="${this.style}">
         Box (${props.n})
       </div>
     `
@@ -157,5 +158,6 @@ the render function.
 A sanitation function that uses [he][1] to escape strings found in
 object literals. This helps prevent XSS.
 
+[A]:https://hxoht.github.io/tonic/
 [0]:https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Template_literals
 [1]:https://github.com/mathiasbynens/he
