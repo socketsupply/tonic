@@ -105,7 +105,7 @@ class BoxContainer extends Tonic {
   click (e) {
     //
     // Set state on a component instance or on this instance,
-    // <b>setProps()</b> will cause a downward cascade of re-rendering.
+    // .setProps() will cause a downward cascade of re-rendering.
     //
     box.setProps({ n: someRandomNumber })
   }
