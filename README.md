@@ -31,21 +31,27 @@ Import the component constructor.
 const Tonic = require('tonic')
 ```
 
-Create a class that extends `Tonic`.
+An (incomplete) example.
 
 ```js
 class Box extends Tonic {
   //
-  // You can listen to any valid dom event by creating a method
-  // with the corresponding name. The method will receive the
-  // event object.
+  // You can listen to any dom event by creating a method with
+  // the corresponding name. The method will receive the plain
+  // old Javascript event object.
   //
   mouseover (e) {
     const r = Math.random().toString(16).slice(2, 8)
     e.target.style.backgroundColor = r
   }
 
+  // 
+  // You can test if the element that was clicked matches a
+  // selector by using the <b>Tonic.match()</b> method.
+  //
   mouseout (e) {
+    if (!Tonic.match(e.target, '.box')) return
+
     e.target.style.backgroundColor = 'fff'
   }
 
@@ -56,7 +62,7 @@ class Box extends Tonic {
   //
   render (props) {
     return `
-      <div ${this.id} style="${this.style}">
+      <div ${this.id} style="${this.style}" class="box">
         Box (${props.n})
       </div>
     `
@@ -66,7 +72,7 @@ class Box extends Tonic {
 const box = new Box()
 ```
 
-Create a main component that will contain the `box` component.
+A component that will contain the `box` component.
 
 ```js
 class BoxContainer extends Tonic {
@@ -77,7 +83,10 @@ class BoxContainer extends Tonic {
     super(props)
 
     //
-    // This is also optional, for demonstration purposes.
+    // One way of adding styles (check the render function
+    // for how it's used). Since it's just a string it could
+    // be rendered into a style tag and could even be read-in
+    // from a separate file.
     //
     this.style = `
       border: 1px solid blue;
@@ -97,7 +106,7 @@ class BoxContainer extends Tonic {
   click (e) {
     //
     // Set state on a component instance or on this instance,
-    // ie, this.setProps(...) will re-render all child components.
+    // <b>setProps()</b> will cause a downward cascade of re-rendering.
     //
     box.setProps({ n: Math.random().toString(16).slice(2, 4) })
   }
