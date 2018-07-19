@@ -163,7 +163,7 @@
             <ul>
               <li>Evented, single source dispatch. No event rebinding.</li>
               <li>Routing agnostic (not all UIs are intended to run in a browser).</li>
-              <li>Server and client side rendering.</li>           
+              <li>Async or sync, server and client side rendering.</li>           
             </ul>
           </div>
         </div>
@@ -249,9 +249,9 @@ class BoxContainer extends Tonic {
   }
 
   <i>//
-  // Calling the render method of a component will return its
-  // html. Since it's just a string, it could be read-in from
-  // another file.
+  // Render will return a string. It can be an <b>async</b> function,
+  // if it is, it can be awaited (don't forget to <b>await</b> attach
+  // or insert).
   //</i>
   render (props) {
     return `

@@ -111,8 +111,9 @@ class BoxContainer extends Tonic {
   }
 
   //
-  // Calling the render method of a component will return its
-  // html.
+  // Render will return a string. It can be an async function,
+  // if it is, it can be awaited (don't forget to await attach
+  // or insert).
   //
   render (props) {
     return `

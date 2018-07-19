@@ -72,12 +72,19 @@ class Tonic {
     if (component[e.type]) component[e.type](e)
   }
 
-  insert (el, pos = 'beforeend') {
-    this.attach(el, pos)
+  isAsync () {
+    return this.render[Symbol.toStringTag] === 'AsyncFunction'
   }
 
-  attach (el, pos) {
-    const s = this.toString()
+  async insert (el, pos = 'beforeend') {
+    this.isAsync() ? (await this.attach(el, pos)) : this.attach(el, pos)
+  }
+
+  async attach (el, pos) {
+    const o = Tonic.clean(this.props)
+    const s = Tonic.html`${this.isAsync()
+      ? (await this.render(o)) : this.render(o)}`
+
     pos ? el.insertAdjacentHTML(pos, s) : (el.innerHTML = s)
 
     const ids = [...document.body.querySelectorAll('[data-componentid]')]
@@ -97,11 +104,6 @@ class Tonic {
       if (key.search('on') !== 0) continue
       el.addEventListener(key.slice(2), this.dispatch)
     }
-  }
-
-  toString () {
-    const o = Tonic.clean(this.props)
-    return Tonic.html`${this.render(o)}`
   }
 }
 
