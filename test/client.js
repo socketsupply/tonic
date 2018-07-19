@@ -24,6 +24,8 @@ test('attach to dom', t => {
 })
 
 test('async render and attach', async t => {
+  document.body.innerHTML = ''
+
   class Div extends Tonic {
     async render () {
       await sleep(100)
@@ -40,6 +42,8 @@ test('async render and attach', async t => {
 })
 
 test('async render and insert', async t => {
+  document.body.innerHTML = ''
+
   class Div extends Tonic {
     async render () {
       await sleep(100)
@@ -55,7 +59,30 @@ test('async render and insert', async t => {
   t.end()
 })
 
+test('setProps', async t => {
+  document.body.innerHTML = ''
+
+  class Div extends Tonic {
+    render (props) {
+      return `<div ${this.id}>${props.number}</div>`
+    }
+  }
+
+  const root = new Div({ number: 1 })
+  root.insert(document.body)
+
+  let d1 = document.querySelector('div')
+  t.equal(d1.innerHTML, '1', 'div contained the correct value')
+  root.setProps({ number: 2 })
+
+  let d2 = document.querySelector('div')
+  t.equal(d2.innerHTML, '2', 'div changed to the correct value')
+  t.end()
+})
+
 test('compose', t => {
+  document.body.innerHTML = ''
+
   class Span extends Tonic {
     click (e) {
       console.log('clicked span', e)
@@ -91,6 +118,8 @@ test('compose', t => {
 })
 
 test('async compose', async t => {
+  document.body.innerHTML = ''
+
   class Span extends Tonic {
     click (e) {
       console.log('clicked span', e)

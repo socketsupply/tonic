@@ -155,18 +155,5 @@ http.createServer((req, res) => {
 })
 ```
 
-# EXTENDING
-The following built-in methods are static and can be overridden
-by assigning new functions to the property name.
-
-### `Tonic.html`
-A [tagged template][0] function that will tidy the html returned by
-the render function.
-
-### `Tonic.clean`
-A sanitation function that uses [he][1] to escape strings found in
-object literals. This helps prevent XSS.
-
 [A]:https://hxoht.github.io/tonic/
 [0]:https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Template_literals
-[1]:https://github.com/mathiasbynens/he

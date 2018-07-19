@@ -8,19 +8,6 @@ class Tonic {
     Tonic.registry[this.componentid] = this
   }
 
-  static clean (o) {
-    if (!o) return
-
-    Object.keys(o).forEach(key => {
-      if (typeof o[key] === 'string') {
-        o[key] = he.escape(o[key])
-      } else if (typeof o[key] === 'object') {
-        Tonic.clean(o[key])
-      }
-    })
-    return o
-  }
-
   static match (el, s) {
     while (!el.matches) {
       el = el.parentNode
@@ -37,11 +24,10 @@ class Tonic {
     return `data-componentid="${this.componentid}"`
   }
 
-  static html ([s, ...strings], ...values) {
-    return values
-      .reduce((a, b) => a.concat(b, strings.shift()), [s])
-      .filter(s => s && (s !== true || s === 0))
-      .join('')
+  html ([s, ...strings], ...values) {
+    const reducer = (a, b) => a.concat(b, he.escape(strings.shift()))
+    const filter = s => s && (s !== true || s === 0)
+    return values.reduce(reducer, [s]).filter(filter).join('')
   }
 
   setProps (o) {
@@ -49,11 +35,14 @@ class Tonic {
     this.rerender()
   }
 
-  rerender () {
+  async rerender () {
     const component = Tonic.registry[this.componentid]
-
     const tmp = document.createElement('tmp')
-    tmp.innerHTML = this.toString()
+
+    tmp.innerHTML = this.html`${this.isAsync()
+      ? await this.render(this.props)
+      : this.render(this.props)
+    }`
 
     const child = tmp.firstElementChild
     const parent = component.el.parentNode
@@ -81,9 +70,10 @@ class Tonic {
   }
 
   async attach (el, pos) {
-    const o = Tonic.clean(this.props)
-    const s = Tonic.html`${this.isAsync()
-      ? (await this.render(o)) : this.render(o)}`
+    const s = this.html`${this.isAsync()
+      ? await this.render(this.props)
+      : this.render(this.props)
+    }`
 
     pos ? el.insertAdjacentHTML(pos, s) : (el.innerHTML = s)
 
@@ -91,6 +81,7 @@ class Tonic {
 
     ids.forEach(c => {
       const component = Tonic.registry[c.dataset.componentid]
+      component.el = c
       if (component && component.mount && !component.mounted) {
         component.mount(c)
         component.mounted = true
