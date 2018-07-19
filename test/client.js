@@ -94,7 +94,7 @@ test('compose', t => {
 
     render (props) {
       return `
-        <span ${this.id} data-event="click" data-num="${props.x}">Span</span>
+        <span ${this.id} data-num="${props.x}">Span</span>
       `
     }
   }
@@ -136,10 +136,14 @@ test('async compose', async t => {
       t.ok(true, 'span was mounted')
     }
 
-    async render (props) {
+    async getX (props) {
       await sleep(500)
+      return props.x
+    }
+
+    async render (props) {
       return `
-        <span ${this.id} data-event="click" data-num="${props.x}">Span</span>
+        <span ${this.id} data-num="${await this.getX(props)}">Span</span>
       `
     }
   }

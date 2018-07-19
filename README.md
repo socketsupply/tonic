@@ -10,11 +10,11 @@ A minimalist [composable component][A] inspired by React.
 - Server and client side rendering.
 
 # NON-GOALS
-- Re-rendering performance is not important in all cases. `innerHTML`
-is fast enough for most cases. And while the "vdom everywhere" approach
-might make code easy to reason about at a high level, it ends up being
-a compromise when performance actually matters. When programming for
-performance, target exact nodes and manage updates explicitly.
+- When re-rendering performance is *truly* important, a virtual dom is
+not the right tool. In these cases you should either A. update some
+specific dom nodes directly or B. use a graphics/animation engine. The
+one-way-everywhere approach might make some code easy to reason about,
+but it ends up being a performance compromise with added complexity.
 - JSX
 - Magic
 
