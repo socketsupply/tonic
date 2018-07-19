@@ -24,7 +24,7 @@ class Tonic {
   static match (el, s) {
     while (!el.matches) {
       el = el.parentNode
-      if (el.tagName === 'html') return null
+      if (el.tagName === 'HTML') return null
     }
     return el.matches(s) ? el : el.closest(s)
   }
