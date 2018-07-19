@@ -46,7 +46,7 @@ class Box extends Tonic {
 
   // 
   // You can test if the element that was clicked matches a
-  // selector by using the <b>Tonic.match()</b> method.
+  // selector by using the Tonic.match() method.
   //
   mouseout (e) {
     if (!Tonic.match(e.target, '.box')) return
@@ -61,7 +61,7 @@ class Box extends Tonic {
   //
   render (props) {
     return `
-      <div ${this.id} style="${this.style}" class="box">
+      <div ${this.id} class="box">
         Box (${props.n})
       </div>
     `
