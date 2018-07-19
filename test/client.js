@@ -103,8 +103,15 @@ test('compose', t => {
 
   class Div extends Tonic {
     mount (el) {
-      t.ok(true, 'div was mounted')
-      t.ok(el.innerHTML.indexOf('Span'), 'div includes span')
+      t.ok(el, 'div was mounted')
+
+      const span = el.querySelector('span')
+      t.ok(span, 'div contains span')
+
+      t.equal(span.textContent, 'Span', 'span includes correct text')
+
+      const prop = span.dataset.num
+      t.equal(prop, '1', 'span has correct property value')
     }
 
     render (props) {
@@ -141,8 +148,15 @@ test('async compose', async t => {
 
   class Div extends Tonic {
     mount (el) {
-      t.ok(true, 'div was mounted')
-      t.ok(el.innerHTML.indexOf('Span'), 'div includes span')
+      t.ok(el, 'div was mounted')
+
+      const span = el.querySelector('span')
+      t.ok(span, 'div contains span')
+
+      t.equal(span.textContent, 'Span', 'span includes correct text')
+
+      const prop = span.dataset.num
+      t.equal(prop, '1', 'span has correct property value')
     }
 
     async render (props) {
