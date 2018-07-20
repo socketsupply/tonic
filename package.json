@@ -6,6 +6,7 @@
   "scripts": {
     "test": "npm run test:browser && npm run test:server",
     "test:browser": "browserify --bare ./test/client.js | tape-run --node",
+    "build:demo": "browserify --bare ./demo > ./docs/bundle.js",
     "test:server": "node ./test/server.js"
   },
   "author": "",

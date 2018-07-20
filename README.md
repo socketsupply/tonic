@@ -118,7 +118,7 @@ class BoxContainer extends Tonic {
   render (props) {
     return `
       <div ${this.id} style="${this.style}">
-        Container ${box.render(props)}
+        Box Container ${box.render(props)}
       </div>
     `
   }

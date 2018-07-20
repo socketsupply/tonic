@@ -1,13 +1,15 @@
-const Tonic = require('.')
+const Tonic = require('..')
 
 class Box extends Tonic {
   constructor (props) {
     super(props)
 
     this.style = `
-      border: 1px solid red;
+      border: 1px dotted #666;
       height: 100px;
       width: 100px;
+      margin: 20px auto;
+      line-height: 90px;
     `
   }
 
@@ -22,7 +24,7 @@ class Box extends Tonic {
 
   render (props) {
     return `
-      <div ${this.id()} style="${this.style}">
+      <div ${this.id} style="${this.style}">
         Box (${props.n})
       </div>
     `
@@ -36,25 +38,28 @@ class Container extends Tonic {
     super(props)
 
     this.style = `
-      border: 1px solid blue;
+      user-select: none;
+      border: 1px solid #999;
       height: 200px;
       width: 200px;
+      padding: 20px;
+      margin: auto;
+      text-align: center;
     `
   }
 
   click (e) {
     box.setProps({ n: Math.random().toString(16).slice(2, 4) })
-    // ...or this.setProps()
   }
 
   render (props) {
     return `
-      <div ${this.id()} style="${this.style}">
-        Container ${box.render(props)}
+      <div ${this.id} style="${this.style}">
+        Box Container ${box.render(props)}
       </div>
     `
   }
 }
 
-const container = new Container({ n: 100 })
-container.attach(document.body)
+const container = new Container({ n: '0f' })
+container.insert(document.querySelector('#demo'))

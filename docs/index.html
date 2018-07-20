@@ -37,6 +37,10 @@
         display: table;
       }
 
+      #demo * {
+        font: 16px 'Inconsolata', monospace;
+      }
+
       .col {
         width: 50%;
         display: table-cell;
@@ -177,12 +181,12 @@ class Box extends Tonic {
   // old Javascript event object.
   //</i>
   mouseover (e) {
-    e.target.style.backgroundColor = '#aaa'
+    e.target.style.backgroundColor = someRandomColor
   }
 
   <i>// 
-  // You can test if the element that was clicked matches a
-  // selector by using the <b>Tonic.match()</b> method.
+  // If you wanted, you could test if the event target
+  // clicked matches a selector by using <b>Tonic.match()</b>.
   //</i>
   mouseout (e) {
     if (!Tonic.match(e.target, '.box')) return
@@ -245,7 +249,7 @@ class BoxContainer extends Tonic {
     // Set state on a component instance or on this instance,
     // <b>setProps()</b> will cause a downward cascade of re-rendering.
     //</i>
-    box.setProps({ n: someRandomNumber })
+    box.setProps({ n: someRandomString })
   }
 
   <i>//
@@ -256,7 +260,7 @@ class BoxContainer extends Tonic {
   render (props) {
     return `
       &lt;div ${this.id} style="${this.style}"&gt;
-        Container ${box.render(props)}
+        Box Container ${box.render(props)}
       &lt;/div&gt;
     `
   }
@@ -275,7 +279,10 @@ container.insert(document.body)</code>
 
 </pre>
 
-        <p class="center">The render method will return a string.</p>
+        <p class="center">Demo (click and hover).</p>
+        <div id="demo"></div>
+
+        <p class="center">Rendering from a server.</p>
         <pre><code>
 http.createServer((req, res) => {
   const container = new BoxContainer({ n: 100 })
@@ -308,5 +315,6 @@ A. If you need to ask, the answer is no.
 
       <p class="center">More details on <a href="https://github.com/hxoht/tonic">Github</a></p>
     </main>
+    <script src="bundle.js"></script>
   </body>
 </html>
