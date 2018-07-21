@@ -51,14 +51,17 @@ class Tonic {
   }
 
   dispatch (e) {
-    const match = Tonic.match(e.target, '[data-componentid]')
-    if (!match) return
+    let el = e.target
 
-    const id = match.dataset.componentid
-    const component = Tonic.registry[id]
-    if (!component) return
+    while (true) {
+      el = Tonic.match(el, `[data-componentid]`)
+      if (!el) break
 
-    if (component[e.type]) component[e.type](e)
+      const component = Tonic.registry[el.dataset.componentid]
+      if (component && component[e.type]) component[e.type](e)
+
+      el = el.parentNode
+    }
   }
 
   isAsync () {
@@ -88,12 +91,12 @@ class Tonic {
       }
     })
 
-    if (Tonic.listening) return
-    Tonic.listening = true
+    if (Tonic.bound) return
+    Tonic.bound = true
 
     for (const key in document.body) {
       if (key.search('on') !== 0) continue
-      el.addEventListener(key.slice(2), this.dispatch)
+      document.body.addEventListener(key.slice(2), e => this.dispatch(e))
     }
   }
 }
