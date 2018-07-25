@@ -1,3 +1,5 @@
+![tonic](https://github.com/hxoht/tonic/raw/addimage/readme-tonic.png)
+
 # SYNOPSIS
 A minimalist [composable component][A] inspired by React.
 
