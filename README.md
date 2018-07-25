@@ -131,14 +131,14 @@ You can use `Tonic.find` to to test arbitrary properties and find the one you're
 looking for.
 
 ```js
-const A extends Tonic {
+class A extends Tonic {
   constructor (props) {
     super(props)
     this.name = 'A'
   }
 }
 
-const B extends Tonic {
+class B extends Tonic {
   someMethod () {
     const component = Tonic.find(c => c.name === 'A')
     component.setProps({})
