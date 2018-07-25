@@ -125,7 +125,7 @@ class BoxContainer extends Tonic {
 }
 ```
 
-# WORKING BETWEEN COMPONENTS
+## WORKING BETWEEN COMPONENTS
 Sometimes you want an instance of a component to tell another one what to do.
 You can use `Tonic.find` to to test arbitrary properties and find the one you're
 looking for.
