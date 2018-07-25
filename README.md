@@ -125,6 +125,27 @@ class BoxContainer extends Tonic {
 }
 ```
 
+# WORKING BETWEEN COMPONENTS
+Sometimes you want an instance of a component to tell another one what to do.
+You can use `Tonic.find` to to test arbitrary properties and find the one you're
+looking for.
+
+```js
+const A extends Tonic {
+  constructor (props) {
+    super(props)
+    this.name = 'A'
+  }
+}
+
+const B extends Tonic {
+  someMethod () {
+    const component = Tonic.find(c => c.name === 'A')
+    component.setProps({})
+  }
+}
+```
+
 ## CLIENT SIDE RENDERING
 The root component can be attached to any node.
 

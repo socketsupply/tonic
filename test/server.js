@@ -13,17 +13,17 @@ test('sanity', t => {
 })
 
 test('setup', t => {
+  class Quxx extends Tonic {
+    render (props) {
+      return `<div>${props.n}</div>`
+    }
+  }
+
+  const quxx = new Quxx({ n: 100 })
+
   server = http.createServer((req, res) => {
     res.statusCode = 200
     res.setHeader('Content-Type', 'text/plain')
-
-    class Quxx extends Tonic {
-      render (props) {
-        return `<div>${props.n}</div>`
-      }
-    }
-
-    const quxx = new Quxx({ n: 100 })
 
     res.end(quxx.render({ n: Tonic.createid(2) }))
   })

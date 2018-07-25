@@ -20,6 +20,10 @@ class Tonic {
     return Math.random().toString(16).slice(s, e)
   }
 
+  static find (cmp) {
+    return Object.values(Tonic.registry).find(cmp)
+  }
+
   get id () {
     return `data-componentid="${this.componentid}"`
   }

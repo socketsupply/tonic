@@ -106,6 +106,14 @@ class BoxContainer extends Tonic {
     console.log('Mounted! The dom node is ready to use.')
   }
 
+  <i>//
+  // The <b>root dom node</b> of the component can be accessed from
+  // <b>this.el</b> after the component has been mounted.
+  //</i>
+  show () {
+    this.el.classList.add('show')
+  }
+
   click (e) {
     <i>//
     // Set state on a component instance or on this instance,
