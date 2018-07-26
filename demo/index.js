@@ -62,4 +62,4 @@ class Container extends Tonic {
 }
 
 const container = new Container({ n: '0f' })
-container.insert(document.querySelector('#demo'))
+container.attach(document.querySelector('#demo'))

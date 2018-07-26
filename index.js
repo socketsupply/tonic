@@ -43,18 +43,15 @@ class Tonic {
   }
 
   async rerender () {
-    const component = Tonic.registry[this.componentid]
     const tmp = document.createElement('tmp')
-
     tmp.innerHTML = this.html`${this.isAsync()
       ? await this.render(this.props)
       : this.render(this.props)
     }`
 
-    const child = tmp.firstElementChild
-    const parent = component.el.parentNode
-    parent.replaceChild(child, component.el)
-    component.el = child
+    const el = tmp.firstElementChild
+    this.el.parentNode.replaceChild(el, this.el)
+    this.el = el
   }
 
   dispatch (e) {
@@ -75,17 +72,14 @@ class Tonic {
     return this.render[Symbol.toStringTag] === 'AsyncFunction'
   }
 
-  async insert (el, pos = 'beforeend') {
-    this.isAsync() ? (await this.attach(el, pos)) : this.attach(el, pos)
-  }
-
-  async attach (el, pos) {
-    const s = this.html`${this.isAsync()
+  async attach (el) {
+    const tmp = document.createElement('tmp')
+    tmp.innerHTML = this.html`${this.isAsync()
       ? await this.render(this.props)
       : this.render(this.props)
     }`
 
-    pos ? el.insertAdjacentHTML(pos, s) : (el.innerHTML = s)
+    el.insertAdjacentElement('beforeend', tmp.firstElementChild)
 
     const ids = [...document.body.querySelectorAll('[data-componentid]')]
 

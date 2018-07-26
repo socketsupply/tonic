@@ -124,8 +124,8 @@ class BoxContainer extends Tonic {
 
   <i>//
   // Render will return a string. It can be an <b>async</b> function,
-  // if it is, it can be awaited (don't forget to <b>await</b> attach
-  // or insert).
+  // if it is, it can be awaited (don't forget to <b>await</b> the
+  // <b>attach</b> method).
   //</i>
   render (props) {
     return `
@@ -145,7 +145,7 @@ class BoxContainer extends Tonic {
 // to any node at any time.
 //</i>
 const container = new BoxContainer({ n: 100 })
-container.insert(document.body)</code>
+container.attach(document.body)</code>
 
 </pre>
 

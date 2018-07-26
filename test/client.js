@@ -41,7 +41,7 @@ test('async render and attach', async t => {
   t.end()
 })
 
-test('async render and insert', async t => {
+test('async render and attach', async t => {
   document.body.innerHTML = ''
 
   class Div extends Tonic {
@@ -52,7 +52,7 @@ test('async render and insert', async t => {
   }
 
   const root = new Div()
-  await root.insert(document.body)
+  await root.attach(document.body)
 
   const div = document.querySelector('div')
   t.ok(div, 'a div was created and attached')
@@ -69,7 +69,7 @@ test('setProps', async t => {
   }
 
   const root = new Div({ number: 1 })
-  root.insert(document.body)
+  root.attach(document.body)
 
   let d1 = document.querySelector('div')
   t.equal(d1.innerHTML, '1', 'div contained the correct value')
