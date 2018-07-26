@@ -1,6 +1,6 @@
 {
   "name": "tonic",
-  "version": "2.0.0",
+  "version": "2.0.1",
   "description": "A composable component inspired by React.",
   "main": "events.js",
   "scripts": {
@@ -15,8 +15,5 @@
     "browserify": "^16.2.2",
     "tape": "^4.9.1",
     "tape-run": "^4.0.0"
-  },
-  "dependencies": {
-    "he": "^1.1.1"
   }
 }
