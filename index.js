@@ -1,11 +1,13 @@
-const he = require('he')
-
 class Tonic {
   constructor (props = {}, state = {}) {
     this.props = props
     this.state = state
     this.componentid = Tonic.createid(2)
     Tonic.registry[this.componentid] = this
+    this._escapeRe = /["&'<>`]/g
+    this._escapeMap = {
+      '"': '&quot;', '&': '&amp;', '\'': '&#x27;', '<': '&lt;', '>': '&gt;', '`': '&#x60;'
+    }
   }
 
   static match (el, s) {
@@ -29,7 +31,8 @@ class Tonic {
   }
 
   html ([s, ...strings], ...values) {
-    const reducer = (a, b) => a.concat(b, he.escape(strings.shift()))
+    const escape = s => s.replace(this._escapeRe, ch => this._escapeMap[ch])
+    const reducer = (a, b) => a.concat(b, escape(strings.shift()))
     const filter = s => s && (s !== true || s === 0)
     return values.reduce(reducer, [s]).filter(filter).join('')
   }
@@ -86,14 +89,14 @@ class Tonic {
 
     const ids = [...document.body.querySelectorAll('[data-componentid]')]
 
-    ids.forEach(c => {
+    for (const c of ids) {
       const component = Tonic.registry[c.dataset.componentid]
       component.el = c
       if (component && component.mount && !component.mounted) {
         component.mount(c)
         component.mounted = true
       }
-    })
+    }
 
     if (Tonic.bound) return
     Tonic.bound = true
@@ -106,4 +109,4 @@ class Tonic {
 }
 
 Tonic.registry = {}
-module.exports = Tonic
+if (typeof module === 'object') module.exports = Tonic
