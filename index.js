@@ -72,14 +72,14 @@ class Tonic {
     return this.render[Symbol.toStringTag] === 'AsyncFunction'
   }
 
-  async attach (el) {
+  async attach (el, placement) {
     const tmp = document.createElement('tmp')
     tmp.innerHTML = this.html`${this.isAsync()
       ? await this.render(this.props)
       : this.render(this.props)
     }`
 
-    el.insertAdjacentElement('beforeend', tmp.firstElementChild)
+    el.insertAdjacentElement(placement || 'beforeend', tmp.firstElementChild)
 
     const ids = [...document.body.querySelectorAll('[data-componentid]')]
 
