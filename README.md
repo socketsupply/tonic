@@ -1,7 +1,7 @@
 ![tonic](https://github.com/hxoht/tonic/raw/addimage/readme-tonic.png)
 
 # SYNOPSIS
-A minimalist composable component inspired by React, based on Web Components.
+A minimalist component library inspired by React, based on Web Components.
 
 # GOALS
 - Quickly read and understand the whole codebase; `~100` lines.
@@ -17,6 +17,11 @@ not the right tool. In these cases you should either A. update some
 specific dom nodes directly or B. use a graphics/animation engine. The
 one-way-everywhere approach might make some code easy to reason about,
 but it ends up being a performance compromise with added complexity.
+- "Isomorphic" components add a huge amount of unwanted complexity to a
+component library. I don't send html from a server very often. My html
+pages are pretty static and served by a cdn. Otherwise, I'm creating
+electron apps for the decentralized web. This may be a deal breaker for
+some people doing more traditional client-server development.
 - JSX
 - Magic
 
