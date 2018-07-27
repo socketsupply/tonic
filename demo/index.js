@@ -1,65 +1,80 @@
 const Tonic = require('..')
 
-class Box extends Tonic {
+class ChildComponent extends Tonic {
   constructor (props) {
     super(props)
 
-    this.style = `
-      border: 1px dotted #666;
-      height: 100px;
-      width: 100px;
-      margin: 20px auto;
-      line-height: 90px;
+    this.stylesheet = `
+      <style>
+        div {
+          display: inline-block;
+          border: 1px dotted #666;
+          height: 100px;
+          width: 100px;
+          line-height: 90px;
+        }
+      </style>
     `
   }
 
   mouseover (e) {
     const r = Math.random().toString(16).slice(2, 8)
-    e.target.style.backgroundColor = r
+    const div = this.shadowRoot.querySelector('div')
+    div.style.backgroundColor = r
   }
 
   mouseout (e) {
-    e.target.style.backgroundColor = 'fff'
+    const div = this.shadowRoot.querySelector('div')
+    div.style.backgroundColor = 'fff'
   }
 
-  render (props) {
-    return `
-      <div ${this.id} style="${this.style}">
-        Box (${props.n})
+  render () {
+    return this.stylesheet + this.html`
+      <div>
+        Child (${this.props.number})
       </div>
     `
   }
 }
 
-const box = new Box()
-
-class Container extends Tonic {
+class ParentComponent extends Tonic {
   constructor (props) {
     super(props)
 
-    this.style = `
-      user-select: none;
-      border: 1px solid #999;
-      height: 200px;
-      width: 200px;
-      padding: 20px;
-      margin: auto;
-      text-align: center;
+    this.stylesheet = `
+      <style>
+        :host {
+          display: inline-block;
+        }
+        .parent {
+          display: inline-block;
+          user-select: none;
+          border: 1px solid #999;
+          height: 200px;
+          width: 200px;
+          padding: 20px;
+          margin: auto;
+          text-align: center;
+        }
+      </style>
     `
   }
 
   click (e) {
-    box.setProps({ n: Math.random().toString(16).slice(2, 4) })
+    this.setProps({ number: Math.random().toString(16).slice(2, 4) })
   }
 
   render (props) {
-    return `
-      <div ${this.id} style="${this.style}">
-        Box Container ${box.render(props)}
+    return this.stylesheet + this.html`
+      <div class="parent">
+        Parent
+        <child-component number="${this.props.number}"/>
       </div>
     `
   }
 }
 
-const container = new Container({ n: '0f' })
-container.attach(document.querySelector('#demo'))
+Tonic.add(ChildComponent, { shadow: true })
+Tonic.add(ParentComponent)
+
+document.querySelector('#demo').innerHTML = `<parent-component/>`

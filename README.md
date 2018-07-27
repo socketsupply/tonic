@@ -1,15 +1,15 @@
 ![tonic](https://github.com/hxoht/tonic/raw/addimage/readme-tonic.png)
 
 # SYNOPSIS
-A minimalist [composable component][A] inspired by React.
+A minimalist composable component inspired by React, based on Web Components.
 
 # GOALS
 - Quickly read and understand the whole codebase; `~100` lines.
 - React-like component composition.
 - One-way binding; pipe data though connected components.
 - Single source event dispatch; no event rebinding needed.
-- Routing agnostic (not all UIs are intended to run in a browser).
-- Server and client side rendering.
+- Bring your own Routers, Reducers, Validators, etc.
+- True encapsulation via standard web technology.
 
 # NON-GOALS
 - When re-rendering performance is *truly* important, a virtual dom is
@@ -33,50 +33,8 @@ Import the component constructor.
 const Tonic = require('tonic')
 ```
 
-An (incomplete) example.
-
 ```js
-class Box extends Tonic {
-  //
-  // You can listen to any dom event by creating a method with
-  // the corresponding name. The method will receive the plain
-  // old Javascript event object.
-  //
-  mouseover (e) {
-    e.target.style.backgroundColor = '#aaa'
-  }
-
-  // 
-  // You can test if the element that was clicked matches a
-  // selector by using the Tonic.match() method.
-  //
-  mouseout (e) {
-    if (!Tonic.match(e.target, '.box')) return
-
-    e.target.style.backgroundColor = '#fff'
-  }
-
-  //
-  // Render must return one root element (which can contain as
-  // many elements as you want). The root must have ${this.id}
-  // if you want to listen to dom or lifecycle events.
-  //
-  render (props) {
-    return `
-      <div ${this.id} class="box">
-        Box (${props.n})
-      </div>
-    `
-  }
-}
-
-const box = new Box()
-```
-
-A component that will contain the `box` component.
-
-```js
-class BoxContainer extends Tonic {
+class ChildComponent extends Tonic {
   //
   // A constructor is not required.
   //
@@ -86,85 +44,49 @@ class BoxContainer extends Tonic {
     //
     // One way of adding styles (check the render function
     // for how it's used). Since it's just a string it could
-    // be rendered into a style tag and could even be read-in
-    // from a separate file.
+    // be read-in from a separate file at compile-time.
     //
-    this.style = `
-      border: 1px solid blue;
-      height: 200px;
-      width: 200px;
+    this.stylesheet = `
+      <style>
+        div {
+          display: inline-block;
+          border: 1px dotted #666;
+          height: 100px;
+          width: 100px;
+          line-height: 90px;
+        }
+      </style>
     `
   }
 
   //
-  // The mount event is fired once the root element is attached
-  // to the dom.
+  // You can listen to any dom event by creating a method with
+  // the corresponding name. The method will receive the plain
+  // old Javascript event object.
   //
-  mount (el) {
-    console.log('mounted!')
+  mouseover (e) {
+    e.target.style.backgroundColor = someRandomColor
   }
 
-  click (e) {
-    //
-    // Set state on a component instance or on this instance,
-    // .setProps() will cause a downward cascade of re-rendering.
-    //
-    box.setProps({ n: someRandomNumber })
+  mouseout (e) {
+    e.target.style.backgroundColor = '#fff'
   }
 
   //
-  // Render will return a string. It can be an async function,
-  // if it is, it can be awaited (don't forget to await attach
-  // or insert).
+  // The render function should return a string. This could
+  // come from an external file or it can be a string of html.
   //
-  render (props) {
+  render () {
     return `
-      <div ${this.id} style="${this.style}">
-        Box Container ${box.render(props)}
+      <div class="child">
+        Child ${this.props.value}
       </div>
     `
   }
 }
 ```
 
-## WORKING BETWEEN COMPONENTS
-Sometimes you want an instance of a component to tell another one what to do.
-You can use `Tonic.find` to to test arbitrary properties and find the one you're
-looking for.
+# MORE DOCS
+Visit [this][0] page.
 
-```js
-class A extends Tonic {
-  constructor (props) {
-    super(props)
-    this.name = 'A'
-  }
-}
-
-class B extends Tonic {
-  someMethod () {
-    const component = Tonic.find(c => c.name === 'A')
-    component.setProps({})
-  }
-}
-```
-
-## CLIENT SIDE RENDERING
-The root component can be attached to any node.
-
-```js
-const container = new BoxContainer({ n: 100 })
-container.attach(document.body)
-```
-
-## SERVER SIDE RENDERING
-The render method returns a string.
-
-```js
-http.createServer((req, res) => {
-  const container = new BoxContainer({ n: 100 })
-  res.end(container.render())
-})
-```
-
-[A]:https://hxoht.github.io/tonic/
-[0]:https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Template_literals
+[0]:https://hxoht.github.io/tonic/

@@ -34,6 +34,10 @@ main {
   font: 16px 'Inconsolata', monospace;
 }
 
+#demo {
+  text-align: center;
+}
+
 .col {
   width: 50%;
   display: table-cell;

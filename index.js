@@ -1,13 +1,17 @@
-class Tonic {
-  constructor (props = {}, state = {}) {
-    this.props = props
-    this.state = state
-    this.componentid = Tonic.createid(2)
-    Tonic.registry[this.componentid] = this
-    this._escapeRe = /["&'<>`]/g
-    this._escapeMap = {
-      '"': '&quot;', '&': '&amp;', '\'': '&#x27;', '<': '&lt;', '>': '&gt;', '`': '&#x60;'
+class Tonic extends window.HTMLElement {
+  constructor () {
+    super()
+    this.state = {}
+    if (this.shadow) {
+      this.attachShadow({ mode: 'open' })
     }
+    this.bindEventListeners()
+  }
+
+  bindEventListeners () {
+    this.events.forEach(event => {
+      this.addEventListener(event, e => this[event](e))
+    })
   }
 
   static match (el, s) {
@@ -18,89 +22,60 @@ class Tonic {
     return el.matches(s) ? el : el.closest(s)
   }
 
-  static createid (s = 2, e) {
-    return Math.random().toString(16).slice(s, e)
-  }
+  static add (c, opts = {}) {
+    const name = c.name.match(/[A-Z][a-z]+/g).join('-').toLowerCase()
+    const methods = Object.getOwnPropertyNames(c.prototype)
+    c.prototype.events = []
+    if (opts.shadow) c.prototype.shadow = true
 
-  static find (cmp) {
-    return Object.values(Tonic.registry).find(cmp)
-  }
-
-  get id () {
-    return `data-componentid="${this.componentid}"`
-  }
-
-  html ([s, ...strings], ...values) {
-    const escape = s => s.replace(this._escapeRe, ch => this._escapeMap[ch])
-    const reducer = (a, b) => a.concat(b, escape(strings.shift()))
-    const filter = s => s && (s !== true || s === 0)
-    return values.reduce(reducer, [s]).filter(filter).join('')
-  }
-
-  setProps (o) {
-    this.props = o
-    this.rerender()
-  }
-
-  async rerender () {
-    const tmp = document.createElement('tmp')
-    tmp.innerHTML = this.html`${this.isAsync()
-      ? await this.render(this.props)
-      : this.render(this.props)
-    }`
-
-    const el = tmp.firstElementChild
-    this.el.parentNode.replaceChild(el, this.el)
-    this.el = el
-  }
-
-  dispatch (e) {
-    let el = e.target
-
-    while (true) {
-      el = Tonic.match(el, `[data-componentid]`)
-      if (!el) break
-
-      const component = Tonic.registry[el.dataset.componentid]
-      if (component && component[e.type]) component[e.type](e)
-
-      el = el.parentNode
-    }
-  }
-
-  isAsync () {
-    return this.render[Symbol.toStringTag] === 'AsyncFunction'
-  }
-
-  async attach (el, placement) {
-    const tmp = document.createElement('tmp')
-    tmp.innerHTML = this.html`${this.isAsync()
-      ? await this.render(this.props)
-      : this.render(this.props)
-    }`
-
-    el.insertAdjacentElement(placement || 'beforeend', tmp.firstElementChild)
-
-    const ids = [...document.body.querySelectorAll('[data-componentid]')]
-
-    for (const c of ids) {
-      const component = Tonic.registry[c.dataset.componentid]
-      component.el = c
-      if (component && component.mount && !component.mounted) {
-        component.mount(c)
-        component.mounted = true
+    for (const key in this.prototype) {
+      const k = key.slice(2)
+      if (methods.includes(k)) {
+        c.prototype.events.push(k)
       }
     }
 
-    if (Tonic.bound) return
-    Tonic.bound = true
+    if (window.customElements.get(name)) return
+    window.customElements.define(name, c)
+  }
 
-    for (const key in document.body) {
-      if (key.search('on') !== 0) continue
-      document.body.addEventListener(key.slice(2), e => this.dispatch(e))
+  static sanitize (o) {
+    for (const [k, v] of Object.entries(o)) {
+      if (typeof v === 'object') o[k] = Tonic.sanitize(v)
+      if (typeof v === 'string') o[k] = Tonic.escape(v)
     }
+    return o
+  }
+
+  static escape (s) {
+    return s.replace(Tonic.escapeRe, ch => Tonic.escapeMap[ch])
+  }
+
+  setProps (o) {
+    this.props = Tonic.sanitize(typeof o === 'function' ? o(this.props) : o)
+    this.el.innerHTML = this.render()
+  }
+
+  html ([s, ...strings], ...values) {
+    const reducer = (a, b) => a.concat(b, strings.shift())
+    const filter = s => s && (s !== true || s === 0)
+    return Tonic.sanitize(values).reduce(reducer, [s]).filter(filter).join('')
+  }
+
+  connectedCallback () {
+    this.props = {}
+    for (const attr of this.attributes) {
+      this.props[attr.name] = attr.value
+    }
+    this.el = (this.shadowRoot || this)
+    this.el.innerHTML = this.render()
+    this.mount && this.mount()
   }
 }
 
-Tonic.registry = {}
+Tonic.escapeRe = /["&'<>`]/g
+Tonic.escapeMap = {
+  '"': '&quot;', '&': '&amp;', '\'': '&#x27;', '<': '&lt;', '>': '&gt;', '`': '&#x60;'
+}
+
 if (typeof module === 'object') module.exports = Tonic

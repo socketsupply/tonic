@@ -27,58 +27,16 @@
           </div>
           <div class="col">
             <ul>
+              <li>Based on standard web technologies; Web Components.</li>
               <li>Evented, single source dispatch. No event rebinding.</li>
-              <li>Routing agnostic (not all UIs are intended to run in a browser).</li>
-              <li>Async or sync, server and client side rendering.</li>           
+              <li>Bring your own Routers, Reducers, Validators, etc.</li>
             </ul>
           </div>
         </div>
 
-        <p class="center">An (incomplete) example component.</p>
+        <p class="center">Example components.</p>
         <pre><code>
-class Box extends Tonic {
-  <i>//
-  // You can listen to any dom event by creating a method with
-  // the corresponding name. The method will receive the plain
-  // old Javascript event object.
-  //</i>
-  mouseover (e) {
-    e.target.style.backgroundColor = someRandomColor
-  }
-
-  <i>// 
-  // If you wanted, you could test if the event target
-  // clicked matches a selector by using <b>Tonic.match()</b>.
-  //</i>
-  mouseout (e) {
-    if (!Tonic.match(e.target, '.box')) return
-
-    e.target.style.backgroundColor = '#fff'
-  }
-
-  <i>//
-  // Render <b>must return one root element</b> (which can contain as
-  // many elements as you want). The root must have <b>${this.id}</b>
-  // if you want to listen to dom or lifecycle events.
-  //</i>
-  render (props) {
-    return `
-      &lt;div ${this.id} class="box"&gt; 
-        Box (${props.n})
-      &lt;/div&gt;
-    `
-  }
-}
-
-const box = new Box()</code>
-
-</pre>
-
-        <p class="center">
-          Another component that uses the instance of the <b>box</b> component.
-        </p>
-        <pre><code>
-class BoxContainer extends Tonic {
+class ChildComponent extends Tonic {
   <i>//
   // A constructor is not required.
   //</i>
@@ -88,19 +46,59 @@ class BoxContainer extends Tonic {
     <i>//
     // One way of adding styles (check the render function
     // for how it's used). Since it's just a string it could
-    // be rendered into a style tag and could even be read-in
-    // from a separate file.
+    // be read-in from a separate file at compile-time.
     //</i>
-    this.style = `
-      border: 1px solid blue;
-      height: 200px;
-      width: 200px;
+    this.stylesheet = `
+      &lt;style&gt;
+        div {
+          display: inline-block;
+          border: 1px dotted #666;
+          height: 100px;
+          width: 100px;
+          line-height: 90px;
+        }
+      &lt;/style&gt;
     `
   }
 
   <i>//
-  // The <b>mount</b> event is fired once the root element is attached
-  // to the dom.
+  // You can listen to any dom event by creating a method with
+  // the corresponding name. The method will receive the plain
+  // old Javascript event object.
+  //</i>
+  mouseover (e) {
+    e.target.style.backgroundColor = someRandomColor
+  }
+
+  mouseout (e) {
+    e.target.style.backgroundColor = '#fff'
+  }
+
+  <i>//
+  // The render function should return a string. This could
+  // come from an external file or it can be a string of html.
+  //</i>
+  render () {
+    return `
+      &lt;div class="child"&gt; 
+        Child ${this.props.value}
+      &lt;/div&gt;
+    `
+  }
+}
+
+</code>
+</pre>
+
+        <p class="center">
+          A <b>parent</b> component that uses the <b>child</b> component.
+        </p>
+        <pre><code>
+class ParentComponent extends Tonic {
+  <i>//
+  // The <b>mount</b> event is fired once the root element is
+  // attached to the dom. You can also use any of the web
+  // component lifecycle events.
   //</i>
   mount (el) {
     console.log('Mounted! The dom node is ready to use.')
@@ -108,7 +106,9 @@ class BoxContainer extends Tonic {
 
   <i>//
   // The <b>root dom node</b> of the component can be accessed from
-  // <b>this.el</b> after the component has been mounted.
+  // <b>this.el</b> after the component has been mounted. If you have
+  // created the component with a shadow dom, this will be the
+  // shadow root.
   //</i>
   show () {
     this.el.classList.add('show')
@@ -118,19 +118,20 @@ class BoxContainer extends Tonic {
     <i>//
     // Set state on a component instance or on this instance,
     // <b>setProps()</b> will cause a downward cascade of re-rendering.
+    // Set props can also accept a function that will provide the
+    // current props as an argument.
     //</i>
-    box.setProps({ n: someRandomString })
+    this.setProps({ value: someRandomValue })
   }
 
   <i>//
-  // Render will return a string. It can be an <b>async</b> function,
-  // if it is, it can be awaited (don't forget to <b>await</b> the
-  // <b>attach</b> method).
+  // <b>this.html</b> template tag makes it easy to escape values.
   //</i>
-  render (props) {
-    return `
-      &lt;div ${this.id} style="${this.style}"&gt;
-        Box Container ${box.render(props)}
+  render () {
+    return this.html`
+      &lt;div class=&quot;parent&quot;&gt;
+        Parent
+        &lt;child-component value="7a"/&gt;
       &lt;/div&gt;
     `
   }
@@ -138,33 +139,32 @@ class BoxContainer extends Tonic {
 
 </pre>
 
-        <p class="center">Components can be attached to any node.</p>
+        <p class="center">Components can be used anywhere in your html.</p>
         <pre><code>
 <i>//
-// Your app may create and attach one or more components
-// to any node at any time.
+// Register your components before using them. If you specify the
+// "shadow" option, your components will render into a shadow dom.
 //</i>
-const container = new BoxContainer({ n: 100 })
-container.attach(document.body)</code>
+Tonic.add(ChildComponent, { shadow: true })
+Tonic.add(ParentComponent)
+
+document.querySelector('#demo').innerHTML = `&lt;parent-component/&gt;`
+</code>
 
 </pre>
 
         <p class="center">Demo (click and hover).</p>
         <div id="demo"></div>
 
-        <p class="center">Rendering from a server.</p>
-        <pre><code>
-http.createServer((req, res) => {
-  const container = new BoxContainer({ n: 100 })
-  res.end(container.render())
-})</code>
-
-</pre>
-
         <p class="center">Questions &amp; Answers.</p>
         <pre><code>
 <b>Q. Is this a framework?</b>
 A. No. But it can be used with one.
+
+<b>Q. What about server rendering?</b>
+A. I don't send html from a server very often. My html
+   pages are usually static and served by a cdn or I'm
+   creating electron apps for the decentralized web.
 
 <b>Q. My framework has modules, what about those?</b>
 A. Why not use something who's singular purpose is to
