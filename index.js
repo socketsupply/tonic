@@ -4,13 +4,7 @@ class Tonic extends window.HTMLElement {
     this.props = {}
     this.state = {}
     if (this.shadow) this.attachShadow({ mode: 'open' })
-    this.bindEventListeners()
-  }
-
-  bindEventListeners () {
-    this.events.forEach(event => {
-      this.addEventListener(event, e => this[event](e))
-    })
+    this._bindEventListeners()
   }
 
   static match (el, s) {
@@ -72,7 +66,22 @@ class Tonic extends window.HTMLElement {
   setProps (o) {
     this.props = Tonic.sanitize(typeof o === 'function' ? o(this.props) : o)
     if (!this.root) throw new Error('Component not yet connected')
-    this.root.innerHTML = this.render()
+    this._setContent(this.render())
+  }
+
+  _bindEventListeners () {
+    this.events.forEach(event => {
+      this.addEventListener(event, e => this[event](e))
+    })
+  }
+
+  _setContent (content) {
+    if (typeof content === 'string') {
+      this.root.innerHTML = content
+    } else {
+      while (this.root.firstChild) this.root.firstChild.remove()
+      this.root.appendChild(content)
+    }
   }
 
   connectedCallback () {
@@ -83,7 +92,7 @@ class Tonic extends window.HTMLElement {
     }
     this.root = (this.shadowRoot || this)
     this.props = Tonic.sanitize(this.props)
-    this.root.innerHTML = this.render()
+    this._setContent(this.render())
     this.connected && this.connected()
   }
 }
