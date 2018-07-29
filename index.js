@@ -90,7 +90,7 @@ class Tonic extends window.HTMLElement {
   connectedCallback () {
     for (let { name, value } of this.attributes) {
       if (name === 'id') this.setAttribute('id', value)
-      if (name === 'data') value = JSON.parse(value)
+      if (name === 'data') try { value = JSON.parse(value) } catch (e) {}
       this.props[name] = value
     }
     this.root = (this.shadowRoot || this)
