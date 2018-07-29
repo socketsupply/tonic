@@ -94,14 +94,6 @@ class ChildComponent extends Tonic {
 
 # API
 
-## INSTANCE METHODS
-
-| Method | Description |
-| :--- | :--- |
-| setProps(Object) | Set the properties of a component instance. |
-| render() | Returns html to be parsed or a dom node that will overwrite. There is usually no need to call this directly, prefer `componentInstance.setProps({ ... })`. |
-| html\`...\` | Tidy up an html string (use as a [tagged template][2]). |
-
 ## STATIC METHODS
 
 | Method | Description |
@@ -111,7 +103,15 @@ class ChildComponent extends Tonic {
 | sanitize(Object) | Escapes all the strings found in an object literal. |
 | match(Node, Selector) | Match the given node against a selector or any matching parent of the given node. This is useful when trying to locate a node from the actual node that was interacted with. |
 
-## LIFECYCLE METHODS
+## INSTANCE METHODS
+
+| Method | Description |
+| :--- | :--- |
+| setProps(Object) | Set the properties of a component instance. |
+| render() | Returns html to be parsed or a dom node that will overwrite. There is usually no need to call this directly, prefer `componentInstance.setProps({ ... })`. |
+| html\`...\` | Tidy up an html string (use as a [tagged template][2]). |
+
+## "LIFECYCLE" INSTANCE METHODS
 
 The standard "[reactions][1]" (aka lifecycle methods) are available on every
 component.
