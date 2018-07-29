@@ -84,7 +84,7 @@ class ChildComponent extends Tonic {
   // old string, so it can be composed any way you want.
   //</i>
   render () {
-    return this.stylesheet + this.html`
+    return `
       &lt;div class="child"&gt; 
         Child ${this.props.value}
       &lt;/div&gt;
