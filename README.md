@@ -17,8 +17,8 @@ not the right tool. In these cases you should either A. update some
 specific dom nodes directly or B. use a graphics/animation engine. The
 one-way-everywhere approach might make some code easy to reason about,
 but it ends up being a performance compromise with added complexity.
-- "Isomorphic" components add a huge amount of unwanted complexity to a
-component library. I don't send html from a server very often. My html
+- "Isomorphic" components add a huge amount of complexity to a component
+library. I don't send html from a server very often. My html
 pages are pretty static and served by a cdn. Otherwise, I'm creating
 electron apps for the decentralized web. This may be a deal breaker for
 some people doing more traditional client-server development.
@@ -38,6 +38,7 @@ Import the component constructor.
 const Tonic = require('tonic')
 ```
 
+# EXAMPLE
 ```js
 class ChildComponent extends Tonic {
   //
@@ -91,7 +92,19 @@ class ChildComponent extends Tonic {
 }
 ```
 
+# LIFECYCLE METHODS
+The standard "[reactions][1]" (aka lifecycle methods) are available on every
+component.
+| Method | Description |
+|:---|:---|
+| constructor | An instance of the element is created or upgraded. Useful for initializing state, settings up event listeners, or creating shadow dom. See the spec for restrictions on what you can do in the constructor. |
+| connected | Called every time the element is inserted into the DOM. Useful for running setup code, such as fetching resources or rendering. Generally, you should try to delay work until this time. |
+| disconnected | Called every time the element is removed from the DOM. Useful for running clean up code. |
+| attributeChanged(attrName, oldVal, newVal) | Called when an observed attribute has been added, removed, updated, or replaced. Also called for initial values when an element is created by the parser, or upgraded. Note: only attributes listed in the observedAttributes property will receive this callback. |
+| adopted | The custom element has been moved into a new document (e.g. someone called document.adoptNode(el)). |
+
 # MORE DOCS
 Visit [this][0] page.
 
 [0]:https://hxoht.github.io/tonic/
+[1]:https://developers.google.com/web/fundamentals/web-components/customelements

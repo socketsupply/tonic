@@ -70,16 +70,22 @@ class ChildComponent extends Tonic {
     e.target.style.backgroundColor = someRandomColor
   }
 
+  <i>//
+  // The <b>root dom node</b> of the component can be accessed
+  // from <b>this.root</b> or <b>this.shadowRoot</b> if you have added
+  // a shadow dom to your component.
+  //</i>
   mouseout (e) {
-    e.target.style.backgroundColor = '#fff'
+    const div = this.shadowRoot.querySelector('div')
+    div.style.backgroundColor = '#fff'
   }
 
   <i>//
-  // The render function should return a string. This could
-  // come from an external file or it can be a string of html.
+  // The render function should return a string. It's a plain
+  // old string, so it can be composed any way you want.
   //</i>
   render () {
-    return `
+    return this.stylesheet + this.html`
       &lt;div class="child"&gt; 
         Child ${this.props.value}
       &lt;/div&gt;
@@ -96,32 +102,33 @@ class ChildComponent extends Tonic {
         <pre><code>
 class ParentComponent extends Tonic {
   <i>//
-  // The <b>mount</b> event is fired once the root element is
+  // The <b>connected</b> event is fired once the root element is
   // attached to the dom. You can also use any of the web
   // component lifecycle events.
   //</i>
-  mount (el) {
+  connected (el) {
     console.log('Mounted! The dom node is ready to use.')
   }
 
-  <i>//
-  // The <b>root dom node</b> of the component can be accessed from
-  // <b>this.el</b> after the component has been mounted. If you have
-  // created the component with a shadow dom, this will be the
-  // shadow root.
-  //</i>
-  show () {
-    this.el.classList.add('show')
+  getRandomValue () {
+    return Math.random().toString(16).slice(2, 8)
   }
 
   click (e) {
     <i>//
+    // Often you'll want to check <b>what</b> element in the component
+    // was clicked. Try <b><a href="https://developer.mozilla.org/en-US/docs/Web/API/Element/matches">Element.matches()</a></b>, <b><a href="https://developer.mozilla.org/en-US/docs/Web/API/Element/closest">Element.closest()</a></b>,
+    // and <b>Tonic.match()</b> (try to match the given selector or find
+    // the closest match).
+    //</i>
+    if (!e.target.matches('.parent')) return
+    <i>//
     // Set state on a component instance or on this instance,
     // <b>setProps()</b> will cause a downward cascade of re-rendering.
-    // Set props can also accept a function that will provide the
-    // current props as an argument.
+    // Set props can also accept a function that will provide
+    // the current props as an argument.
     //</i>
-    this.setProps({ value: someRandomValue })
+    this.setProps({ value: this.getRandomValue() })
   }
 
   <i>//
@@ -131,7 +138,8 @@ class ParentComponent extends Tonic {
     return this.html`
       &lt;div class=&quot;parent&quot;&gt;
         Parent
-        &lt;child-component value="7a"/&gt;
+        &lt;child-component value=${this.props.value}&gt;
+        &lt;/child-component&gt;
       &lt;/div&gt;
     `
   }
@@ -139,7 +147,7 @@ class ParentComponent extends Tonic {
 
 </pre>
 
-        <p class="center">Components can be used anywhere in your html.</p>
+        <p class="center">Register your components to use them anywhere.</p>
         <pre><code>
 <i>//
 // Register your components before using them. If you specify the
@@ -147,10 +155,36 @@ class ParentComponent extends Tonic {
 //</i>
 Tonic.add(ChildComponent, { shadow: true })
 Tonic.add(ParentComponent)
-
-document.querySelector('#demo').innerHTML = `&lt;parent-component/&gt;`
 </code>
+</pre>
 
+        <p class="center">Add components to your html, pass them data.</p>
+<pre><code>
+<i>//
+// Web components can not be "self-closing". They also must
+// be two or more words. For example, <b>ParentComponent</b>
+// instead of <b>Parent</b>.
+//</i>
+const someNode = document.querySelector('#demo')
+
+someNode.innerHTML = `
+  &lt;parent-component value="7a"&gt;
+  &lt;/parent-component&gt;
+`
+
+<i>//
+// Native HTML only understands strings. If you want to pass
+// non-string props, from the HTML you need to first stringify
+// them.
+//</i>
+`&lt;parent-component id="parent" value=${JSON.stringify(data)}&gt;
+&lt;/parent-component&gt;`
+
+<i>//
+// Alternatively, you can call the method on the element.
+//</i>
+document.getElementById('parent').setProps(data)
+</code>
 </pre>
 
         <p class="center">Demo (click and hover).</p>

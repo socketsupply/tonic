@@ -1,10 +1,9 @@
 class Tonic extends window.HTMLElement {
   constructor () {
     super()
+    this.props = {}
     this.state = {}
-    if (this.shadow) {
-      this.attachShadow({ mode: 'open' })
-    }
+    if (this.shadow) this.attachShadow({ mode: 'open' })
     this.bindEventListeners()
   }
 
@@ -23,7 +22,9 @@ class Tonic extends window.HTMLElement {
   }
 
   static add (c, opts = {}) {
-    const name = c.name.match(/[A-Z][a-z]+/g).join('-').toLowerCase()
+    const name = c.name.match(/[A-Z][a-z]*/g).join('-').toLowerCase()
+    if (window.customElements.get(name)) return
+
     const methods = Object.getOwnPropertyNames(c.prototype)
     c.prototype.events = []
     if (opts.shadow) c.prototype.shadow = true
@@ -35,7 +36,6 @@ class Tonic extends window.HTMLElement {
       }
     }
 
-    if (window.customElements.get(name)) return
     window.customElements.define(name, c)
   }
 
@@ -51,25 +51,40 @@ class Tonic extends window.HTMLElement {
     return s.replace(Tonic.escapeRe, ch => Tonic.escapeMap[ch])
   }
 
-  setProps (o) {
-    this.props = Tonic.sanitize(typeof o === 'function' ? o(this.props) : o)
-    this.el.innerHTML = this.render()
-  }
-
   html ([s, ...strings], ...values) {
     const reducer = (a, b) => a.concat(b, strings.shift())
     const filter = s => s && (s !== true || s === 0)
     return Tonic.sanitize(values).reduce(reducer, [s]).filter(filter).join('')
   }
 
+  disconnectedCallback (...args) {
+    this.disconnected && this.disconnected(...args)
+  }
+
+  attributesChangedCallback (...args) {
+    this.attributeChanged && this.attributeChanged(...args)
+  }
+
+  adoptedCallback (...args) {
+    this.adopted && this.adopted(...args)
+  }
+
+  setProps (o) {
+    this.props = Tonic.sanitize(typeof o === 'function' ? o(this.props) : o)
+    if (!this.root) throw new Error('Component not yet connected')
+    this.root.innerHTML = this.render()
+  }
+
   connectedCallback () {
-    this.props = {}
-    for (const attr of this.attributes) {
-      this.props[attr.name] = attr.value
+    for (let { name, value } of this.attributes) {
+      if (name === 'id') this.setAttribute('id', value)
+      try { value = JSON.parse(value) } catch (e) {}
+      this.props[name] = value
     }
-    this.el = (this.shadowRoot || this)
-    this.el.innerHTML = this.render()
-    this.mount && this.mount()
+    this.root = (this.shadowRoot || this)
+    this.props = Tonic.sanitize(this.props)
+    this.root.innerHTML = this.render()
+    this.connected && this.connected()
   }
 }
 

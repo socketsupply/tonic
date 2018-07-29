@@ -11,6 +11,7 @@ class ChildComponent extends Tonic {
           border: 1px dotted #666;
           height: 100px;
           width: 100px;
+          margin-top: 15px;
           line-height: 90px;
         }
       </style>
@@ -31,7 +32,7 @@ class ChildComponent extends Tonic {
   render () {
     return this.stylesheet + this.html`
       <div>
-        Child (${this.props.number})
+        Child ${this.props.number}
       </div>
     `
   }
@@ -61,6 +62,7 @@ class ParentComponent extends Tonic {
   }
 
   click (e) {
+    if (!e.target.matches('.parent')) return
     this.setProps({ number: Math.random().toString(16).slice(2, 4) })
   }
 
@@ -68,7 +70,8 @@ class ParentComponent extends Tonic {
     return this.stylesheet + this.html`
       <div class="parent">
         Parent
-        <child-component number="${this.props.number}"/>
+        <child-component number=${this.props.number}>
+        </child-component>
       </div>
     `
   }
