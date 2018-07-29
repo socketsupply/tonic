@@ -95,6 +95,7 @@ class Tonic extends window.HTMLElement {
     }
     this.root = (this.shadowRoot || this)
     this.props = Tonic.sanitize(this.props)
+    this.willConnect && this.willConnect()
     this.root.appendChild(this._setContent(this.render()))
     this.connected && this.connected()
 
