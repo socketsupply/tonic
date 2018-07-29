@@ -40,7 +40,7 @@ const Tonic = require('tonic')
 
 # EXAMPLE
 ```js
-class ChildComponent extends Tonic {
+class ExampleComponent extends Tonic {
   //
   // A constructor is not required.
   //
@@ -50,7 +50,9 @@ class ChildComponent extends Tonic {
     //
     // One way of adding styles (check the render function
     // for how it's used). Since it's just a string it could
-    // be read-in from a separate file at compile-time.
+    // be read-in from a separate file at compile-time. Your
+    // style will "private" and won't affect any other part
+    // of the page. No prefix hacks or monkey patching.
     //
     this.stylesheet = `
       <style>
@@ -67,29 +69,33 @@ class ChildComponent extends Tonic {
 
   //
   // You can listen to any dom event by creating a method with
-  // the corresponding name. The method will receive the plain
-  // old Javascript event object.
+  // the corresponding name. The method will only fire for this
+  // component. You receive the plain old Javascript event object.
   //
   mouseover (e) {
-    e.target.style.backgroundColor = someRandomColor
+    e.target.style.backgroundColor = '#666'
   }
 
-  mouseout (e) {
-    e.target.style.backgroundColor = '#fff'
+  mouseout ({ target }) {
+    target.style.backgroundColor = '#fff'
   }
 
   //
-  // The render function should return a string. This could
-  // come from an external file or it can be a string of html.
+  // The render function should return a string or dom node.
   //
   render () {
     return `
-      <div class="child">
-        Child ${this.props.value}
+      <div class="example">
+        ${this.props.value}
       </div>
     `
   }
 }
+
+Tonic.add(ExampleComponent)
+document.body.innerHTML = `
+  <example-component value="Hello, World">
+  </example-component>
 ```
 
 # API
