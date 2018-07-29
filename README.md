@@ -90,9 +90,14 @@ class ExampleComponent extends Tonic {
 }
 
 Tonic.add(ExampleComponent)
+
+//
+// The tag-name is automatically registered and based on the class name.
+//
 document.body.innerHTML = `
   <example-component value="Hello, World">
   </example-component>
+`
 ```
 
 # API
