@@ -175,9 +175,10 @@ someNode.innerHTML = `
 <i>//
 // Native HTML only understands strings. If you want to pass
 // non-string props, from the HTML you need to first stringify
-// them.
+// them. The "data" attribute is special and will automatically
+// be parsed into json for you.
 //</i>
-`&lt;parent-component id="parent" value=${JSON.stringify(data)}&gt;
+`&lt;parent-component id="parent" data=${JSON.stringify(data)}&gt;
 &lt;/parent-component&gt;`
 
 <i>//
