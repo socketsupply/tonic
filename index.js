@@ -66,7 +66,7 @@ class Tonic extends window.HTMLElement {
   setProps (o) {
     this.props = Tonic.sanitize(typeof o === 'function' ? o(this.props) : o)
     if (!this.root) throw new Error('Component not yet connected')
-    this._setContent(this.render())
+    this.root.appendChild(this._setContent(this.render()))
   }
 
   _bindEventListeners () {
@@ -76,12 +76,15 @@ class Tonic extends window.HTMLElement {
   }
 
   _setContent (content) {
+    while (this.root.firstChild) this.root.firstChild.remove()
+    let node = content
     if (typeof content === 'string') {
-      this.root.innerHTML = content
-    } else {
-      while (this.root.firstChild) this.root.firstChild.remove()
-      this.root.appendChild(content)
+      const tmp = document.createElement('tmp')
+      tmp.innerHTML = content
+      node = tmp.firstElementChild
     }
+    if (this.styleNode) node.appendChild(this.styleNode)
+    return node
   }
 
   connectedCallback () {
@@ -92,14 +95,18 @@ class Tonic extends window.HTMLElement {
     }
     this.root = (this.shadowRoot || this)
     this.props = Tonic.sanitize(this.props)
-    this._setContent(this.render())
+    this.root.appendChild(this._setContent(this.render()))
     this.connected && this.connected()
+
+    if (this.stylesheet) {
+      const style = document.createElement('style')
+      style.textContent = this.stylesheet
+      this.styleNode = this.root.appendChild(style)
+    }
   }
 }
 
 Tonic.escapeRe = /["&'<>`]/g
-Tonic.escapeMap = {
-  '"': '&quot;', '&': '&amp;', '\'': '&#x27;', '<': '&lt;', '>': '&gt;', '`': '&#x60;'
-}
+Tonic.escapeMap = { '"': '&quot;', '&': '&amp;', '\'': '&#x27;', '<': '&lt;', '>': '&gt;', '`': '&#x60;' }
 
 if (typeof module === 'object') module.exports = Tonic

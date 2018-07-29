@@ -107,6 +107,28 @@ test('fail to connect before setProps', t => {
   }
 })
 
+test('stylesheet', t => {
+  document.body.innerHTML = ''
+  class ComponentF extends Tonic {
+    constructor () {
+      super()
+      this.stylesheet = `
+        div {
+          color: red;
+        }
+      `
+    }
+    render () {
+      return `<div></div>`
+    }
+  }
+
+  Tonic.add(ComponentF)
+  const c = document.createElement('component-f')
+  document.body.appendChild(c)
+  t.end()
+})
+
 test('cleanup, ensure exist', t => {
   t.end()
   process.exit(0)

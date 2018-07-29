@@ -5,16 +5,14 @@ class ChildComponent extends Tonic {
     super(props)
 
     this.stylesheet = `
-      <style>
-        div {
-          display: inline-block;
-          border: 1px dotted #666;
-          height: 100px;
-          width: 100px;
-          margin-top: 15px;
-          line-height: 90px;
-        }
-      </style>
+      div {
+        display: inline-block;
+        border: 1px dotted #666;
+        height: 100px;
+        width: 100px;
+        margin-top: 15px;
+        line-height: 90px;
+      }
     `
   }
 
@@ -30,7 +28,7 @@ class ChildComponent extends Tonic {
   }
 
   render () {
-    return this.stylesheet + this.html`
+    return this.html`
       <div>
         Child ${this.props.number}
       </div>
@@ -43,21 +41,19 @@ class ParentComponent extends Tonic {
     super(props)
 
     this.stylesheet = `
-      <style>
-        :host {
-          display: inline-block;
-        }
-        .parent {
-          display: inline-block;
-          user-select: none;
-          border: 1px solid #999;
-          height: 200px;
-          width: 200px;
-          padding: 20px;
-          margin: auto;
-          text-align: center;
-        }
-      </style>
+      :host {
+        display: inline-block;
+      }
+      .parent {
+        display: inline-block;
+        user-select: none;
+        border: 1px solid #999;
+        height: 200px;
+        width: 200px;
+        padding: 20px;
+        margin: auto;
+        text-align: center;
+      }
     `
   }
 
@@ -67,7 +63,7 @@ class ParentComponent extends Tonic {
   }
 
   render (props) {
-    return this.stylesheet + this.html`
+    return this.html`
       <div class="parent">
         Parent
         <child-component number=${this.props.number}>

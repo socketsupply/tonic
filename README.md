@@ -48,22 +48,19 @@ class ExampleComponent extends Tonic {
     super(props)
 
     //
-    // One way of adding styles (check the render function
-    // for how it's used). Since it's just a string it could
-    // be read-in from a separate file at compile-time. Your
-    // style will "private" and won't affect any other part
+    // CSS can be be read-in from a separate file, created by a
+    // preprocessor at compile-time. Or use your fav CSS-in-JS.
+    // Your style will "private" and won't affect any other part
     // of the page. No prefix hacks or monkey patching.
     //
     this.stylesheet = `
-      <style>
-        div {
-          display: inline-block;
-          border: 1px dotted #666;
-          height: 100px;
-          width: 100px;
-          line-height: 90px;
-        }
-      </style>
+      div {
+        display: inline-block;
+        border: 1px dotted #666;
+        height: 100px;
+        width: 100px;
+        line-height: 90px;
+      }
     `
   }
 

@@ -6,16 +6,14 @@ class ChildComponent extends Tonic {
     super(props)
 
     this.stylesheet = `
-      <style>
-        div {
-          display: inline-block;
-          border: 1px dotted #666;
-          height: 100px;
-          width: 100px;
-          margin-top: 15px;
-          line-height: 90px;
-        }
-      </style>
+      div {
+        display: inline-block;
+        border: 1px dotted #666;
+        height: 100px;
+        width: 100px;
+        margin-top: 15px;
+        line-height: 90px;
+      }
     `
   }
 
@@ -31,7 +29,7 @@ class ChildComponent extends Tonic {
   }
 
   render () {
-    return this.stylesheet + this.html`
+    return this.html`
       <div>
         Child ${this.props.number}
       </div>
@@ -44,21 +42,19 @@ class ParentComponent extends Tonic {
     super(props)
 
     this.stylesheet = `
-      <style>
-        :host {
-          display: inline-block;
-        }
-        .parent {
-          display: inline-block;
-          user-select: none;
-          border: 1px solid #999;
-          height: 200px;
-          width: 200px;
-          padding: 20px;
-          margin: auto;
-          text-align: center;
-        }
-      </style>
+      :host {
+        display: inline-block;
+      }
+      .parent {
+        display: inline-block;
+        user-select: none;
+        border: 1px solid #999;
+        height: 200px;
+        width: 200px;
+        padding: 20px;
+        margin: auto;
+        text-align: center;
+      }
     `
   }
 
@@ -68,7 +64,7 @@ class ParentComponent extends Tonic {
   }
 
   render (props) {
-    return this.stylesheet + this.html`
+    return this.html`
       <div class="parent">
         Parent
         <child-component number=${this.props.number}>
@@ -90,13 +86,7 @@ class Tonic extends window.HTMLElement {
     this.props = {}
     this.state = {}
     if (this.shadow) this.attachShadow({ mode: 'open' })
-    this.bindEventListeners()
-  }
-
-  bindEventListeners () {
-    this.events.forEach(event => {
-      this.addEventListener(event, e => this[event](e))
-    })
+    this._bindEventListeners()
   }
 
   static match (el, s) {
@@ -158,26 +148,50 @@ class Tonic extends window.HTMLElement {
   setProps (o) {
     this.props = Tonic.sanitize(typeof o === 'function' ? o(this.props) : o)
     if (!this.root) throw new Error('Component not yet connected')
-    this.root.innerHTML = this.render()
+    this.root.appendChild(this._setContent(this.render()))
+  }
+
+  _bindEventListeners () {
+    this.events.forEach(event => {
+      this.addEventListener(event, e => this[event](e))
+    })
+  }
+
+  _setContent (content) {
+    // if (this.styleNode) this.root.parentNode.removeChild(this.styleNode)
+    while (this.root.firstChild) this.root.firstChild.remove()
+    let node = content
+    if (typeof content === 'string') {
+      const tmp = document.createElement('tmp')
+      tmp.innerHTML = content
+      node = tmp.firstElementChild
+    }
+    console.log('>>>', node)
+    if (this.styleNode) node.appendChild(this.styleNode)
+    return node
   }
 
   connectedCallback () {
     for (let { name, value } of this.attributes) {
       if (name === 'id') this.setAttribute('id', value)
-      try { value = JSON.parse(value) } catch (e) {}
+      if (name === 'data') value = JSON.parse(value)
       this.props[name] = value
     }
     this.root = (this.shadowRoot || this)
     this.props = Tonic.sanitize(this.props)
-    this.root.innerHTML = this.render()
+    this.root.appendChild(this._setContent(this.render()))
     this.connected && this.connected()
+
+    if (this.stylesheet) {
+      const style = document.createElement('style')
+      style.textContent = this.stylesheet
+      this.styleNode = this.root.appendChild(style)
+    }
   }
 }
 
 Tonic.escapeRe = /["&'<>`]/g
-Tonic.escapeMap = {
-  '"': '&quot;', '&': '&amp;', '\'': '&#x27;', '<': '&lt;', '>': '&gt;', '`': '&#x60;'
-}
+Tonic.escapeMap = { '"': '&quot;', '&': '&amp;', '\'': '&#x27;', '<': '&lt;', '>': '&gt;', '`': '&#x60;' }
 
 if (typeof module === 'object') module.exports = Tonic
 
