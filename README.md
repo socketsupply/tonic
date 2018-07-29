@@ -48,10 +48,10 @@ class ExampleComponent extends Tonic {
     super(props)
 
     //
-    // CSS can be be read-in from a separate file, created by a
-    // preprocessor at compile-time. Or use your fav CSS-in-JS.
-    // Your style will "private" and won't affect any other part
-    // of the page. No prefix hacks or monkey patching.
+    // CSS can be be read-in from a separate file, compiled by a
+    // or you can use your fav CSS-in-JS solution. Either way,
+    // your style will "private" and won't affect any other part
+    // of the page. No prefix hacks or monkey patching needed.
     //
     this.stylesheet = `
       div {
