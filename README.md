@@ -93,10 +93,12 @@ class ChildComponent extends Tonic {
 ```
 
 # LIFECYCLE METHODS
+
 The standard "[reactions][1]" (aka lifecycle methods) are available on every
 component.
+
 | Method | Description |
-|:---|:---|
+| :--- | :--- |
 | constructor | An instance of the element is created or upgraded. Useful for initializing state, settings up event listeners, or creating shadow dom. See the spec for restrictions on what you can do in the constructor. |
 | connected | Called every time the element is inserted into the DOM. Useful for running setup code, such as fetching resources or rendering. Generally, you should try to delay work until this time. |
 | disconnected | Called every time the element is removed from the DOM. Useful for running clean up code. |
