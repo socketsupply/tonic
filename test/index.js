@@ -28,6 +28,7 @@ test('pass props', t => {
   Tonic.add(class ComponentB extends Tonic {
     willConnect () {
       this.setAttribute('id', this.props.id)
+      t.ok(this.props.testItem, 'automatically camelcase props')
     }
     render () {
       return `<div>${this.props.data.message}</div>`
@@ -40,6 +41,7 @@ test('pass props', t => {
 
     <component-b
       id="x"
+      test-item="true"
       data=${JSON.stringify(d)}>
     </component-b>
 
@@ -65,7 +67,10 @@ test('get element by id and set properties via the api', t => {
   Tonic.add(ComponentC)
 
   document.body.innerHTML = `
-    <component-c id="test" number=1></component-c>
+    <component-c
+      id="test"
+      number=1>
+    </component-c>
   `
 
   const div = document.getElementById('test')
