@@ -26,6 +26,9 @@ test('attach to dom', t => {
 
 test('pass props', t => {
   Tonic.add(class ComponentB extends Tonic {
+    willConnect () {
+      this.setAttribute('id', this.props.id)
+    }
     render () {
       return `<div>${this.props.data.message}</div>`
     }
@@ -51,6 +54,9 @@ test('pass props', t => {
 
 test('get element by id and set properties via the api', t => {
   class ComponentC extends Tonic {
+    wellConnect () {
+      this.setAttribute('id', this.props.id)
+    }
     render () {
       return `<div>${this.props.number}</div>`
     }

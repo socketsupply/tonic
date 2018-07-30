@@ -21,7 +21,6 @@ class Tonic extends window.HTMLElement {
 
     const methods = Object.getOwnPropertyNames(c.prototype)
     c.prototype.events = []
-    if (opts.shadow) c.prototype.shadow = true
 
     for (const key in this.prototype) {
       const k = key.slice(2)
@@ -30,6 +29,7 @@ class Tonic extends window.HTMLElement {
       }
     }
 
+    if (opts.shadow) c.prototype.shadow = true
     window.customElements.define(name, c)
   }
 
@@ -88,11 +88,12 @@ class Tonic extends window.HTMLElement {
   }
 
   connectedCallback () {
-    for (let { name, value } of this.attributes) {
-      if (name === 'id') this.setAttribute('id', value)
-      if (name === 'data') try { value = JSON.parse(value) } catch (e) {}
-      this.props[name] = value
+    for (let { name, value } of this.attributes) this.props[name] = value
+
+    if (this.props.data) {
+      try { this.props.data = JSON.parse(this.props.data) } catch (e) {}
     }
+
     this.root = (this.shadowRoot || this)
     this.props = Tonic.sanitize(this.props)
     this.willConnect && this.willConnect()
