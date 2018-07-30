@@ -193,21 +193,32 @@ document.getElementById('parent').setProps(data)
         <div id="demo"></div>
 
         <p class="center">
-          Prerendering.
+          Prerendering and returning dom nodes to the render function..
         </p>
 <pre><code>
 class AnotherComponent extends Tonic {
-  prerender () {
+  constructor () {
+    super()
+
     <i>//
-    // Using either the dom api or html you can
-    // create a structure that can be reused by the
-    // <b>render</b> method.
+    // If you have lots of structure, but only a few
+    // changes, you could prerender your layout to create
+    // a reusable node and pass it to the <b>render</b> method.
+    // This structure could also come from a &lt;template&gt;
+    // tag which would also improve performance.
     //</i>
-    const div = document.createElement('div')
-    div.classList.add('foobar')
-    this.template = div
+    this.template = document.createElement('div')
   }
 
+  connected () {
+    <i>//
+    // Target and update a few nodes directly.
+    //</i>
+  }
+
+  <i>//
+  // Render will automatically deep-clone this node for you.
+  //</i>
   render () {
     return this.template
   }
