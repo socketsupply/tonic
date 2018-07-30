@@ -77,12 +77,16 @@ class Tonic extends window.HTMLElement {
 
   _setContent (content) {
     while (this.root.firstChild) this.root.firstChild.remove()
-    let node = content
+    let node = null
+
     if (typeof content === 'string') {
       const tmp = document.createElement('tmp')
       tmp.innerHTML = content
       node = tmp.firstElementChild
+    } else {
+      node = content.cloneNode(true)
     }
+
     if (this.styleNode) node.appendChild(this.styleNode)
     return node
   }

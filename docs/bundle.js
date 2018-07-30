@@ -103,7 +103,6 @@ class Tonic extends window.HTMLElement {
 
     const methods = Object.getOwnPropertyNames(c.prototype)
     c.prototype.events = []
-    if (opts.shadow) c.prototype.shadow = true
 
     for (const key in this.prototype) {
       const k = key.slice(2)
@@ -112,6 +111,7 @@ class Tonic extends window.HTMLElement {
       }
     }
 
+    if (opts.shadow) c.prototype.shadow = true
     window.customElements.define(name, c)
   }
 
@@ -158,27 +158,31 @@ class Tonic extends window.HTMLElement {
   }
 
   _setContent (content) {
-    // if (this.styleNode) this.root.parentNode.removeChild(this.styleNode)
     while (this.root.firstChild) this.root.firstChild.remove()
-    let node = content
+    let node = null
+
     if (typeof content === 'string') {
       const tmp = document.createElement('tmp')
       tmp.innerHTML = content
       node = tmp.firstElementChild
+    } else {
+      node = content.cloneNode(true)
     }
-    console.log('>>>', node)
+
     if (this.styleNode) node.appendChild(this.styleNode)
     return node
   }
 
   connectedCallback () {
-    for (let { name, value } of this.attributes) {
-      if (name === 'id') this.setAttribute('id', value)
-      if (name === 'data') value = JSON.parse(value)
-      this.props[name] = value
+    for (const { name, value } of this.attributes) this.props[name] = value
+
+    if (this.props.data) {
+      try { this.props.data = JSON.parse(this.props.data) } catch (e) {}
     }
+
     this.root = (this.shadowRoot || this)
     this.props = Tonic.sanitize(this.props)
+    this.willConnect && this.willConnect()
     this.root.appendChild(this._setContent(this.render()))
     this.connected && this.connected()
 

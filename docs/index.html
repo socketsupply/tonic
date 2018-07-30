@@ -192,6 +192,30 @@ document.getElementById('parent').setProps(data)
         <p class="center">Demo (click and hover).</p>
         <div id="demo"></div>
 
+        <p class="center">
+          Prerendering.
+        </p>
+<pre><code>
+class AnotherComponent extends Tonic {
+  prerender () {
+    <i>//
+    // Using either the dom api or html you can
+    // create a structure that can be reused by the
+    // <b>render</b> method.
+    //</i>
+    const div = document.createElement('div')
+    div.classList.add('foobar')
+    this.template = div
+  }
+
+  render () {
+    return this.template
+  }
+}</code>
+
+</pre>
+
+
         <p class="center">Questions &amp; Answers.</p>
         <pre><code>
 <b>Q. Is this a framework?</b>
