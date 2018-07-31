@@ -122,15 +122,15 @@ document.body.innerHTML = `
 ## "LIFECYCLE" INSTANCE METHODS
 
 The standard "[reactions][1]" (aka lifecycle methods) are available on every
-component.
+component (as well as a few others).
 
 | Method | Description |
 | :--- | :--- |
 | constructor() | An instance of the element is created or upgraded. Useful for initializing state, settings up event listeners, or creating shadow dom. See the spec for restrictions on what you can do in the constructor. |
 | willConnect() | Called prior to the element being inserted into the DOM. Useful for updating configuration, state and preparing for the render. |
 | connected() | Called every time the element is inserted into the DOM. Useful for running setup code, such as fetching resources or rendering. Generally, you should try to delay work until this time. |
-| disconnected | Called every time the element is removed from the DOM. Useful for running clean up code. |
-| updated(oldProps) | Called every time the props are updated. This method is not called on the initial render. |
+| disconnected() | Called every time the element is removed from the DOM. Useful for running clean up code. |
+| updated(oldProps) | Called after setProps() is called. This method is not called on the initial render. |
 | attributeChanged(attrName, oldVal, newVal) | Called when an observed attribute has been added, removed, updated, or replaced. Also called for initial values when an element is created by the parser, or upgraded. Note: only attributes listed in the observedAttributes property will receive this callback. |
 | adopted() | The custom element has been moved into a new document (e.g. someone called document.adoptNode(el)). |
 
