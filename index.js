@@ -3,6 +3,7 @@ class Tonic extends window.HTMLElement {
     super()
     this.props = {}
     this.state = {}
+    this.on = this.addEventListener
     if (this.shadow) this.attachShadow({ mode: 'open' })
     this._bindEventListeners()
   }
@@ -67,6 +68,7 @@ class Tonic extends window.HTMLElement {
     this.props = Tonic.sanitize(typeof o === 'function' ? o(this.props) : o)
     if (!this.root) throw new Error('Component not yet connected')
     this.root.appendChild(this._setContent(this.render()))
+    this.updated && this.updated()
   }
 
   _bindEventListeners () {
