@@ -65,7 +65,7 @@ class Tonic extends window.HTMLElement {
   }
 
   setProps (o) {
-    const oldProps = JSON.parse(JSON.stringify(o))
+    const oldProps = JSON.parse(JSON.stringify(this.props))
     this.props = Tonic.sanitize(typeof o === 'function' ? o(this.props) : o)
     if (!this.root) throw new Error('Component not yet connected')
     this.root.appendChild(this._setContent(this.render()))
