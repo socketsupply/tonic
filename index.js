@@ -3,7 +3,6 @@ class Tonic extends window.HTMLElement {
     super()
     this.props = {}
     this.state = {}
-    this.on = this.addEventListener
     if (this.shadow) this.attachShadow({ mode: 'open' })
     this._bindEventListeners()
   }
@@ -74,7 +73,9 @@ class Tonic extends window.HTMLElement {
 
   _bindEventListeners () {
     this.events.forEach(event => {
-      (this.shadowRoot || this).addEventListener(event, e => this[event](e))
+      const fn = e => this[event](e)
+      this.addEventListener(event, fn)
+      this.shadowRoot && this.shadowRoot.addEventListener(event, fn)
     })
   }
 
