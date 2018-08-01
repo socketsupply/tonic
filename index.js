@@ -98,7 +98,7 @@ class Tonic extends window.HTMLElement {
   connectedCallback () {
     for (let { name, value } of this.attributes) {
       name = name.replace(/-(.)/gui, (_, m) => m.toUpperCase())
-      this.props[name] = value
+      this.props[name] = value || name
     }
 
     if (this.props.data) {

@@ -28,6 +28,7 @@ test('pass props', t => {
   Tonic.add(class ComponentB extends Tonic {
     willConnect () {
       this.setAttribute('id', this.props.id)
+      t.ok(this.props.disabled, 'disabled')
       t.ok(this.props.testItem, 'automatically camelcase props')
     }
     render () {
@@ -42,6 +43,7 @@ test('pass props', t => {
     <component-b
       id="x"
       test-item="true"
+      disabled
       data=${JSON.stringify(d)}>
     </component-b>
 
