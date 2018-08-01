@@ -85,6 +85,7 @@ class Tonic extends window.HTMLElement {
     super()
     this.props = {}
     this.state = {}
+    this.on = this.addEventListener
     if (this.shadow) this.attachShadow({ mode: 'open' })
     this._bindEventListeners()
   }
@@ -146,14 +147,16 @@ class Tonic extends window.HTMLElement {
   }
 
   setProps (o) {
+    const oldProps = JSON.parse(JSON.stringify(this.props))
     this.props = Tonic.sanitize(typeof o === 'function' ? o(this.props) : o)
     if (!this.root) throw new Error('Component not yet connected')
     this.root.appendChild(this._setContent(this.render()))
+    this.updated && this.updated(oldProps)
   }
 
   _bindEventListeners () {
     this.events.forEach(event => {
-      this.addEventListener(event, e => this[event](e))
+      (this.shadowRoot || this).addEventListener(event, e => this[event](e))
     })
   }
 
@@ -174,7 +177,10 @@ class Tonic extends window.HTMLElement {
   }
 
   connectedCallback () {
-    for (const { name, value } of this.attributes) this.props[name] = value
+    for (let { name, value } of this.attributes) {
+      name = name.replace(/-(.)/gui, (_, m) => m.toUpperCase())
+      this.props[name] = value
+    }
 
     if (this.props.data) {
       try { this.props.data = JSON.parse(this.props.data) } catch (e) {}
