@@ -74,8 +74,9 @@ class Tonic extends window.HTMLElement {
   _bindEventListeners () {
     this.events.forEach(event => {
       const fn = e => this[event](e)
-      this.addEventListener(event, fn)
-      this.shadowRoot && this.shadowRoot.addEventListener(event, fn)
+      this.shadowRoot
+        ? this.shadowRoot.addEventListener(event, fn)
+        : this.addEventListener(event, fn)
     })
   }
 
