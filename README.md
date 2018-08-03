@@ -26,8 +26,6 @@ some people doing more traditional client-server development.
 - Magic
 
 # USAGE
-Install using npm, yarn, etc.
-
 ```bash
 npm install hxoht/tonic
 ```
@@ -41,18 +39,9 @@ const Tonic = require('tonic')
 # EXAMPLE
 ```js
 class ExampleComponent extends Tonic {
-  //
-  // A constructor is not required.
-  //
   constructor (props) {
     super(props)
 
-    //
-    // CSS can be be read-in from a separate file, compiled by a
-    // or you can use your fav CSS-in-JS solution. Either way,
-    // your style will "private" and won't affect any other part
-    // of the page. No prefix hacks or monkey patching needed.
-    //
     this.stylesheet = `
       div {
         display: inline-block;
@@ -64,11 +53,6 @@ class ExampleComponent extends Tonic {
     `
   }
 
-  //
-  // You can listen to any dom event by creating a method with
-  // the corresponding name. The method will only fire for this
-  // component. You receive the plain old Javascript event object.
-  //
   mouseover (e) {
     e.target.style.backgroundColor = '#666'
   }
@@ -77,9 +61,6 @@ class ExampleComponent extends Tonic {
     target.style.backgroundColor = '#fff'
   }
 
-  //
-  // The render function should return a string or dom node.
-  //
   render () {
     return `
       <div class="example">
@@ -91,9 +72,6 @@ class ExampleComponent extends Tonic {
 
 Tonic.add(ExampleComponent)
 
-//
-// The tag-name is automatically registered and based on the class name.
-//
 document.body.innerHTML = `
   <example-component value="Hello, World">
   </example-component>
@@ -133,6 +111,42 @@ component (as well as a few others).
 | updated(oldProps) | Called after setProps() is called. This method is not called on the initial render. |
 | attributeChanged(attrName, oldVal, newVal) | Called when an observed attribute has been added, removed, updated, or replaced. Also called for initial values when an element is created by the parser, or upgraded. Note: only attributes listed in the observedAttributes property will receive this callback. |
 | adopted() | The custom element has been moved into a new document (e.g. someone called document.adoptNode(el)). |
+
+# EVENT MODEL
+Events that do not normally propagate from the shadow DOM to the standard DOM
+will still call your event methods.
+
+# TROUBLE SHOOTING
+
+### Class Name Mangling
+If you are using Uglify (or something similar), it will mangle your class names.
+To fix this, just pass the `keep_fnames` option babel-minify has something
+similar.
+
+```js
+  new UglifyJsPlugin({
+    uglifyOptions: {
+      keep_fnames: true
+    },
+    extractComments: true,
+    parallel: true
+  })
+```
+
+### Babel Transpiler Issues
+Built-in classes such as Date, Array, DOM etc cannot be properly subclassed due
+to limitations in ES5. This babel plugin will usually fix this problem.
+
+```js
+{
+  test: /\.js$/,
+  exclude: /node_modules/,
+  loader: 'babel-loader',
+  query: {
+    presets: [['env', { exclude: ['transform-es2015-classes'] }]]
+  }
+}
+```
 
 ## MORE DOCS AND EXAMPLES
 Visit [this][0] demo page for more information.

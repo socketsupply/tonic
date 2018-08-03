@@ -16,6 +16,7 @@ class Tonic extends window.HTMLElement {
   }
 
   static add (c, opts = {}) {
+    if (!c.name) throw Error('Mangling detected, see troubleshooting guide.')
     const name = c.name.match(/[A-Z][a-z]*/g).join('-').toLowerCase()
     if (window.customElements.get(name)) return
 
