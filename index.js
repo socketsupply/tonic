@@ -30,7 +30,7 @@ class Tonic {
 
   static _constructTags (tagName) {
     for (const node of document.getElementsByTagName(tagName.toLowerCase())) {
-      if (!node.destroy) continue
+      if (node.destroy) continue
       const t = new Tonic.registry[tagName](node)
       if (!t) throw Error('Unable to construct component, see guide.')
     }
