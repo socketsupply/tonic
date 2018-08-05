@@ -1,37 +1,57 @@
-class Tonic extends window.HTMLElement {
-  constructor () {
-    super()
+class Tonic {
+  constructor (node) {
     this.props = {}
     this.state = {}
-    if (this.shadow) this.attachShadow({ mode: 'open' })
+    const name = Tonic._splitName(this.constructor.name)
+    this.root = node || document.createElement(name.toLowerCase())
+    Tonic.refs.push(this.root)
+    this.root.destroy = index => this._disconnect(index)
+    this.root.setProps = v => this.setProps(v)
+    this.root.setState = v => this.setState(v)
     this._bindEventListeners()
+    this._connect()
   }
 
   static match (el, s) {
-    while (!el.matches) {
-      el = el.parentNode
-      if (el.tagName === 'HTML') return null
-    }
+    if (!el.matches) el = el.parentElement
     return el.matches(s) ? el : el.closest(s)
   }
 
-  static add (c, opts = {}) {
-    if (!c.name) throw Error('Mangling detected, see troubleshooting guide.')
-    const name = c.name.match(/[A-Z][a-z]*/g).join('-').toLowerCase()
-    if (window.customElements.get(name)) return
+  static add (c) {
+    c.prototype._props = Object.getOwnPropertyNames(c.prototype)
+    if (!c.name) throw Error('Mangling detected, see guide.')
 
-    const methods = Object.getOwnPropertyNames(c.prototype)
-    c.prototype.events = []
+    const name = Tonic._splitName(c.name).toUpperCase()
+    Tonic.registry[name] = c
+    if (c.registered) throw new Error(`Already registered ${c.name}`)
+    c.registered = true
+    Tonic._constructTags(document.body, name)
+  }
 
-    for (const key in this.prototype) {
-      const k = key.slice(2)
-      if (methods.includes(k)) {
-        c.prototype.events.push(k)
+  static _constructTags (root, tagName) {
+    const construct = (node, name) => {
+      if (Tonic.registry[name] && !node.destroy) {
+        return new Tonic.registry[name](node)
       }
     }
 
-    if (opts.shadow) c.prototype.shadow = true
-    window.customElements.define(name, c)
+    construct(root, tagName)
+    const it = document.createNodeIterator(root, window.NodeFilter.SHOW_ELEMENT)
+
+    while (true) {
+      const node = it.nextNode()
+      if (!node) break
+      if (Tonic.registry[node.tagName]) construct(node, node.tagName)
+    }
+  }
+
+  static _scopeCSS (s, tagName) {
+    return s.split('\n').map(line => {
+      if (!line.includes('{')) return line
+      const parts = line.split('{').map(s => s.trim())
+      const selector = parts[0].split(',').map(p => `${tagName} ${p}`).join(', ')
+      return `${selector} { ${parts[1]}`
+    }).join('\n')
   }
 
   static sanitize (o) {
@@ -46,38 +66,33 @@ class Tonic extends window.HTMLElement {
     return s.replace(Tonic.escapeRe, ch => Tonic.escapeMap[ch])
   }
 
+  static _splitName (s) {
+    return s.match(/[A-Z][a-z]*/g).join('-')
+  }
+
   html ([s, ...strings], ...values) {
     const reducer = (a, b) => a.concat(b, strings.shift())
     const filter = s => s && (s !== true || s === 0)
     return Tonic.sanitize(values).reduce(reducer, [s]).filter(filter).join('')
   }
 
-  disconnectedCallback (...args) {
-    this.disconnected && this.disconnected(...args)
-  }
-
-  attributesChangedCallback (...args) {
-    this.attributeChanged && this.attributeChanged(...args)
-  }
-
-  adoptedCallback (...args) {
-    this.adopted && this.adopted(...args)
+  setState (o) {
+    this.state = typeof o === 'function' ? o(this.state) : o
   }
 
   setProps (o) {
     const oldProps = JSON.parse(JSON.stringify(this.props))
     this.props = Tonic.sanitize(typeof o === 'function' ? o(this.props) : o)
-    if (!this.root) throw new Error('Component not yet connected')
     this.root.appendChild(this._setContent(this.render()))
     this.updated && this.updated(oldProps)
   }
 
   _bindEventListeners () {
-    this.events.forEach(event => {
-      const fn = e => this[event](e, e.path[0] || e.target)
-      this.shadowRoot.addEventListener(event, e => !e.composed && fn(e))
-      this.addEventListener(event, fn)
-    })
+    const hp = Object.getOwnPropertyNames(window.HTMLElement.prototype)
+    for (const p of this._props) {
+      if (hp.indexOf('on' + p) !== 0) continue
+      this.root.addEventListener(p, e => this[p](e))
+    }
   }
 
   _setContent (content) {
@@ -92,12 +107,15 @@ class Tonic extends window.HTMLElement {
       node = content.cloneNode(true)
     }
 
-    if (this.styleNode) node.appendChild(this.styleNode)
+    Tonic._constructTags(node)
+
+    if (this.styleNode) node.insertAdjacentElement('afterbegin', this.styleNode)
+    Tonic.refs.forEach((e, i) => !e.parentNode && e.destroy(i))
     return node
   }
 
-  connectedCallback () {
-    for (let { name, value } of this.attributes) {
+  _connect () {
+    for (let { name, value } of this.root.attributes) {
       name = name.replace(/-(.)/gui, (_, m) => m.toUpperCase())
       this.props[name] = value || name
     }
@@ -106,20 +124,30 @@ class Tonic extends window.HTMLElement {
       try { this.props.data = JSON.parse(this.props.data) } catch (e) {}
     }
 
-    this.root = (this.shadowRoot || this)
     this.props = Tonic.sanitize(this.props)
     this.willConnect && this.willConnect()
     this.root.appendChild(this._setContent(this.render()))
-    this.connected && this.connected()
 
-    if (this.stylesheet) {
-      const style = document.createElement('style')
-      style.textContent = this.stylesheet
-      this.styleNode = this.root.appendChild(style)
+    const styles = this.style && this.style()
+
+    if (styles && !this.styleNode) {
+      const style = this.styleNode = document.createElement('style')
+      style.textContent = Tonic._scopeCSS(styles, this.root.tagName.toLowerCase())
+      this.root.insertAdjacentElement('afterbegin', style)
     }
+    this.connected && this.connected()
+  }
+
+  _disconnect (index) {
+    this.disconnected && this.disconnected()
+    delete this.styleNode
+    delete this.root
+    Tonic.refs.splice(index, 1)
   }
 }
 
+Tonic.refs = []
+Tonic.registry = {}
 Tonic.escapeRe = /["&'<>`]/g
 Tonic.escapeMap = { '"': '&quot;', '&': '&amp;', '\'': '&#x27;', '<': '&lt;', '>': '&gt;', '`': '&#x60;' }
 
