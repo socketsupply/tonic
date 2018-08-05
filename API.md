@@ -26,7 +26,7 @@ component (as well as a few others).
 
 | Method | Description |
 | :--- | :--- |
-| `constructor()` | An instance of the element is created or upgraded. Useful for initializing state, settings up event listeners, or creating shadow dom. See the spec for restrictions on what you can do in the constructor. |
+| `constructor(props)` | An instance of the element is created or upgraded. Useful for initializing state, settings up event listeners, or creating shadow dom. See the spec for restrictions on what you can do in the constructor. A constructor must call `super(props)`. |
 | `willConnect()` | Called prior to the element being inserted into the DOM. Useful for updating configuration, state and preparing for the render. |
 | `connected()` | Called every time the element is inserted into the DOM. Useful for running setup code, such as fetching resources or rendering. Generally, you should try to delay work until this time. |
 | `disconnected()` | Called every time the element is removed from the DOM. Useful for running clean up code. |
