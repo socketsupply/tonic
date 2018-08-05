@@ -25,7 +25,7 @@ class Tonic {
     Tonic.registry[name] = c
     if (c.registered) throw new Error(`Already registered ${c.name}`)
     c.registered = true
-    Tonic._constructTags(document.body, name)
+    Tonic._constructTags(name)
   }
 
   static _constructTags (tagName) {
@@ -98,7 +98,7 @@ class Tonic {
       node = content.cloneNode(true)
     }
 
-    Tonic._constructTags(node)
+    Tonic._constructTags(node.tagName)
 
     if (this.styleNode) node.insertAdjacentElement('afterbegin', this.styleNode)
     Tonic.refs.forEach((e, i) => !e.parentNode && e.destroy(i))
