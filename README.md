@@ -26,14 +26,10 @@ some people doing more traditional client-server development.
 - Magic
 
 # USAGE
-You can find an `api` doc [here][0], and a trouble shooting guide [here][1].
+You can find an api doc [here][0], and a trouble shooting guide [here][1].
 
 ```bash
 npm install hxoht/tonic
-```
-
-```js
-const Tonic = require('tonic')
 ```
 
 # EXAMPLE
