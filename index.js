@@ -28,20 +28,11 @@ class Tonic {
     Tonic._constructTags(document.body, name)
   }
 
-  static _constructTags (root, tagName) {
-    const construct = (node, name) => {
-      if (Tonic.registry[name] && !node.destroy) {
-        return new Tonic.registry[name](node)
-      }
-    }
-
-    construct(root, tagName)
-    const it = document.createNodeIterator(root, window.NodeFilter.SHOW_ELEMENT)
-
-    while (true) {
-      const node = it.nextNode()
-      if (!node) break
-      if (Tonic.registry[node.tagName]) construct(node, node.tagName)
+  static _constructTags (tagName) {
+    for (const node of document.getElementsByTagName(tagName.toLowerCase())) {
+      if (!node.destroy) continue
+      const t = new Tonic.registry[tagName](node)
+      if (!t) throw Error('Unable to construct component, see guide.')
     }
   }
 
