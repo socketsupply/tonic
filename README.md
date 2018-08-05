@@ -66,7 +66,7 @@ class Greeting extends Tonic {
 Tonic.add(Greeting)
 ```
 
-```html
+```xml
 <greeting value="Hello, World">
 </greeting>
 ```
