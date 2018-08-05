@@ -2,7 +2,6 @@
 
 # SYNOPSIS
 A minimalist component library inspired by React and Web Components.
-View a more detailed page with example components [here][0].
 
 # GOALS
 - Quickly read and understand the whole codebase; `~150` lines.
@@ -27,6 +26,8 @@ some people doing more traditional client-server development.
 - Magic
 
 # USAGE
+You can find an `api` doc [here][0], and a trouble shooting guide [here][1].
+
 ```bash
 npm install hxoht/tonic
 ```
@@ -71,4 +72,5 @@ Tonic.add(Greeting)
 </greeting>
 ```
 
-[0]:https://hxoht.github.io/tonic/
+[0]:/API.md
+[1]:/HELP.md
