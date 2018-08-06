@@ -25,14 +25,16 @@ class Tonic {
     Tonic.registry[name] = c
     if (c.registered) throw new Error(`Already registered ${c.name}`)
     c.registered = true
-    Tonic._constructTags(name)
+    Tonic._constructTags()
   }
 
-  static _constructTags (tagName) {
-    for (const node of document.getElementsByTagName(tagName.toLowerCase())) {
-      if (!Tonic.registry[tagName] || node.destroy) continue
-      const t = new Tonic.registry[tagName](node)
-      if (!t) throw Error('Unable to construct component, see guide.')
+  static _constructTags () {
+    for (const tagName of Object.keys(Tonic.registry)) {
+      for (const node of document.getElementsByTagName(tagName.toLowerCase())) {
+        if (!Tonic.registry[tagName] || node.destroy) continue
+        const t = new Tonic.registry[tagName](node)
+        if (!t) throw Error('Unable to construct component, see guide.')
+      }
     }
   }
 
@@ -75,6 +77,7 @@ class Tonic {
     const oldProps = JSON.parse(JSON.stringify(this.props))
     this.props = Tonic.sanitize(typeof o === 'function' ? o(this.props) : o)
     this.root.appendChild(this._setContent(this.render()))
+    Tonic._constructTags()
     this.updated && this.updated(oldProps)
   }
 
@@ -98,8 +101,6 @@ class Tonic {
       node = content.cloneNode(true)
     }
 
-    Tonic._constructTags(node.tagName)
-
     if (this.styleNode) node.insertAdjacentElement('afterbegin', this.styleNode)
     Tonic.refs.forEach((e, i) => !e.parentNode && e.destroy(i))
     return node
@@ -118,6 +119,7 @@ class Tonic {
     this.props = Tonic.sanitize(this.props)
     this.willConnect && this.willConnect()
     this.root.appendChild(this._setContent(this.render()))
+    Tonic._constructTags()
 
     const styles = this.style && this.style()
 
