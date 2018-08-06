@@ -13,6 +13,7 @@
 
 | Method | Description |
 | :--- | :--- |
+| `emit(String, Object)` | Emit a custom event on the root element of the component. A listener will receive a plain old javascript event object that contains the [`detail`][4] property. |
 | `setProps(Object)` | Set the properties of a component instance. Can also take a function which will receive the current props as an argument. |
 | `setState(Object)` | Set the state of a component instance. Can also take a function which will receive the current props as an argument. |
 | `style()` | Returns a string of css to be inlined with the component. This will be "scoped" so that it does not affect the rest of the page. It will also persist across rerenders to save on parsing costs. |
@@ -40,3 +41,4 @@ the standard DOM will still call your event methods.
 [1]:https://developers.google.com/web/fundamentals/web-components/customelements
 [2]:https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Template_literals
 [3]:https://github.com/mathiasbynens/he
+[4]:https://developer.mozilla.org/en-US/docs/Web/Guide/Events/Creating_and_triggering_events

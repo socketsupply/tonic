@@ -68,6 +68,10 @@ class Tonic {
     return s.match(/[A-Z][a-z]*/g).join('-')
   }
 
+  emit (name, detail) {
+    this.root.dispatchEvent(new window.Event(name, { detail }))
+  }
+
   html ([s, ...strings], ...values) {
     const reducer = (a, b) => a.concat(b, strings.shift())
     const filter = s => s && (s !== true || s === 0)
