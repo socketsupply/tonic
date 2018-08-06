@@ -33,6 +33,7 @@ test('pass props', t => {
       id="x"
       test-item="true"
       disabled
+      empty=''
       data='${JSON.stringify(d)}'>
     </component-b>
 
@@ -41,7 +42,7 @@ test('pass props', t => {
   Tonic.add(class ComponentB extends Tonic {
     connected () {
       this.root.setAttribute('id', this.props.id)
-      t.equal(this.props.disabled, 'disabled', 'disabled property was found')
+      t.ok(this.props.disabled === '', 'disabled property was found')
       t.ok(this.props.testItem, 'automatically camelcase props')
     }
     render () {
@@ -140,7 +141,7 @@ test('stylesheet & prefixing', t => {
   }
 
   Tonic.add(ComponentF)
-  const style = document.body.getElementsByTagName('style')[0]
+  const style = document.head.getElementsByTagName('style')[0]
   const expected = `component-f div { color: red; }`
   t.equal(style.textContent, expected, 'style was prefixed')
   t.end()

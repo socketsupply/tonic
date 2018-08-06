@@ -25,6 +25,11 @@ class Tonic {
     Tonic.registry[name] = c
     if (c.registered) throw new Error(`Already registered ${c.name}`)
     c.registered = true
+
+    if (!Tonic.styleNode) {
+      Tonic.styleNode = document.head.appendChild(document.createElement('style'))
+    }
+
     Tonic._constructTags()
   }
 
@@ -109,7 +114,7 @@ class Tonic {
   _connect () {
     for (let { name, value } of this.root.attributes) {
       name = name.replace(/-(.)/gui, (_, m) => m.toUpperCase())
-      this.props[name] = value || name
+      this.props[name] = value
     }
 
     if (this.props.data) {
@@ -117,17 +122,22 @@ class Tonic {
     }
 
     this.props = Tonic.sanitize(this.props)
+
+    for (const [k, v] of Object.entries(this.defaults ? this.defaults() : {})) {
+      if (!this.props[k]) this.props[k] = v
+    }
+
     this.willConnect && this.willConnect()
     this.root.appendChild(this._setContent(this.render()))
     Tonic._constructTags()
 
-    const styles = this.style && this.style()
-
-    if (styles && !this.styleNode) {
-      const style = this.styleNode = document.createElement('style')
-      style.textContent = Tonic._scopeCSS(styles, this.root.tagName.toLowerCase())
-      this.root.insertAdjacentElement('afterbegin', style)
+    if (this.style && !Tonic.registry[this.root.tagName].styled) {
+      Tonic.registry[this.root.tagName].styled = true
+      const css = Tonic._scopeCSS(this.style(), this.root.tagName.toLowerCase())
+      const textNode = document.createTextNode(css)
+      Tonic.styleNode.appendChild(textNode)
     }
+
     this.connected && this.connected()
   }
 
