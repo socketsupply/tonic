@@ -114,7 +114,7 @@ class Tonic {
   _connect () {
     for (let { name, value } of this.root.attributes) {
       name = name.replace(/-(.)/gui, (_, m) => m.toUpperCase())
-      this.props[name] = value
+      this.props[name] = value || name
     }
 
     if (this.props.data) {
