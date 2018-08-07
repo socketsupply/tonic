@@ -42,7 +42,7 @@ test('pass props', t => {
   Tonic.add(class ComponentB extends Tonic {
     connected () {
       this.root.setAttribute('id', this.props.id)
-      t.ok(this.props.disabled === '', 'disabled property was found')
+      t.equal(this.props.disabled, 'disabled', 'disabled property was found')
       t.ok(this.props.testItem, 'automatically camelcase props')
     }
     render () {
@@ -132,7 +132,7 @@ test('stylesheet & prefixing', t => {
 
   class ComponentF extends Tonic {
     style () {
-      return `div { color: red; }`
+      return `component-f div { color: red; }`
     }
 
     render () {
