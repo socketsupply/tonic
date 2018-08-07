@@ -76,7 +76,7 @@ class Tonic {
   setProps (o) {
     const oldProps = JSON.parse(JSON.stringify(this.props))
     this.props = Tonic.sanitize(typeof o === 'function' ? o(this.props) : o)
-    this.root.appendChild(this._setContent(this.render()))
+    this._setContent(this.root, this.render())
     Tonic._constructTags()
     this.updated && this.updated(oldProps)
   }
@@ -89,21 +89,10 @@ class Tonic {
     }
   }
 
-  _setContent (content) {
-    while (this.root.firstChild) this.root.firstChild.remove()
-    let node = null
-
-    if (typeof content === 'string') {
-      const tmp = document.createElement('tmp')
-      tmp.innerHTML = content
-      node = tmp.firstElementChild
-    } else {
-      node = content.cloneNode(true)
-    }
-
-    if (this.styleNode) node.insertAdjacentElement('afterbegin', this.styleNode)
+  _setContent (target, content) {
+    if (typeof content === 'string') target.innerHTML = content
+    else target.appendChild(content)
     Tonic.refs.forEach((e, i) => !e.parentNode && e.destroy(i))
-    return node
   }
 
   _connect () {
@@ -123,7 +112,7 @@ class Tonic {
     }
 
     this.willConnect && this.willConnect()
-    this.root.appendChild(this._setContent(this.render()))
+    this._setContent(this.root, this.render())
     Tonic._constructTags()
 
     if (this.style && !Tonic.registry[this.root.tagName].styled) {
