@@ -25,7 +25,8 @@ some people doing more traditional client-server development.
 - Magic
 
 # USAGE
-You can find an api doc [here][0], and a trouble shooting guide [here][1].
+You can find an api doc [here][0], a trouble shooting guide [here][1],
+and a bunch of examples [here][2].
 
 ```bash
 npm install hxoht/tonic
@@ -69,3 +70,4 @@ Tonic.add(Greeting)
 
 [0]:/API.md
 [1]:/HELP.md
+[2]:https://hxoht.github.io/components
