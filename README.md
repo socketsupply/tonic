@@ -9,7 +9,6 @@ A minimalist component library inspired by React and Web Components.
 - One-way binding; pipe data though connected components.
 - Single source event dispatch; no event rebinding needed.
 - Bring your own Routers, Reducers, Validators, etc.
-- Inline style encapsulation.
 
 # NON-GOALS
 - When re-rendering performance is *truly* important, a virtual dom is
@@ -37,7 +36,7 @@ npm install hxoht/tonic
 class Greeting extends Tonic {
   style () {
     return `
-      div {
+      greeting div {
         display: inline-block;
         border: 1px dotted #666;
         height: 100px;

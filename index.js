@@ -43,15 +43,6 @@ class Tonic {
     }
   }
 
-  static _scopeCSS (s, tagName) {
-    return s.split('\n').map(line => {
-      if (!line.includes('{')) return line
-      const parts = line.split('{').map(s => s.trim())
-      const selector = parts[0].split(',').map(p => `${tagName} ${p}`).join(', ')
-      return `${selector} { ${parts[1]}`
-    }).join('\n')
-  }
-
   static sanitize (o) {
     for (const [k, v] of Object.entries(o)) {
       if (typeof v === 'object') o[k] = Tonic.sanitize(v)
@@ -137,8 +128,7 @@ class Tonic {
 
     if (this.style && !Tonic.registry[this.root.tagName].styled) {
       Tonic.registry[this.root.tagName].styled = true
-      const css = Tonic._scopeCSS(this.style(), this.root.tagName.toLowerCase())
-      const textNode = document.createTextNode(css)
+      const textNode = document.createTextNode(this.style())
       Tonic.styleNode.appendChild(textNode)
     }
 

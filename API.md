@@ -18,7 +18,7 @@
 | `setState(Object)` | Set the state of a component instance. Can also take a function which will receive the current props as an argument. |
 | `style()` | Returns a string of css to be inlined with the component. This will be "scoped" so that it does not affect the rest of the page. It will also persist across rerenders to save on parsing costs. |
 | `render()` | Returns html to be parsed or a dom node that will overwrite. There is usually no need to call this directly, prefer `componentInstance.setProps({ ... })`. |
-| `html\`...\`` | Tidy up an html string (use as a [tagged template][2]). |
+| html\`...\` | Tidy up an html string (use as a [tagged template][2]). |
 
 ## "LIFECYCLE" INSTANCE METHODS
 
