@@ -90,8 +90,12 @@ class Tonic {
   }
 
   _setContent (target, content) {
-    if (typeof content === 'string') target.innerHTML = content
-    else target.appendChild(content)
+    if (typeof content === 'string') {
+      target.innerHTML = content
+    } else {
+      while (target.firstChild) target.firstChild.remove()
+      target.appendChild(content)
+    }
     Tonic.refs.forEach((e, i) => !e.parentNode && e.destroy(i))
   }
 
