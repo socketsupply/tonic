@@ -4,12 +4,12 @@ class Tonic {
     this.state = {}
     const name = Tonic._splitName(this.constructor.name)
     this.root = node || document.createElement(name.toLowerCase())
-    Tonic.refs.push(this.root)
     this.root.disconnect = index => this._disconnect(index)
     this.root.setProps = v => this.setProps(v)
     this.root.setState = v => this.setState(v)
     this._bindEventListeners()
     this._connect()
+    Tonic.refs.push(this.root)
   }
 
   static match (el, s) {
@@ -34,9 +34,9 @@ class Tonic {
     Tonic._constructTags()
   }
 
-  static _constructTags () {
+  static _constructTags (root) {
     for (const tagName of Tonic.tags) {
-      for (const node of document.getElementsByTagName(tagName)) {
+      for (const node of (root || document).getElementsByTagName(tagName)) {
         if (!Tonic.registry[tagName] || node.disconnect) continue
         const t = new Tonic.registry[tagName](node)
         if (!t) throw Error('Unable to construct component, see guide.')
@@ -78,7 +78,7 @@ class Tonic {
     const oldProps = JSON.parse(JSON.stringify(this.props))
     this.props = Tonic.sanitize(typeof o === 'function' ? o(this.props) : o)
     this._setContent(this.root, this.render())
-    Tonic._constructTags()
+    Tonic._constructTags(this.root)
     this.updated && this.updated(oldProps)
   }
 
@@ -126,7 +126,7 @@ class Tonic {
 
     this.willConnect && this.willConnect()
     this._setContent(this.root, this.render())
-    Tonic._constructTags()
+    Tonic._constructTags(this.root)
 
     if (this.style && !Tonic.registry[this.root.tagName].styled) {
       Tonic.registry[this.root.tagName].styled = true
