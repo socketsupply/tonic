@@ -183,11 +183,15 @@ test('component composition', t => {
 
 test('lifecycle events', t => {
   document.body.innerHTML = `<quxx></quxx>`
-  t.plan(6)
 
   class Bazz extends Tonic {
+    constructor (p) {
+      super(p)
+      t.ok(true, 'calling bazz ctor')
+    }
+
     disconnected () {
-      console.log('disconnected')
+      t.ok(true, 'disconnected event fired')
     }
     render () {
       return `<div class="bar"></div>`
@@ -195,6 +199,11 @@ test('lifecycle events', t => {
   }
 
   class Quxx extends Tonic {
+    constructor (p) {
+      super(p)
+      t.ok(true, 'calling quxx ctor')
+    }
+
     willConnect () {
       t.ok(true, 'willConnect event fired')
       const expected = `<quxx></quxx>`
@@ -217,6 +226,15 @@ test('lifecycle events', t => {
   Tonic.add(Quxx)
   const q = document.querySelector('quxx')
   q.setProps({})
+  const refsLength = Tonic.refs.length
+
+  // once again to overwrite the old instances
+  q.setProps({})
+  t.equal(Tonic.refs.length, refsLength, 'Cleanup, refs correct count')
+
+  // once again to check that the refs length is the same
+  q.setProps({})
+  t.equal(Tonic.refs.length, refsLength, 'Cleanup, refs still correct count')
   t.end()
 })
 

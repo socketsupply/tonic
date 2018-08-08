@@ -5,7 +5,7 @@ class Tonic {
     const name = Tonic._splitName(this.constructor.name)
     this.root = node || document.createElement(name.toLowerCase())
     Tonic.refs.push(this.root)
-    this.root.destroy = index => this._disconnect(index)
+    this.root.disconnect = index => this._disconnect(index)
     this.root.setProps = v => this.setProps(v)
     this.root.setState = v => this.setState(v)
     this._bindEventListeners()
@@ -21,8 +21,9 @@ class Tonic {
     c.prototype._props = Object.getOwnPropertyNames(c.prototype)
     if (!c.name) throw Error('Mangling detected, see guide.')
 
-    const name = Tonic._splitName(c.name).toUpperCase()
-    Tonic.registry[name] = c
+    const name = Tonic._splitName(c.name)
+    Tonic.registry[name.toUpperCase()] = c
+    Tonic.tags = Object.keys(Tonic.registry)
     if (c.registered) throw new Error(`Already registered ${c.name}`)
     c.registered = true
 
@@ -34,9 +35,9 @@ class Tonic {
   }
 
   static _constructTags () {
-    for (const tagName of Object.keys(Tonic.registry)) {
-      for (const node of document.getElementsByTagName(tagName.toLowerCase())) {
-        if (!Tonic.registry[tagName] || node.destroy) continue
+    for (const tagName of Tonic.tags) {
+      for (const node of document.getElementsByTagName(tagName)) {
+        if (!Tonic.registry[tagName] || node.disconnect) continue
         const t = new Tonic.registry[tagName](node)
         if (!t) throw Error('Unable to construct component, see guide.')
       }
@@ -90,13 +91,21 @@ class Tonic {
   }
 
   _setContent (target, content) {
+    for (const tagName of Tonic.tags) {
+      for (const node of target.getElementsByTagName(tagName)) {
+        const index = Tonic.refs.findIndex(ref => ref === node)
+        if (index === -1) continue
+        node.disconnect(index)
+      }
+    }
+
     if (typeof content === 'string') {
       target.innerHTML = content
     } else {
-      while (target.firstChild) target.firstChild.remove()
+      while (target.firstChild) target.removeChild(target.firstChild)
       target.appendChild(content)
     }
-    Tonic.refs.forEach((e, i) => !e.parentNode && e.destroy(i))
+    this.root = target
   }
 
   _connect () {
@@ -136,6 +145,7 @@ class Tonic {
   }
 }
 
+Tonic.tags = []
 Tonic.refs = []
 Tonic.registry = {}
 Tonic.escapeRe = /["&'<>`]/g
