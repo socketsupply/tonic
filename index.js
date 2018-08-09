@@ -90,7 +90,7 @@ class Tonic {
     }
   }
 
-  _setContent (target, content) {
+  _setContent (target, content = '') {
     for (const tagName of Tonic.tags) {
       for (const node of target.getElementsByTagName(tagName)) {
         const index = Tonic.refs.findIndex(ref => ref === node)
