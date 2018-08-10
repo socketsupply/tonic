@@ -19,7 +19,7 @@ class Tonic {
 
   static add (c) {
     c.prototype._props = Object.getOwnPropertyNames(c.prototype)
-    if (!c.name || c.name.length === 1) throw Error('Mangling detected, see guide.')
+    if (!c.name || c.name.length === 1) throw Error('Tonic Error: Mangling detected, see HELP => https://github.com/hxoht/tonic/blob/master/HELP.md.')
 
     const name = Tonic._splitName(c.name)
     Tonic.registry[name.toUpperCase()] = c
