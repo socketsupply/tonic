@@ -22,7 +22,7 @@ class Tonic {
     if (!c.name || c.name.length === 1) throw Error('Tonic Error: Mangling detected, see HELP => https://github.com/hxoht/tonic/blob/master/HELP.md.')
 
     const name = Tonic._splitName(c.name)
-    Tonic.registry[name.toUpperCase()] = c
+    Tonic.registry[name.toUpperCase()] = Tonic[c.name] = c
     Tonic.tags = Object.keys(Tonic.registry)
     if (c.registered) throw new Error(`Already registered ${c.name}`)
     c.registered = true
@@ -37,7 +37,7 @@ class Tonic {
   static _constructTags (root) {
     for (const tagName of Tonic.tags) {
       for (const node of (root || document).getElementsByTagName(tagName)) {
-        if (!Tonic.registry[tagName] || node.disconnect) continue
+        if (node.disconnect) continue
         const t = new Tonic.registry[tagName](node)
         if (!t) throw Error('Unable to construct component, see guide.')
       }
@@ -77,6 +77,7 @@ class Tonic {
   setProps (o) {
     const oldProps = JSON.parse(JSON.stringify(this.props))
     this.props = Tonic.sanitize(typeof o === 'function' ? o(this.props) : o)
+    if (!this.root) throw new Error('.setProps called on destroyed component')
     this._setContent(this.root, this.render())
     Tonic._constructTags(this.root)
     this.updated && this.updated(oldProps)
@@ -100,7 +101,7 @@ class Tonic {
     }
 
     if (typeof content === 'string') {
-      target.innerHTML = content
+      target.innerHTML = content.trim()
     } else {
       while (target.firstChild) target.removeChild(target.firstChild)
       target.appendChild(content)
@@ -111,7 +112,7 @@ class Tonic {
   _connect () {
     for (let { name, value } of this.root.attributes) {
       name = name.replace(/-(.)/gui, (_, m) => m.toUpperCase())
-      this.props[name] = value || name
+      this.props[name] = value === 'undefined' ? undefined : (value || name)
     }
 
     if (this.props.data) {
@@ -139,7 +140,6 @@ class Tonic {
 
   _disconnect (index) {
     this.disconnected && this.disconnected()
-    delete this.styleNode
     delete this.root
     Tonic.refs.splice(index, 1)
   }

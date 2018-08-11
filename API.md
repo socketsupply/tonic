@@ -23,15 +23,16 @@
 ## "LIFECYCLE" INSTANCE METHODS
 
 The standard "[reactions][1]" (aka lifecycle methods) are available on every
-component (as well as a few others).
+component (as well as a few others) (The events are listed in the order that
+they fire).
 
 | Method | Description |
 | :--- | :--- |
-| `constructor(props)` | An instance of the element is created or upgraded. Useful for initializing state, settings up event listeners, or creating shadow dom. See the spec for restrictions on what you can do in the constructor. A constructor must call `super(props)`. |
 | `willConnect()` | Called prior to the element being inserted into the DOM. Useful for updating configuration, state and preparing for the render. |
+| `constructor(props)` | An instance of the element is created or upgraded. Useful for initializing state, settings up event listeners, or creating shadow dom. See the spec for restrictions on what you can do in the constructor. A constructor must call `super(props)`. |
 | `connected()` | Called every time the element is inserted into the DOM. Useful for running setup code, such as fetching resources or rendering. Generally, you should try to delay work until this time. |
-| `disconnected()` | Called every time the element is removed from the DOM. Useful for running clean up code. |
 | `updated(oldProps)` | Called after setProps() is called. This method is not called on the initial render. |
+| `disconnected()` | Called every time the element is removed from the DOM. Useful for running clean up code. |
 
 ## EVENTS
 Any method defined on your class that matches a dom method will be called when
