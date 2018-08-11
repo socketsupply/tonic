@@ -8,6 +8,10 @@ class Tonic {
     this.root.setProps = v => this.setProps(v)
     this.root.setState = v => this.setState(v)
     this._bindEventListeners()
+    if (this.wrap) {
+      const render = this.render
+      this.render = () => this.wrap(render.bind(this))
+    }
     this._connect()
     Tonic.refs.push(this.root)
   }
@@ -19,7 +23,7 @@ class Tonic {
 
   static add (c) {
     c.prototype._props = Object.getOwnPropertyNames(c.prototype)
-    if (!c.name || c.name.length === 1) throw Error('Tonic Error: Mangling detected, see HELP => https://github.com/hxoht/tonic/blob/master/HELP.md.')
+    if (!c.name || c.name.length === 1) throw Error('Mangling detected, see guide. https://github.com/hxoht/tonic/blob/master/HELP.md.')
 
     const name = Tonic._splitName(c.name)
     Tonic.registry[name.toUpperCase()] = Tonic[c.name] = c
@@ -60,10 +64,6 @@ class Tonic {
     return s.match(/[A-Z][a-z]*/g).join('-')
   }
 
-  emit (name, detail) {
-    this.root.dispatchEvent(new window.Event(name, { detail }))
-  }
-
   html ([s, ...strings], ...values) {
     const reducer = (a, b) => a.concat(b, strings.shift())
     const filter = s => s && (s !== true || s === 0)
@@ -77,7 +77,7 @@ class Tonic {
   setProps (o) {
     const oldProps = JSON.parse(JSON.stringify(this.props))
     this.props = Tonic.sanitize(typeof o === 'function' ? o(this.props) : o)
-    if (!this.root) throw new Error('.setProps called on destroyed component')
+    if (!this.root) throw new Error('.setProps called on destroyed component, see guide.')
     this._setContent(this.root, this.render())
     Tonic._constructTags(this.root)
     this.updated && this.updated(oldProps)
