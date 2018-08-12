@@ -54,6 +54,18 @@ test('pass props', t => {
   const div2 = document.getElementById('x')
   t.equal(div1.textContent, 'hello', 'div contains the prop value')
   t.ok(div2)
+
+  const expectedProps = {
+    id: 'x',
+    testItem: 'true',
+    disabled: 'disabled',
+    empty: 'empty',
+    data: {
+      message: 'hello'
+    }
+  }
+
+  t.deepEqual(div2.getProps(), expectedProps, 'get props matches expected')
   t.end()
 })
 

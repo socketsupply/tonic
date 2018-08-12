@@ -7,6 +7,7 @@ class Tonic {
     this.root.disconnect = index => this._disconnect(index)
     this.root.setProps = v => this.setProps(v)
     this.root.setState = v => this.setState(v)
+    this.root.getProps = () => this.getProps()
     this._bindEventListeners()
     if (this.wrap) {
       const render = this.render
@@ -81,6 +82,10 @@ class Tonic {
     this._setContent(this.root, this.render())
     Tonic._constructTags(this.root)
     this.updated && this.updated(oldProps)
+  }
+
+  getProps () {
+    return this.props
   }
 
   _bindEventListeners () {
