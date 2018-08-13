@@ -109,7 +109,7 @@ class Tonic {
       target.innerHTML = content.trim()
     } else {
       while (target.firstChild) target.removeChild(target.firstChild)
-      target.appendChild(content)
+      target.appendChild(content.cloneNode(true))
     }
     this.root = target
   }
