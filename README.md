@@ -4,11 +4,12 @@
 A minimalist component library inspired by React and Web Components.
 
 # GOALS
-- Quickly read and understand the whole codebase; `~150` lines.
+- Tonic is tiny. About 150 lines of code.
 - React-like component composition.
 - One-way binding; pipe data though connected components.
-- Single source event dispatch; no event rebinding needed.
-- Bring your own Routers, Reducers, Validators, etc.
+- Prefer event delegation over individual event listeners.
+- Prefer Javascript Template Literals to weird Template Langauges.
+- Unopinionated about Routers, Reducers, Validators, etc.
 
 # NON-GOALS
 - When re-rendering performance is *truly* important, a virtual dom is
