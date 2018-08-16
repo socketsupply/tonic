@@ -136,6 +136,7 @@ class Tonic {
     }
 
     this.willConnect && this.willConnect()
+    this.children = this.children || this.root.innerHTML
     this._setContent(this.root, this.render())
     Tonic._constructTags(this.root)
 

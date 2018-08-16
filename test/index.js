@@ -250,6 +250,102 @@ test('lifecycle events', t => {
   t.end()
 })
 
+test('compose sugar (this.children)', t => {
+  class ComponentG extends Tonic {
+    render () {
+      return `<div class="parent">${this.children}</div>`
+    }
+  }
+
+  class ComponentH extends Tonic {
+    render () {
+      return `<div class="child">${this.props.value}</div>`
+    }
+  }
+
+  document.body.innerHTML = `
+    <component-g>
+      <component-h value="x"></component-h>
+    </component-g>
+  `
+
+  Tonic.add(ComponentG)
+  Tonic.add(ComponentH)
+
+  const g = document.querySelector('component-g')
+  const children = g.querySelectorAll('.child')
+  t.equal(children.length, 1, 'child element was added')
+  t.equal(children[0].innerHTML, 'x')
+
+  const h = document.querySelector('component-h')
+
+  h.setProps({
+    value: 'y'
+  })
+
+  const childrenAfterSetProps = g.querySelectorAll('.child')
+  t.equal(childrenAfterSetProps.length, 1, 'child element was replaced')
+  t.equal(childrenAfterSetProps[0].innerHTML, 'y')
+  t.end()
+})
+
+test('check that composed elements use (and re-use) their initial innerHTML correctly', t => {
+  class ComponentI extends Tonic {
+    render () {
+      return `<div class="i">
+        <component-j>
+          <component-k value="${this.props.value}">
+          </component-k>
+        </component-j>
+      </div>`
+    }
+  }
+
+  class ComponentJ extends Tonic {
+    render () {
+      return `<div class="j">${this.children}</div>`
+    }
+  }
+
+  class ComponentK extends Tonic {
+    render () {
+      return `<div class="k">${this.props.value}</div>`
+    }
+  }
+
+  document.body.innerHTML = `
+    <component-i value="x">
+    </component-i>
+  `
+
+  Tonic.add(ComponentI)
+  Tonic.add(ComponentJ)
+  Tonic.add(ComponentK)
+
+  const i = document.querySelector('component-i')
+  const kTags = i.getElementsByTagName('component-k')
+  t.equal(kTags.length, 1)
+
+  const kClasses = i.querySelectorAll('.k')
+  t.equal(kClasses.length, 1)
+
+  const kText = kClasses[0].textContent
+  t.equal(kText, 'x', 'The text of the inner-most child was rendered correctly')
+
+  i.setProps({
+    value: 1
+  })
+
+  const kTagsAfterSetProps = i.getElementsByTagName('component-k')
+  t.equal(kTagsAfterSetProps.length, 1, 'correct number of components rendered')
+
+  const kClassesAfterSetProps = i.querySelectorAll('.k')
+  t.equal(kClassesAfterSetProps.length, 1, 'correct number of elements rendered')
+  const kTextAfterSetProps = kClassesAfterSetProps[0].textContent
+  t.equal(kTextAfterSetProps, '1', 'The text of the inner-most child was rendered correctly')
+  t.end()
+})
+
 test('cleanup, ensure exist', t => {
   t.end()
   process.exit(0)
