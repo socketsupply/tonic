@@ -67,7 +67,7 @@ class Tonic {
   html ([s, ...strings], ...values) {
     const reducer = (a, b) => a.concat(b, strings.shift())
     const filter = s => s && (s !== true || s === 0)
-    return Tonic.sanitize(values).reduce(reducer, [s]).filter(filter).join('')
+    return values.reduce(reducer, [s]).filter(filter).join('')
   }
 
   setState (o) {
