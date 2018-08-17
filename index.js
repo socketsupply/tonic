@@ -120,9 +120,9 @@ class Tonic {
   _connect () {
     for (let { name, value } of this.root.attributes) {
       name = name.replace(/-(.)/g, (_, m) => m.toUpperCase())
-      this.props[name] = value === 'undefined' ? undefined : (value || name)
+      const p = this.props[name] = value === 'undefined' ? undefined : (value || name)
 
-      const m = this.props[name][0] === '{' && /{(.+)}/.exec(this.props[name])
+      const m = p && p[0] === '{' && /{(.+)}/.exec(p)
       if (m && m[1]) {
         try {
           this.props[name] = JSON.parse(m[1])
