@@ -3,7 +3,7 @@ class Tonic {
     this.props = {}
     this.state = {}
     const name = Tonic._splitName(this.constructor.name)
-    this.root = node || document.createElement(name.toLowerCase())
+    this.root = node || document.createElement(name)
     this.root.disconnect = index => this._disconnect(index)
     this.root.setProps = v => this.setProps(v)
     this.root.setState = v => this.setState(v)
@@ -40,12 +40,10 @@ class Tonic {
     Tonic._constructTags()
   }
 
-  static _constructTags (root) {
+  static _constructTags (root) { /* eslint-disable no-new */
     for (const tagName of Tonic.tags) {
       for (const node of (root || document).getElementsByTagName(tagName)) {
-        if (node.disconnect) continue
-        const t = new Tonic.registry[tagName](node)
-        if (!t) throw Error('Unable to construct component, see guide.')
+        if (!node.disconnect) new Tonic.registry[tagName](node)
       }
     }
   }
@@ -121,12 +119,18 @@ class Tonic {
 
   _connect () {
     for (let { name, value } of this.root.attributes) {
-      name = name.replace(/-(.)/gui, (_, m) => m.toUpperCase())
+      name = name.replace(/-(.)/g, (_, m) => m.toUpperCase())
       this.props[name] = value === 'undefined' ? undefined : (value || name)
-    }
 
-    if (this.props.data) {
-      try { this.props.data = JSON.parse(this.props.data) } catch (e) {}
+      const m = this.props[name][0] === '{' && /{(.+)}/.exec(this.props[name])
+      if (m && m[1]) {
+        try {
+          this.props[name] = JSON.parse(m[1])
+        } catch (err) {
+          this.props[name] = m[1]
+          console.error(`Parse error (${name}), ${err.message}`)
+        }
+      }
     }
 
     this.props = Tonic.sanitize(this.props)

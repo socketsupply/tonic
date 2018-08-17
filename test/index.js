@@ -34,7 +34,9 @@ test('pass props', t => {
       test-item="true"
       disabled
       empty=''
-      data='${JSON.stringify(d)}'>
+      number={777}
+      fail={#}
+      data={${JSON.stringify(d)}}>
     </component-b>
 
   `
@@ -60,6 +62,8 @@ test('pass props', t => {
     testItem: 'true',
     disabled: 'disabled',
     empty: 'empty',
+    number: 777,
+    fail: '#',
     data: {
       message: 'hello'
     }
