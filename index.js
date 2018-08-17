@@ -78,7 +78,7 @@ class Tonic {
     return this.state
   }
 
-  rerender (o) {
+  rerender (o = this.props) {
     const oldProps = JSON.parse(JSON.stringify(this.props))
     this.props = Tonic.sanitize(typeof o === 'function' ? o(this.props) : o)
     if (!this.root) throw new Error('.rerender called on destroyed component, see guide.')
