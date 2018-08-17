@@ -93,12 +93,12 @@ test('get element by id and set properties via the api', t => {
     const div = document.getElementById('test')
     t.ok(div, 'a component was found by its id')
     t.equal(div.textContent, '1', 'initial value is set by props')
-    t.ok(div.setProps, 'a component has the setProps method')
+    t.ok(div.rerender, 'a component has the rerender method')
   }
 
   const div = document.getElementById('test')
-  div.setProps({ number: 2 })
-  t.equal(div.textContent, '2', 'the value was changed by setProps')
+  div.rerender({ number: 2 })
+  t.equal(div.textContent, '2', 'the value was changed by rerender')
   t.end()
 })
 
@@ -115,17 +115,17 @@ test('construct from api', t => {
   const d = new ComponentD()
   document.body.appendChild(d.root)
 
-  d.setProps({ number: 3 })
+  d.rerender({ number: 3 })
   const div1 = document.body.querySelector('div')
   t.equal(div1.getAttribute('number'), '3', 'attribute was set in component')
 
-  d.setProps({ number: 6 })
+  d.rerender({ number: 6 })
   const div2 = document.body.querySelector('div')
   t.equal(div2.getAttribute('number'), '6', 'attribute was set in component')
   t.end()
 })
 
-test('fail to connect before setProps', t => {
+test('fail to connect before rerender', t => {
   document.body.innerHTML = ''
 
   class ComponentE extends Tonic {
@@ -137,7 +137,7 @@ test('fail to connect before setProps', t => {
   Tonic.add(ComponentE)
   const c = document.createElement('component-e')
 
-  t.ok(!c.setProps, 'Component not yet connected')
+  t.ok(!c.rerender, 'Component not yet connected')
   t.end()
 })
 
@@ -241,15 +241,15 @@ test('lifecycle events', t => {
   Tonic.add(Bazz)
   Tonic.add(Quxx)
   const q = document.querySelector('quxx')
-  q.setProps({})
+  q.rerender({})
   const refsLength = Tonic.refs.length
 
   // once again to overwrite the old instances
-  q.setProps({})
+  q.rerender({})
   t.equal(Tonic.refs.length, refsLength, 'Cleanup, refs correct count')
 
   // once again to check that the refs length is the same
-  q.setProps({})
+  q.rerender({})
   t.equal(Tonic.refs.length, refsLength, 'Cleanup, refs still correct count')
   t.end()
 })
@@ -283,7 +283,7 @@ test('compose sugar (this.children)', t => {
 
   const h = document.querySelector('component-h')
 
-  h.setProps({
+  h.rerender({
     value: 'y'
   })
 
@@ -336,7 +336,7 @@ test('check that composed elements use (and re-use) their initial innerHTML corr
   const kText = kClasses[0].textContent
   t.equal(kText, 'x', 'The text of the inner-most child was rendered correctly')
 
-  i.setProps({
+  i.rerender({
     value: 1
   })
 

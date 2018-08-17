@@ -14,12 +14,12 @@
 | Method | Description |
 | :--- | :--- |
 | `emit(String, Object)` | Emit a custom event on the root element of the component. A listener will receive a plain old javascript event object that contains the [`detail`][4] property. |
-| `setProps(Object)` | Set the properties of a component instance. Can also take a function which will receive the current props as an argument. |
+| `rerender(Object | Function)` | Set the properties of a component instance. Can also take a function which will receive the current props as an argument. |
 | `getProps()` | Get the properties of a component instance. |
-| `setState(Object)` | Set the state of a component instance. Can also take a function which will receive the current props as an argument. |
+| `setState(Object | Function)` | Set the state of a component instance. Can also take a function which will receive the current props as an argument. |
 | `getState()` | Get the state of a component instance. |
 | `style()` | Returns a string of css to be inlined with the component. This will be "scoped" so that it does not affect the rest of the page. It will also persist across rerenders to save on parsing costs. |
-| `render()` | Returns html to be parsed or a dom node that will overwrite. There is usually no need to call this directly, prefer `componentInstance.setProps({ ... })`. |
+| `render()` | Returns html to be parsed or a dom node that will overwrite. There is usually no need to call this directly, prefer `componentInstance.rerender({ ... })`. |
 | html\`...\` | Tidy up an html string (use as a [tagged template][2]). |
 
 ## "LIFECYCLE" INSTANCE METHODS
@@ -33,7 +33,7 @@ they fire).
 | `willConnect()` | Called prior to the element being inserted into the DOM. Useful for updating configuration, state and preparing for the render. |
 | `constructor(props)` | An instance of the element is created or upgraded. Useful for initializing state, settings up event listeners, or creating shadow dom. See the spec for restrictions on what you can do in the constructor. A constructor must call `super(props)`. |
 | `connected()` | Called every time the element is inserted into the DOM. Useful for running setup code, such as fetching resources or rendering. Generally, you should try to delay work until this time. |
-| `updated(oldProps)` | Called after setProps() is called. This method is not called on the initial render. |
+| `updated(oldProps)` | Called after render() is called. This method is not called on the initial render. |
 | `disconnected()` | Called every time the element is removed from the DOM. Useful for running clean up code. |
 
 ## EVENTS
