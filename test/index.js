@@ -197,6 +197,43 @@ test('component composition', t => {
   t.end()
 })
 
+test('persist named component state after re-renering', t => {
+  document.body.innerHTML = `
+    <stateful-parent>
+    </stateful-parent>
+  `
+
+  class StatefulParent extends Tonic {
+    render () {
+      return `<div>
+        <stateful-child id="stateful-child">
+        </stateful-child>
+      </div>`
+    }
+  }
+
+  class StatefulChild extends Tonic {
+    connected () {
+      this.setState(state => Object.assign({}, state, {
+        count: (state.count || 0) + 1
+      }))
+    }
+
+    render () {
+      return `<div>CHILD</div>`
+    }
+  }
+
+  Tonic.add(StatefulParent)
+  Tonic.add(StatefulChild)
+  const parent = document.getElementsByTagName('stateful-parent')[0]
+  parent.reRender()
+  const child = document.getElementsByTagName('stateful-child')[0]
+  const { count } = child.getState()
+  t.equal(count, 2, `the named element's state was persisted after re-rendering`)
+  t.end()
+})
+
 test('lifecycle events', t => {
   document.body.innerHTML = `<quxx></quxx>`
 
