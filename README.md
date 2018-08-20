@@ -1,7 +1,7 @@
 ![tonic](https://github.com/hxoht/tonic/raw/addimage/readme-tonic.png)
 
 # SYNOPSIS
-A minimalist component library inspired by React and Web Components.
+A minimalist component class inspired by React and Web Components.
 
 # GOALS
 - Tonic is tiny. About 150 lines of code.
