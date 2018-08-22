@@ -145,11 +145,11 @@ class Tonic {
     this.children = this.children || this.root.innerHTML
     this._setContent(this.root, this.render())
     Tonic._constructTags(this.root)
+    const style = this.style && this.style()
 
-    if (this.style && !Tonic.registry[this.root.tagName].styled) {
+    if (style && !Tonic.registry[this.root.tagName].styled) {
       Tonic.registry[this.root.tagName].styled = true
-      const textNode = document.createTextNode(this.style())
-      Tonic.styleNode.appendChild(textNode)
+      Tonic.styleNode.appendChild(document.createTextNode(style))
     }
 
     this.connected && this.connected()
