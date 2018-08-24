@@ -25,23 +25,22 @@ test('attach to dom', t => {
 })
 
 test('pass props', t => {
-  const d = { message: 'hello' }
-
   document.body.innerHTML = `
 
     <component-b
       id="x"
       test-item="true"
       disabled
-      empty=''
-      number={777}
-      arr={[1,2,3]}
-      obj={{"foo":100}}
-      fail={#}
-      data={${JSON.stringify(d)}}>
+      number=77
+      empty=''>
     </component-b>
-
   `
+
+  Tonic.add(class ComponentBB extends Tonic {
+    render () {
+      return `<div>${this.props.data[0].foo}</div>`
+    }
+  })
 
   Tonic.add(class ComponentB extends Tonic {
     connected () {
@@ -50,30 +49,25 @@ test('pass props', t => {
       t.ok(this.props.testItem, 'automatically camelcase props')
     }
     render () {
-      return `<div>${this.props.data.message}</div>`
+      const test = [
+        { foo: 'hello, world' }
+      ]
+
+      return `
+        <component-b-b data=${this.prop(test)}>
+        </component-b-b>
+      `
     }
   })
 
-  const div1 = document.querySelector('div')
+  const div1 = document.getElementsByTagName('div')[0]
+  t.equal(div1.textContent, 'hello, world', 'div contains the prop value')
   const div2 = document.getElementById('x')
-  t.equal(div1.textContent, 'hello', 'div contains the prop value')
   t.ok(div2)
+  const props = div2.getProps()
+  console.log(props)
+  t.equal(props.testItem, 'true', 'correct props')
 
-  const expectedProps = {
-    id: 'x',
-    testItem: 'true',
-    disabled: 'disabled',
-    empty: 'empty',
-    number: 777,
-    arr: [1, 2, 3],
-    obj: { foo: 100 },
-    fail: '#',
-    data: {
-      message: 'hello'
-    }
-  }
-
-  t.deepEqual(div2.getProps(), expectedProps, 'get props matches expected')
   t.end()
 })
 

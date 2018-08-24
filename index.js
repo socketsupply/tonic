@@ -4,6 +4,7 @@ class Tonic {
     this.state = state || {}
     const name = Tonic._splitName(this.constructor.name)
     this.root = node || document.createElement(name)
+    this.root._id = Tonic._createId()
     this.root.disconnect = index => this._disconnect(index)
     this.root.reRender = v => this.reRender(v)
     this.root.setState = v => this.setState(v)
@@ -16,6 +17,10 @@ class Tonic {
     }
     this._connect()
     Tonic.refs.push(this.root)
+  }
+
+  static _createId () {
+    return Math.random().toString(16).slice(2, 8)
   }
 
   static match (el, s) {
@@ -128,19 +133,23 @@ class Tonic {
     return states
   }
 
+  prop (o) {
+    const id = this.root._id
+    const p = `__${id}__${Tonic._createId()}__`
+    if (!Tonic._data[id]) Tonic._data[id] = {}
+    Tonic._data[id][p] = o
+    return p
+  }
+
   _connect () {
     for (let { name, value } of this.root.attributes) {
       name = name.replace(/-(.)/g, (_, m) => m.toUpperCase())
       const p = this.props[name] = value === 'undefined' ? undefined : (value || name)
 
-      const m = p && p[0] === '{' && /{(.+)}/.exec(p)
-      if (m && m[1]) {
-        try {
-          this.props[name] = JSON.parse(m[1])
-        } catch (err) {
-          this.props[name] = m[1]
-          console.error(`Parse error (${name}), ${err.message}`)
-        }
+      if (/__\w+__\w+__/.test(p)) {
+        const { 1: root } = p.split('__')
+        this.props[name] = Tonic._data[root][p]
+        continue
       }
     }
 
@@ -166,6 +175,7 @@ class Tonic {
 
   _disconnect (index) {
     this.disconnected && this.disconnected()
+    delete Tonic._data[this.root._id]
     delete this.root
     Tonic.refs.splice(index, 1)
   }
@@ -173,6 +183,7 @@ class Tonic {
 
 Tonic.tags = []
 Tonic.refs = []
+Tonic._data = {}
 Tonic.registry = {}
 Tonic.escapeRe = /["&'<>`]/g
 Tonic.escapeMap = { '"': '&quot;', '&': '&amp;', '\'': '&#x27;', '<': '&lt;', '>': '&gt;', '`': '&#x60;' }
