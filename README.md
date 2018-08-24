@@ -36,7 +36,7 @@ npm install hxoht/tonic
 # EXAMPLE
 ```js
 class Greeting extends Tonic {
-  style () {
+  stylesheet () {
     return `
       greeting div {
         display: inline-block;

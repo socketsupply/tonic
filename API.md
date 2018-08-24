@@ -16,7 +16,8 @@
 | <code>reRender(Object &#124; Function)</code> | Set the properties of a component instance. Can also take a function which will receive the current props as an argument. |
 | `getProps()` | Get the properties of a component instance. |
 | <code>setState(Object &#124; Function)</code> | Set the state of a component instance. Can also take a function which will receive the current props as an argument. |
-| `style()` | Returns a string of css to be inlined with the component. This will be "scoped" so that it does not affect the rest of the page. It will also persist across re-renders to save on parsing costs. |
+| `stylesheet()` | Returns a string of css to be lazily added to a `style` tag in the head. |
+| `styles()` | Returns an object that represents inline-styles. Styles are applied by adding a keys from the object to the `styles` attribute of an html tag in the render function, for example `styles="key1 key2"`. Each object's key-value pair are added to the element's style object. |
 | `render()` | Returns HTML to be parsed or a dom node that will overwrite. There is usually no need to call this directly, prefer `componentInstance.reRender({ ... })`. |
 | html\`...\` | Tidy up an HTML string (use as a [tagged template][2]). |
 

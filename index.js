@@ -34,7 +34,9 @@ class Tonic {
     c.registered = true
 
     if (!Tonic.styleNode) {
-      Tonic.styleNode = document.head.appendChild(document.createElement('style'))
+      const styleTag = document.createElement('style')
+      styleTag.setAttribute('nonce', Tonic.nonce)
+      Tonic.styleNode = document.head.appendChild(styleTag)
     }
 
     Tonic._constructTags()
@@ -111,6 +113,13 @@ class Tonic {
 
     if (typeof content === 'string') {
       target.innerHTML = content.trim()
+
+      if (this.styles) {
+        const styles = this.styles()
+        Array.from(target.querySelectorAll('[styles]')).forEach(el =>
+          el.getAttribute('styles').split(/\s+/).forEach(s =>
+            Object.assign(el.style, styles[s.trim()])))
+      }
     } else {
       while (target.firstChild) target.removeChild(target.firstChild)
       target.appendChild(content.cloneNode(true))
@@ -145,7 +154,7 @@ class Tonic {
     this.children = this.children || this.root.innerHTML
     this._setContent(this.root, this.render())
     Tonic._constructTags(this.root)
-    const style = this.style && this.style()
+    const style = this.stylesheet && this.stylesheet()
 
     if (style && !Tonic.registry[this.root.tagName].styled) {
       Tonic.registry[this.root.tagName].styled = true

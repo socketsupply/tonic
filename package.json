@@ -1,6 +1,6 @@
 {
   "name": "tonic",
-  "version": "5.1.2",
+  "version": "6.0.0",
   "description": "A composable component inspired by React.",
   "main": "events.js",
   "scripts": {

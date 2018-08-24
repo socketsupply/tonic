@@ -141,18 +141,29 @@ test('fail to connect before reRender', t => {
   t.end()
 })
 
-test('stylesheet & prefixing', t => {
+test('stylesheets and inline styles', t => {
   document.body.innerHTML = `
     <component-f number=1></component-f>
   `
 
   class ComponentF extends Tonic {
-    style () {
+    stylesheet () {
       return `component-f div { color: red; }`
     }
 
+    styles () {
+      return {
+        foo: {
+          color: 'red'
+        },
+        bar: {
+          backgroundColor: 'red'
+        }
+      }
+    }
+
     render () {
-      return `<div></div>`
+      return `<div styles="foo bar"></div>`
     }
   }
 
@@ -160,6 +171,11 @@ test('stylesheet & prefixing', t => {
   const style = document.head.getElementsByTagName('style')[0]
   const expected = `component-f div { color: red; }`
   t.equal(style.textContent, expected, 'style was prefixed')
+  const div = document.querySelector('div')
+  const computed = window.getComputedStyle(div)
+  t.equal(computed.color, 'rgb(255, 0, 0)', 'inline style was set')
+  t.equal(computed.backgroundColor, 'rgb(255, 0, 0)', 'inline style was set')
+
   t.end()
 })
 
