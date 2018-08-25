@@ -31,7 +31,6 @@ test('pass props', t => {
       id="x"
       test-item="true"
       disabled
-      number=77
       empty=''>
     </component-b>
   `
@@ -46,26 +45,40 @@ test('pass props', t => {
     connected () {
       this.root.setAttribute('id', this.props.id)
       t.equal(this.props.disabled, 'disabled', 'disabled property was found')
+      t.equal(this.props.empty, 'empty', 'empty property was found')
       t.ok(this.props.testItem, 'automatically camelcase props')
     }
+
     render () {
       const test = [
         { foo: 'hello, world' }
       ]
 
-      return `
-        <component-b-b data=${this.prop(test)}>
+      return this.html`
+        <component-b-b
+          id="y"
+          data=${test}
+          number=${42.42}
+          fn=${() => 'hello, world'}>
         </component-b-b>
       `
     }
   })
 
+  const bb = document.getElementById('y')
+  {
+    const props = bb.getProps()
+    t.equal(props.fn(), 'hello, world', 'passed a function')
+    t.equal(props.number, 42.42, 'float parsed properly')
+  }
+
   const div1 = document.getElementsByTagName('div')[0]
-  t.equal(div1.textContent, 'hello, world', 'div contains the prop value')
+  t.equal(div1.textContent, 'hello, world', 'data prop received properly')
+
   const div2 = document.getElementById('x')
   t.ok(div2)
+
   const props = div2.getProps()
-  console.log(props)
   t.equal(props.testItem, 'true', 'correct props')
 
   t.end()

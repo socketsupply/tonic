@@ -53,7 +53,7 @@ class Greeting extends Tonic {
   }
 
   render () {
-    return `
+    return this.html`
       <h1 class="example">
         ${this.props.value}
       </h1>
