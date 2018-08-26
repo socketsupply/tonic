@@ -1,5 +1,5 @@
 class Tonic {
-  constructor (node, state) {
+  constructor ({ node, state } = {}) {
     this.props = {}
     this.state = state || {}
     const name = Tonic._splitName(this.constructor.name)
@@ -50,7 +50,7 @@ class Tonic {
   static _constructTags (root, states = {}) { /* eslint-disable no-new */
     for (const tagName of Tonic.tags) {
       for (const node of (root || document).getElementsByTagName(tagName)) {
-        if (!node.disconnect) new Tonic.registry[tagName](node, states[node.id])
+        if (!node.disconnect) new Tonic.registry[tagName]({ node, state: states[node.id] })
       }
     }
   }
