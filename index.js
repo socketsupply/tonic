@@ -149,7 +149,7 @@ class Tonic {
   _connect () {
     for (let { name, value } of this.root.attributes) {
       name = name.replace(/-(.)/g, (_, m) => m.toUpperCase())
-      const p = this.props[name] = value === 'undefined' ? undefined : (value || name)
+      const p = this.props[name] = value
 
       if (/__\w+__\w+__/.test(p)) {
         const { 1: root } = p.split('__')

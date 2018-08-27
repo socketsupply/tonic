@@ -44,8 +44,8 @@ test('pass props', t => {
   Tonic.add(class ComponentB extends Tonic {
     connected () {
       this.root.setAttribute('id', this.props.id)
-      t.equal(this.props.disabled, 'disabled', 'disabled property was found')
-      t.equal(this.props.empty, 'empty', 'empty property was found')
+      t.equal(this.props.disabled, '', 'disabled property was found')
+      t.equal(this.props.empty, '', 'empty property was found')
       t.ok(this.props.testItem, 'automatically camelcase props')
     }
 
