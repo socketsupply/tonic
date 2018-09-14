@@ -1,5 +1,5 @@
 {
-  "name": "tonic",
+  "name": "@conductorlab/tonic",
   "version": "7.2.1",
   "description": "A composable component inspired by React.",
   "main": "events.js",
@@ -9,10 +9,23 @@
     "build:demo": "browserify --bare ./demo > ./docs/bundle.js"
   },
   "author": "",
-  "license": "ISC",
+  "license": "MIT",
   "devDependencies": {
     "browserify": "^16.2.2",
     "tape": "^4.9.1",
     "tape-run": "^4.0.0"
-  }
+  },
+  "directories": {
+    "test": "test"
+  },
+  "dependencies": {
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/hxoht/tonic.git"
+  },
+  "bugs": {
+    "url": "https://github.com/hxoht/tonic/issues"
+  },
+  "homepage": "https://github.com/hxoht/tonic#readme"
 }
