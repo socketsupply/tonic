@@ -30,7 +30,7 @@ You can find an api doc [here][0], a trouble shooting guide [here][1],
 and a bunch of examples [here][2].
 
 ```bash
-npm install hxoht/tonic
+npm install @conductorlab/tonic
 ```
 
 # EXAMPLE
