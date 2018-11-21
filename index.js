@@ -56,6 +56,7 @@ class Tonic {
   }
 
   static sanitize (o) {
+    if (o === null) return o
     for (const [k, v] of Object.entries(o)) {
       if (typeof v === 'object') o[k] = Tonic.sanitize(v)
       if (typeof v === 'string') o[k] = Tonic.escape(v)
