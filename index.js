@@ -103,11 +103,15 @@ class Tonic {
     return this.props
   }
 
+  handleEvent (e) {
+    this[e.type](e)
+  }
+
   _bindEventListeners () {
     const hp = Object.getOwnPropertyNames(window.HTMLElement.prototype)
     for (const p of this._props) {
       if (hp.indexOf('on' + p) === -1) continue
-      this.root.addEventListener(p, e => this[p](e))
+      this.root.addEventListener(p, this)
     }
   }
 
