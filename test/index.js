@@ -321,7 +321,7 @@ test('lifecycle events', t => {
 test('compose sugar (this.children)', t => {
   class ComponentG extends Tonic {
     render () {
-      return `<div class="parent">${this.children}</div>`
+      return this.html`<div class="parent">${this.children}</div>`
     }
   }
 
@@ -360,7 +360,7 @@ test('compose sugar (this.children)', t => {
 test('check that composed elements use (and re-use) their initial innerHTML correctly', t => {
   class ComponentI extends Tonic {
     render () {
-      return `<div class="i">
+      return this.html`<div class="i">
         <component-j>
           <component-k value="${this.props.value}">
           </component-k>
@@ -371,7 +371,7 @@ test('check that composed elements use (and re-use) their initial innerHTML corr
 
   class ComponentJ extends Tonic {
     render () {
-      return `<div class="j">${this.children}</div>`
+      return this.html`<div class="j">${this.children}</div>`
     }
   }
 
