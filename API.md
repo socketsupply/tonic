@@ -4,7 +4,7 @@
 
 | Method | Description |
 | :--- | :--- |
-| `add(Class, Object)` | Register a class as a new custom-tag and provide optional options for it. |
+| `add(Class, Object)` | Register a class as a new custom-tag and provide options for it. |
 | `escape(String)` | Escapes HTML characters from a string (based on [he][3]). |
 | `sanitize(Object)` | Escapes all the strings found in an object literal. |
 | `match(Node, Selector)` | Match the given node against a selector or any matching parent of the given node. This is useful when trying to locate a node from the actual node that was interacted with. |
@@ -17,9 +17,15 @@
 | `getProps()` | Get the properties of a component instance. |
 | <code>setState(Object &#124; Function)</code> | Set the state of a component instance. Can also take a function which will receive the current props as an argument. |
 | `stylesheet()` | Returns a string of css to be lazily added to a `style` tag in the head. |
-| `styles()` | Returns an object that represents inline-styles. Styles are applied by adding a keys from the object to the `styles` attribute of an html tag in the render function, for example `styles="key1 key2"`. Each object's key-value pair are added to the element's style object. |
+| `styles()` | Returns an object that represents inline-styles to be applied to the component. Styles are applied by adding a keys from the object to the `styles` attribute of an html tag in the render function, for example `styles="key1 key2"`. Each object's key-value pair are added to the element's style object. |
 | `render()` | Returns HTML to be parsed or a dom node that will overwrite. There is usually no need to call this directly, prefer `componentInstance.reRender({ ... })`. |
 | html\`...\` | Tidy up an HTML string (use as a [tagged template][2]). |
+
+## INSTANCE PROPERTIES
+
+| Name | Description |
+| :--- | :--- |
+| <code>children</code> | An array of nodes, the original child nodes of the component. |
 
 ## "LIFECYCLE" INSTANCE METHODS
 
