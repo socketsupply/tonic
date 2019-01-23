@@ -25,8 +25,7 @@
 
 | Name | Description |
 | :--- | :--- |
-| <code>children</code> | An array of nodes, the original child nodes. |
-|
+| <code>children</code> | An array of nodes, the original child nodes of the component. |
 
 ## "LIFECYCLE" INSTANCE METHODS
 
