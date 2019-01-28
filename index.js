@@ -15,6 +15,7 @@ class Tonic {
       const render = this.render
       this.render = () => this.wrap(render.bind(this))
     }
+
     this._connect()
     Tonic.refs.push(this.root)
   }
@@ -28,7 +29,7 @@ class Tonic {
     return el.matches(s) ? el : el.closest(s)
   }
 
-  static add (c) {
+  static add (c, root) {
     c.prototype._props = Object.getOwnPropertyNames(c.prototype)
     if (!c.name || c.name.length === 1) throw Error('Mangling detected, see guide. https://github.com/hxoht/tonic/blob/master/HELP.md.')
 
@@ -44,14 +45,24 @@ class Tonic {
       Tonic.styleNode = document.head.appendChild(styleTag)
     }
 
-    Tonic._constructTags()
+    if (!root) return
+    Tonic._constructTags(root)
   }
 
-  static _constructTags (root, states = {}) { /* eslint-disable no-new */
-    for (const tagName of Tonic.tags) {
-      for (const node of (root || document).getElementsByTagName(tagName)) {
-        if (!node.disconnect) new Tonic.registry[tagName]({ node, state: states[node.id] })
+  static _constructTags (node, states = {}) { /* eslint-disable no-new */
+    node = node.firstElementChild
+
+    while (node) {
+      const tagName = node.tagName
+
+      if (Tonic.tags.includes(tagName)) {
+        new Tonic.registry[tagName]({ node, state: states[node.id] })
+        node = node.nextElementSibling
+        continue
       }
+
+      Tonic._constructTags(node, states)
+      node = node.nextElementSibling
     }
   }
 
@@ -79,6 +90,7 @@ class Tonic {
       if (typeof v === 'object' && v.__children__) return this._children(v)
       if (typeof v === 'object' || typeof v === 'function') return this._prop(v)
       if (typeof v === 'number') return `${v}__float`
+      if (typeof v === 'boolean') return `${v.toString()}`
       return v
     }
     return values.map(ref).reduce(reduce, [s]).filter(filter).join('')

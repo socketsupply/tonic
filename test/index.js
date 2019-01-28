@@ -17,7 +17,7 @@ test('attach to dom', t => {
     <component-a></component-a>
   `
 
-  Tonic.add(ComponentA)
+  Tonic.add(ComponentA, document.body)
 
   const div = document.querySelector('div')
   t.ok(div, 'a div was created and attached')
@@ -63,7 +63,7 @@ test('pass props', t => {
         </component-b-b>
       `
     }
-  })
+  }, document.body)
 
   const bb = document.getElementById('y')
   {
@@ -98,7 +98,7 @@ test('get element by id and set properties via the api', t => {
     }
   }
 
-  Tonic.add(ComponentC)
+  Tonic.add(ComponentC, document.body)
 
   {
     const div = document.getElementById('test')
@@ -178,7 +178,7 @@ test('stylesheets and inline styles', t => {
     }
   }
 
-  Tonic.add(ComponentF)
+  Tonic.add(ComponentF, document.body)
   const style = document.head.getElementsByTagName('style')[0]
   const expected = `component-f div { color: red; }`
   t.equal(style.textContent, expected, 'style was prefixed')
@@ -216,8 +216,8 @@ test('component composition', t => {
     }
   }
 
-  Tonic.add(Foo)
-  Tonic.add(Bar)
+  Tonic.add(Foo, document.body)
+  Tonic.add(Bar, document.body)
 
   t.equal(document.body.querySelectorAll('.bar').length, 2, 'two bar divs')
   t.equal(document.body.querySelectorAll('.foo').length, 4, 'four foo divs')
@@ -251,8 +251,8 @@ test('persist named component state after re-renering', t => {
     }
   }
 
-  Tonic.add(StatefulParent)
   Tonic.add(StatefulChild)
+  Tonic.add(StatefulParent, document.body)
   const parent = document.getElementsByTagName('stateful-parent')[0]
   parent.reRender()
   const child = document.getElementsByTagName('stateful-child')[0]
@@ -303,7 +303,7 @@ test('lifecycle events', t => {
   }
 
   Tonic.add(Bazz)
-  Tonic.add(Quxx)
+  Tonic.add(Quxx, document.body)
   const q = document.querySelector('quxx')
   q.reRender({})
   const refsLength = Tonic.refs.length
@@ -338,7 +338,7 @@ test('compose sugar (this.children)', t => {
   `
 
   Tonic.add(ComponentG)
-  Tonic.add(ComponentH)
+  Tonic.add(ComponentH, document.body)
 
   const g = document.querySelector('component-g')
   const children = g.querySelectorAll('.child')
@@ -386,9 +386,9 @@ test('check that composed elements use (and re-use) their initial innerHTML corr
     </component-i>
   `
 
-  Tonic.add(ComponentI)
   Tonic.add(ComponentJ)
   Tonic.add(ComponentK)
+  Tonic.add(ComponentI, document.body)
 
   const i = document.querySelector('component-i')
   const kTags = i.getElementsByTagName('component-k')
@@ -411,6 +411,85 @@ test('check that composed elements use (and re-use) their initial innerHTML corr
   t.equal(kClassesAfterSetProps.length, 1, 'correct number of elements rendered')
   const kTextAfterSetProps = kClassesAfterSetProps[0].textContent
   t.equal(kTextAfterSetProps, '1', 'The text of the inner-most child was rendered correctly')
+  t.end()
+})
+
+test('mixed order declaration', t => {
+  class App extends Tonic {
+    render () {
+      return this.html`<div class="app">${this.children}</div>`
+    }
+  }
+
+  class ComponentA extends Tonic {
+    render () {
+      return `<div class="a">A</div>`
+    }
+  }
+
+  class ComponentB extends Tonic {
+    render () {
+      return this.html`<div class="b">${this.children}</div>`
+    }
+  }
+
+  class ComponentC extends Tonic {
+    render () {
+      return this.html`<div class="c">${this.children}</div>`
+    }
+  }
+
+  class ComponentD extends Tonic {
+    render () {
+      return `<div class="d">D</div>`
+    }
+  }
+
+  document.body.innerHTML = `
+    <App>
+      <component-a>
+      </component-a>
+
+      <component-b>
+        <component-c>
+          <component-d>
+          </component-d>
+        </component-c>
+      </component-b> 
+    </App>
+  `
+
+  Tonic.add(ComponentD)
+  Tonic.add(ComponentA)
+  Tonic.add(ComponentC)
+  Tonic.add(ComponentB)
+  Tonic.add(App, document.body)
+
+  {
+    const div = document.querySelector('.app')
+    t.ok(div, 'a div was created and attached')
+  }
+
+  {
+    const div = document.querySelector('body .app .a')
+    t.ok(div, 'a div was created and attached')
+  }
+
+  {
+    const div = document.querySelector('body .app .b')
+    t.ok(div, 'a div was created and attached')
+  }
+
+  {
+    const div = document.querySelector('body .app .b .c')
+    t.ok(div, 'a div was created and attached')
+  }
+
+  {
+    const div = document.querySelector('body .app .b .c .d')
+    t.ok(div, 'a div was created and attached')
+  }
+
   t.end()
 })
 
