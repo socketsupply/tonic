@@ -15,6 +15,7 @@ class Tonic {
       const render = this.render
       this.render = () => this.wrap(render.bind(this))
     }
+
     this._connect()
     Tonic.refs.push(this.root)
   }
@@ -28,9 +29,9 @@ class Tonic {
     return el.matches(s) ? el : el.closest(s)
   }
 
-  static add (c) {
+  static add (c, isReady) {
     c.prototype._props = Object.getOwnPropertyNames(c.prototype)
-    if (!c.name || c.name.length === 1) throw Error('Mangling detected, see guide. https://github.com/hxoht/tonic/blob/master/HELP.md.')
+    if (!c.name || c.name.length === 1) throw Error('Mangling detected. https://github.com/heapwolf/tonic/blob/master/HELP.md')
 
     const name = Tonic._splitName(c.name)
     Tonic.registry[name.toUpperCase()] = Tonic[c.name] = c
@@ -44,14 +45,23 @@ class Tonic {
       Tonic.styleNode = document.head.appendChild(styleTag)
     }
 
-    Tonic._constructTags()
+    if (isReady || c.name === 'App') Tonic.init(document.firstElementChild)
   }
 
-  static _constructTags (root, states = {}) { /* eslint-disable no-new */
-    for (const tagName of Tonic.tags) {
-      for (const node of (root || document).getElementsByTagName(tagName)) {
-        if (!node.disconnect) new Tonic.registry[tagName]({ node, state: states[node.id] })
+  static init (node = document.firstElementChild, states = {}) {
+    node = node.firstElementChild
+
+    while (node) {
+      const tagName = node.tagName
+
+      if (Tonic.tags.includes(tagName)) { /* eslint-disable no-new */
+        new Tonic.registry[tagName]({ node, state: states[node.id] })
+        node = node.nextElementSibling
+        continue
       }
+
+      Tonic.init(node, states)
+      node = node.nextElementSibling
     }
   }
 
@@ -79,6 +89,7 @@ class Tonic {
       if (typeof v === 'object' && v.__children__) return this._children(v)
       if (typeof v === 'object' || typeof v === 'function') return this._prop(v)
       if (typeof v === 'number') return `${v}__float`
+      if (typeof v === 'boolean') return `${v.toString()}`
       return v
     }
     return values.map(ref).reduce(reduce, [s]).filter(filter).join('')
@@ -96,7 +107,7 @@ class Tonic {
     const oldProps = JSON.parse(JSON.stringify(this.props))
     this.props = Tonic.sanitize(typeof o === 'function' ? o(this.props) : o)
     if (!this.root) throw new Error('.reRender called on destroyed component, see guide.')
-    Tonic._constructTags(this.root, this._setContent(this.root, this.render()))
+    Tonic.init(this.root, this._setContent(this.root, this.render()))
     this.updated && this.updated(oldProps)
   }
 
@@ -193,7 +204,7 @@ class Tonic {
     this.children = [...this.root.childNodes].map(node => node.cloneNode(true))
     this.children.__children__ = true
     this._setContent(this.root, this.render())
-    Tonic._constructTags(this.root)
+    Tonic.init(this.root)
     const style = this.stylesheet && this.stylesheet()
 
     if (style && !Tonic.registry[this.root.tagName].styled) {
