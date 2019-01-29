@@ -338,7 +338,8 @@ test('compose sugar (this.children)', t => {
   `
 
   Tonic.add(ComponentG)
-  Tonic.add(ComponentH, document.body)
+  Tonic.add(ComponentH)
+  Tonic.init(document.body)
 
   const g = document.querySelector('component-g')
   const children = g.querySelectorAll('.child')
@@ -388,7 +389,10 @@ test('check that composed elements use (and re-use) their initial innerHTML corr
 
   Tonic.add(ComponentJ)
   Tonic.add(ComponentK)
-  Tonic.add(ComponentI, document.body)
+  Tonic.add(ComponentI)
+  Tonic.init()
+
+  t.comment('Uses init() instead of <app>')
 
   const i = document.querySelector('component-i')
   const kTags = i.getElementsByTagName('component-k')
@@ -463,7 +467,7 @@ test('mixed order declaration', t => {
   Tonic.add(ComponentA)
   Tonic.add(ComponentC)
   Tonic.add(ComponentB)
-  Tonic.add(App, document.body)
+  Tonic.add(App)
 
   {
     const div = document.querySelector('.app')
