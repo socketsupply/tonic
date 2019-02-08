@@ -54,7 +54,7 @@ class Tonic {
     while (node) {
       const tagName = node.tagName
 
-      if (Tonic.tags.includes(tagName)) { /* eslint-disable no-new */
+      if (Tonic.tags.includes(tagName) && !node._id) { /* eslint-disable no-new */
         new Tonic.registry[tagName]({ node, state: states[node.id] })
         node = node.nextElementSibling
         continue
