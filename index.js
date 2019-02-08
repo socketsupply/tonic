@@ -29,7 +29,7 @@ class Tonic {
     return el.matches(s) ? el : el.closest(s)
   }
 
-  static add (c, isReady) {
+  static add (c, root) {
     c.prototype._props = Object.getOwnPropertyNames(c.prototype)
     if (!c.name || c.name.length === 1) throw Error('Mangling detected. https://github.com/heapwolf/tonic/blob/master/HELP.md')
 
@@ -45,7 +45,7 @@ class Tonic {
       Tonic.styleNode = document.head.appendChild(styleTag)
     }
 
-    if (isReady || c.name === 'App') Tonic.init(document.firstElementChild)
+    if (root || c.name === 'App') Tonic.init(root || document.firstElementChild)
   }
 
   static init (node = document.firstElementChild, states = {}) {
