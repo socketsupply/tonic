@@ -3,21 +3,23 @@ class Tonic {
     this.props = {}
     this.state = state || {}
     const name = Tonic._splitName(this.constructor.name)
-    this.root = node || document.createElement(name)
-    this.root._id = Tonic._createId()
-    this.root.disconnect = index => this._disconnect(index)
-    this.root.reRender = v => this.reRender(v)
-    this.root.setState = v => this.setState(v)
-    this.root.getProps = () => this.getProps()
-    this.root.getState = () => this.getState()
-    this._bindEventListeners()
+    const r = this.root = node || document.createElement(name)
+    r._id = Tonic._createId()
+    r._unmount = index => this._unmount(index)
+    r.reRender = v => this.reRender(v)
+    r.setState = v => this.setState(v)
+    r.getProps = () => this.getProps()
+    r.getState = () => this.getState()
+
+    this._events()
+
     if (this.wrap) {
       const render = this.render
       this.render = () => this.wrap(render.bind(this))
     }
 
     this._connect()
-    Tonic.refs.push(this.root)
+    Tonic._refs.push(this.root)
   }
 
   static _createId () {
@@ -31,31 +33,32 @@ class Tonic {
 
   static add (c, root) {
     c.prototype._props = Object.getOwnPropertyNames(c.prototype)
-    if (!c.name || c.name.length === 1) throw Error('Mangling detected. https://github.com/heapwolf/tonic/blob/master/HELP.md')
+    if (!c.name || c.name.length === 1) throw Error('Mangling. https://bit.ly/2TkJ6zP')
 
+    const d = document
     const name = Tonic._splitName(c.name)
-    Tonic.registry[name.toUpperCase()] = Tonic[c.name] = c
-    Tonic.tags = Object.keys(Tonic.registry)
-    if (c.registered) throw new Error(`Already registered ${c.name}`)
+    Tonic._reg[name.toUpperCase()] = c
+    Tonic._tags = Object.keys(Tonic._reg)
+    if (c.registered) return
     c.registered = true
 
     if (!Tonic.styleNode) {
-      const styleTag = document.createElement('style')
-      Tonic.nonce && styleTag.setAttribute('nonce', Tonic.nonce)
-      Tonic.styleNode = document.head.appendChild(styleTag)
+      const t = d.createElement('style')
+      Tonic.nonce && t.setAttribute('nonce', Tonic.nonce)
+      Tonic.styleNode = d.head.appendChild(t)
     }
 
-    if (root || c.name === 'App') Tonic.init(root || document.firstElementChild)
+    if (root || c.name === 'App') Tonic.init(root || d.firstElementChild)
   }
 
   static init (node = document.firstElementChild, states = {}) {
     node = node.firstElementChild
 
     while (node) {
-      const tagName = node.tagName
+      const t = node.tagName
 
-      if (Tonic.tags.includes(tagName) && !node._id) { /* eslint-disable no-new */
-        new Tonic.registry[tagName]({ node, state: states[node.id] })
+      if (Tonic._tags.includes(t) && !node._id) { /* eslint-disable no-new */
+        new Tonic._reg[t]({ node, state: states[node.id] })
         node = node.nextElementSibling
         continue
       }
@@ -86,8 +89,9 @@ class Tonic {
     const reduce = (a, b) => a.concat(b, strings.shift())
     const filter = s => s && (s !== true || s === 0)
     const ref = v => {
-      if (typeof v === 'object' && v.__children__) return this._children(v)
-      if (typeof v === 'object' || typeof v === 'function') return this._prop(v)
+      const isObject = typeof v === 'object'
+      if (isObject && v.__children__) return this._children(v)
+      if (isObject || typeof v === 'function') return this._prop(v)
       if (typeof v === 'number') return `${v}__float`
       if (typeof v === 'boolean') return `${v.toString()}`
       return v
@@ -104,10 +108,10 @@ class Tonic {
   }
 
   reRender (o = this.props) {
+    if (!this.root) return
     const oldProps = JSON.parse(JSON.stringify(this.props))
     this.props = Tonic.sanitize(typeof o === 'function' ? o(this.props) : o)
-    if (!this.root) throw new Error('.reRender called on destroyed component, see guide.')
-    Tonic.init(this.root, this._setContent(this.root, this.render()))
+    Tonic.init(this.root, this._set(this.root, this.render()))
     this.updated && this.updated(oldProps)
   }
 
@@ -119,7 +123,7 @@ class Tonic {
     this[e.type](e)
   }
 
-  _bindEventListeners () {
+  _events () {
     const hp = Object.getOwnPropertyNames(window.HTMLElement.prototype)
     for (const p of this._props) {
       if (hp.indexOf('on' + p) === -1) continue
@@ -127,37 +131,40 @@ class Tonic {
     }
   }
 
-  _setContent (target, content = '') {
+  _set (target, content = '') {
     const states = {}
-    for (const tagName of Tonic.tags) {
-      for (const node of target.getElementsByTagName(tagName)) {
-        const index = Tonic.refs.findIndex(ref => ref === node)
-        if (index === -1) continue
-        states[node.id] = node.getState()
-        node.disconnect(index)
-      }
-    }
+
+    // for (const t of Tonic._tags) {
+      // for (const node of target.getElementsByTagName(t)) {
+    target.querySelectorAll(Tonic._tags.join()).forEach(node => {
+      const index = Tonic._refs.findIndex(ref => ref === node)
+      if (index === -1) return
+      states[node.id] = node.getState()
+      node._unmount(index)
+    })
+      // }
+    // }
 
     if (typeof content === 'string') {
       target.innerHTML = content.trim()
 
       if (this.styles) {
         const styles = this.styles()
-        Array.from(target.querySelectorAll('[styles]')).forEach(el =>
+        target.querySelectorAll('[styles]').forEach(el =>
           el.getAttribute('styles').split(/\s+/).forEach(s =>
             Object.assign(el.style, styles[s.trim()])))
       }
 
-      Array.from(target.querySelectorAll('tonic-children')).forEach(el => {
+      target.querySelectorAll('tonic-children').forEach(el => {
         const root = Tonic._elements[this.root._id]
-        Array.from(root[el.id]).forEach(node => {
+        root[el.id].forEach(node => {
           el.parentNode.insertBefore(node, el)
         })
         delete root[el.id]
         el.parentNode.removeChild(el)
       })
     } else {
-      while (target.firstChild) target.removeChild(target.firstChild)
+      target.innerHTML = ''
       target.appendChild(content.cloneNode(true))
     }
     this.root = target
@@ -194,42 +201,42 @@ class Tonic {
       }
     }
 
-    this.props = Tonic.sanitize(this.props)
-
-    for (const [k, v] of Object.entries(this.defaults ? this.defaults() : {})) {
-      if (!this.props[k]) this.props[k] = v
-    }
+    const defaults = this.defaults && this.defaults()
+    this.props = Object.assign(Tonic.sanitize(this.props), defaults)
 
     this.willConnect && this.willConnect()
     this.children = [...this.root.childNodes].map(node => node.cloneNode(true))
     this.children.__children__ = true
-    this._setContent(this.root, this.render())
+    this._set(this.root, this.render())
     Tonic.init(this.root)
-    const style = this.stylesheet && this.stylesheet()
 
-    if (style && !Tonic.registry[this.root.tagName].styled) {
-      Tonic.registry[this.root.tagName].styled = true
-      Tonic.styleNode.appendChild(document.createTextNode(style))
+    if (this.stylesheet && !Tonic._reg[this.root.tagName].styled) {
+      Tonic._reg[this.root.tagName].styled = true
+      Tonic.styleNode.appendChild(document.createTextNode(this.stylesheet()))
     }
 
     this.connected && this.connected()
   }
 
-  _disconnect (index) {
+  _unmount (index) {
     this.disconnected && this.disconnected()
     delete Tonic._data[this.root._id]
     delete Tonic._elements[this.root._id]
     delete this.root
-    Tonic.refs.splice(index, 1)
+    Tonic._refs.splice(index, 1)
   }
 }
 
-Tonic.tags = []
-Tonic.refs = []
-Tonic._data = {}
-Tonic._elements = {}
-Tonic.registry = {}
-Tonic.escapeRe = /["&'<>`]/g
-Tonic.escapeMap = { '"': '&quot;', '&': '&amp;', '\'': '&#x27;', '<': '&lt;', '>': '&gt;', '`': '&#x60;' }
+Tonic.render = Tonic.add
+
+Object.assign(Tonic, {
+  _tags: [],
+  _refs: [],
+  _data: {},
+  _elements: {},
+  _reg: {},
+  escapeRe: /["&'<>`]/g,
+  escapeMap: { '"': '&quot;', '&': '&amp;', '\'': '&#x27;', '<': '&lt;', '>': '&gt;', '`': '&#x60;' }
+})
 
 if (typeof module === 'object') module.exports = Tonic

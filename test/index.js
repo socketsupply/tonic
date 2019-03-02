@@ -1,5 +1,11 @@
 const test = require('tape')
-const Tonic = require('..')
+const path = require('path')
+
+const src = path.join(__dirname, process.env['MIN']
+  ? '../dist/tonic.min.js'
+  : '..')
+
+const Tonic = require(src)
 
 test('sanity', t => {
   t.ok(true)
@@ -306,15 +312,15 @@ test('lifecycle events', t => {
   Tonic.add(Quxx, document.body)
   const q = document.querySelector('quxx')
   q.reRender({})
-  const refsLength = Tonic.refs.length
+  const refsLength = Tonic._refs.length
 
   // once again to overwrite the old instances
   q.reRender({})
-  t.equal(Tonic.refs.length, refsLength, 'Cleanup, refs correct count')
+  t.equal(Tonic._refs.length, refsLength, 'Cleanup, refs correct count')
 
   // once again to check that the refs length is the same
   q.reRender({})
-  t.equal(Tonic.refs.length, refsLength, 'Cleanup, refs still correct count')
+  t.equal(Tonic._refs.length, refsLength, 'Cleanup, refs still correct count')
   t.end()
 })
 
