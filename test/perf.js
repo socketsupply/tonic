@@ -29,7 +29,7 @@ Tonic.add(Hello)
 document.addEventListener('DOMContentLoaded', () => {
   Tonic.add(App)
 
-  const app = document.querySelector('hello')
+  const app = document.querySelector('app')
   const hello = document.querySelector('hello')
 
   suite
