@@ -1,25 +1,13 @@
-class Tonic {
-  constructor ({ node, state } = {}) {
-    this.props = {}
+class Tonic extends window.HTMLElement {
+  constructor () {
+    super()
+
+    const state = Tonic._states[this.id]
+    delete Tonic._states[this.id]
+
     this.state = state || {}
-    const name = Tonic._splitName(this.constructor.name)
-    const r = this.root = node || document.createElement(name)
-    r._id = Tonic._createId()
-    r._unmount = index => this._unmount(index)
-    r.reRender = v => this.reRender(v)
-    r.setState = v => this.setState(v)
-    r.getProps = () => this.getProps()
-    r.getState = () => this.getState()
-
+    this.props = {}
     this._events()
-
-    if (this.wrap) {
-      const render = this.render
-      this.render = () => this.wrap(render.bind(this))
-    }
-
-    this._connect()
-    Tonic._refs.push(this.root)
   }
 
   static _createId () {
@@ -35,37 +23,13 @@ class Tonic {
     c.prototype._props = Object.getOwnPropertyNames(c.prototype)
     if (!c.name || c.name.length === 1) throw Error('Mangling. https://bit.ly/2TkJ6zP')
 
-    const d = document
-    const name = Tonic._splitName(c.name)
+    const name = Tonic._splitName(c.name).toLowerCase()
+    if (window.customElements.get(name)) return
+
     Tonic._reg[name.toUpperCase()] = c
     Tonic._tags = Object.keys(Tonic._reg)
-    if (c.registered) return
-    c.registered = true
 
-    if (!Tonic.styleNode) {
-      const t = d.createElement('style')
-      Tonic.nonce && t.setAttribute('nonce', Tonic.nonce)
-      Tonic.styleNode = d.head.appendChild(t)
-    }
-
-    if (root || c.name === 'App') Tonic.init(root || d.firstElementChild)
-  }
-
-  static init (node = document.firstElementChild, states = {}) {
-    node = node.firstElementChild
-
-    while (node) {
-      const t = node.tagName
-
-      if (Tonic._tags.includes(t) && !node._id) { /* eslint-disable no-new */
-        new Tonic._reg[t]({ node, state: states[node.id] })
-        node = node.nextElementSibling
-        continue
-      }
-
-      Tonic.init(node, states)
-      node = node.nextElementSibling
-    }
+    window.customElements.define(name, c)
   }
 
   static sanitize (o) {
@@ -89,9 +53,11 @@ class Tonic {
     const reduce = (a, b) => a.concat(b, strings.shift())
     const filter = s => s && (s !== true || s === 0)
     const ref = v => {
-      const isObject = typeof v === 'object'
-      if (isObject && v.__children__) return this._children(v)
-      if (isObject || typeof v === 'function') return this._prop(v)
+      if (({}).toString.call(v) === '[object HTMLCollection]') {
+        return this._placehold([...v].map(node => node.cloneNode(true)))
+      }
+
+      if (typeof v === 'object' || typeof v === 'function') return this._prop(v)
       if (typeof v === 'number') return `${v}__float`
       if (typeof v === 'boolean') return `${v.toString()}`
       return v
@@ -111,7 +77,7 @@ class Tonic {
     if (!this.root) return
     const oldProps = JSON.parse(JSON.stringify(this.props))
     this.props = Tonic.sanitize(typeof o === 'function' ? o(this.props) : o)
-    Tonic.init(this.root, this._set(this.root, this.render()))
+    this._set(this.root, this.render(this.state, this.props))
     this.updated && this.updated(oldProps)
   }
 
@@ -132,18 +98,11 @@ class Tonic {
   }
 
   _set (target, content = '') {
-    const states = {}
-
-    // for (const t of Tonic._tags) {
-      // for (const node of target.getElementsByTagName(t)) {
     target.querySelectorAll(Tonic._tags.join()).forEach(node => {
       const index = Tonic._refs.findIndex(ref => ref === node)
       if (index === -1) return
-      states[node.id] = node.getState()
-      node._unmount(index)
+      Tonic._states[node.id] = node.getState()
     })
-      // }
-    // }
 
     if (typeof content === 'string') {
       target.innerHTML = content.trim()
@@ -156,19 +115,18 @@ class Tonic {
       }
 
       target.querySelectorAll('tonic-children').forEach(el => {
-        const root = Tonic._elements[this.root._id]
-        root[el.id].forEach(node => {
-          el.parentNode.insertBefore(node, el)
-        })
-        delete root[el.id]
+        const nodes = Tonic._children[this._id][el.id]
+        nodes.forEach(node => el.parentNode.insertBefore(node, el))
+
+        delete Tonic._children[el.id]
         el.parentNode.removeChild(el)
       })
     } else {
       target.innerHTML = ''
       target.appendChild(content.cloneNode(true))
     }
+
     this.root = target
-    return states
   }
 
   _prop (o) {
@@ -179,15 +137,25 @@ class Tonic {
     return p
   }
 
-  _children (r) {
-    const id = this.root._id
+  _placehold (r) {
+    const id = this._id
     const ref = Tonic._createId()
-    if (!Tonic._elements[id]) Tonic._elements[id] = {}
-    Tonic._elements[id][ref] = r
+    if (!Tonic._children[id]) Tonic._children[id] = {}
+    Tonic._children[id][ref] = r
     return `<tonic-children id="${ref}"/></tonic-children>`
   }
 
-  _connect () {
+  connectedCallback () {
+    this.root = (this.shadowRoot || this)
+    this.root._id = Tonic._createId()
+
+    if (this.wrap) {
+      const render = this.render
+      this.render = () => this.wrap(render.bind(this))
+    }
+
+    Tonic._refs.push(this.root)
+
     for (let { name, value } of this.root.attributes) {
       name = name.replace(/-(.)/g, (_, m) => m.toUpperCase())
       const p = this.props[name] = value
@@ -205,23 +173,22 @@ class Tonic {
     this.props = Object.assign(Tonic.sanitize(this.props), defaults)
 
     this.willConnect && this.willConnect()
-    this.children = [...this.root.childNodes].map(node => node.cloneNode(true))
-    this.children.__children__ = true
-    this._set(this.root, this.render())
-    Tonic.init(this.root)
+    this._set(this.root, this.render(this.state, this.props))
 
-    if (this.stylesheet && !Tonic._reg[this.root.tagName].styled) {
-      Tonic._reg[this.root.tagName].styled = true
-      Tonic.styleNode.appendChild(document.createTextNode(this.stylesheet()))
+    if (this.stylesheet) {
+      const styleNode = document.createElement('style')
+      const source = document.createTextNode(this.stylesheet())
+      styleNode.appendChild(source)
+      this.root.insertBefore(styleNode, this.root.firstChild)
     }
 
     this.connected && this.connected()
   }
 
-  _unmount (index) {
+  disconnectedCallback (index) {
     this.disconnected && this.disconnected()
     delete Tonic._data[this.root._id]
-    delete Tonic._elements[this.root._id]
+    delete Tonic._children[this.root._id]
     delete this.root
     Tonic._refs.splice(index, 1)
   }
@@ -233,7 +200,8 @@ Object.assign(Tonic, {
   _tags: [],
   _refs: [],
   _data: {},
-  _elements: {},
+  _states: {},
+  _children: {},
   _reg: {},
   escapeRe: /["&'<>`]/g,
   escapeMap: { '"': '&quot;', '&': '&amp;', '\'': '&#x27;', '<': '&lt;', '>': '&gt;', '`': '&#x60;' }

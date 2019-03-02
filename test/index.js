@@ -130,7 +130,7 @@ test('construct from api', t => {
 
   Tonic.add(ComponentD)
   const d = new ComponentD()
-  document.body.appendChild(d.root)
+  document.body.appendChild(d)
 
   d.reRender({ number: 3 })
   const div1 = document.body.querySelector('div')
@@ -139,22 +139,6 @@ test('construct from api', t => {
   d.reRender({ number: 6 })
   const div2 = document.body.querySelector('div')
   t.equal(div2.getAttribute('number'), '6', 'attribute was set in component')
-  t.end()
-})
-
-test('fail to connect before reRender', t => {
-  document.body.innerHTML = ''
-
-  class ComponentE extends Tonic {
-    render () {
-      return `<div number="${this.props.number}"></div>`
-    }
-  }
-
-  Tonic.add(ComponentE)
-  const c = document.createElement('component-e')
-
-  t.ok(!c.reRender, 'Component not yet connected')
   t.end()
 })
 
@@ -184,11 +168,12 @@ test('stylesheets and inline styles', t => {
     }
   }
 
-  Tonic.add(ComponentF, document.body)
-  const style = document.head.getElementsByTagName('style')[0]
+  Tonic.add(ComponentF)
+
   const expected = `component-f div { color: red; }`
+  const style = document.querySelector('component-f style')
   t.equal(style.textContent, expected, 'style was prefixed')
-  const div = document.querySelector('div')
+  const div = document.querySelector('component-f div')
   const computed = window.getComputedStyle(div)
   t.equal(computed.color, 'rgb(255, 0, 0)', 'inline style was set')
   t.equal(computed.backgroundColor, 'rgb(255, 0, 0)', 'inline style was set')
@@ -199,31 +184,31 @@ test('stylesheets and inline styles', t => {
 test('component composition', t => {
   document.body.innerHTML = `
     A Few
-    <bar></bar>
+    <x-bar></x-bar>
     Noisy
-    <bar></bar>
+    <x-bar></x-bar>
     Text Nodes
   `
 
-  class Foo extends Tonic {
+  class XFoo extends Tonic {
     render () {
       return `<div class="foo"></div>`
     }
   }
 
-  class Bar extends Tonic {
+  class XBar extends Tonic {
     render () {
       return `
         <div class="bar">
-          <foo></foo>
-          <foo></foo>
+          <x-foo></x-foo>
+          <x-foo></x-foo>
         </div>
       `
     }
   }
 
-  Tonic.add(Foo, document.body)
-  Tonic.add(Bar, document.body)
+  Tonic.add(XFoo)
+  Tonic.add(XBar)
 
   t.equal(document.body.querySelectorAll('.bar').length, 2, 'two bar divs')
   t.equal(document.body.querySelectorAll('.foo').length, 4, 'four foo divs')
@@ -258,7 +243,8 @@ test('persist named component state after re-renering', t => {
   }
 
   Tonic.add(StatefulChild)
-  Tonic.add(StatefulParent, document.body)
+  Tonic.add(StatefulParent)
+
   const parent = document.getElementsByTagName('stateful-parent')[0]
   parent.reRender()
   const child = document.getElementsByTagName('stateful-child')[0]
@@ -268,9 +254,9 @@ test('persist named component state after re-renering', t => {
 })
 
 test('lifecycle events', t => {
-  document.body.innerHTML = `<quxx></quxx>`
+  document.body.innerHTML = `<x-quxx></x-quxx>`
 
-  class Bazz extends Tonic {
+  class XBazz extends Tonic {
     constructor (p) {
       super(p)
       t.ok(true, 'calling bazz ctor')
@@ -284,7 +270,7 @@ test('lifecycle events', t => {
     }
   }
 
-  class Quxx extends Tonic {
+  class XQuxx extends Tonic {
     constructor (p) {
       super(p)
       t.ok(true, 'calling quxx ctor')
@@ -292,25 +278,25 @@ test('lifecycle events', t => {
 
     willConnect () {
       t.ok(true, 'willConnect event fired')
-      const expected = `<quxx></quxx>`
+      const expected = `<x-quxx></x-quxx>`
       t.equal(document.body.innerHTML, expected, 'nothing added yet')
     }
 
     connected () {
       t.ok(true, 'connected event fired')
-      const expected = `<quxx><div class="quxx"><bazz><div class="bar"></div></bazz></div></quxx>`
+      const expected = `<x-quxx><div class="quxx"><x-bazz><div class="bar"></div></x-bazz></div></x-quxx>`
       t.equal(document.body.innerHTML, expected, 'rendered')
     }
 
     render () {
       t.ok(true, 'render event fired')
-      return `<div class="quxx"><bazz></bazz></div>`
+      return `<div class="quxx"><x-bazz></x-bazz></div>`
     }
   }
 
-  Tonic.add(Bazz)
-  Tonic.add(Quxx, document.body)
-  const q = document.querySelector('quxx')
+  Tonic.add(XBazz)
+  Tonic.add(XQuxx)
+  const q = document.querySelector('x-quxx')
   q.reRender({})
   const refsLength = Tonic._refs.length
 
@@ -345,7 +331,6 @@ test('compose sugar (this.children)', t => {
 
   Tonic.add(ComponentG)
   Tonic.add(ComponentH)
-  Tonic.init(document.body)
 
   const g = document.querySelector('component-g')
   const children = g.querySelectorAll('.child')
@@ -396,7 +381,6 @@ test('check that composed elements use (and re-use) their initial innerHTML corr
   Tonic.add(ComponentJ)
   Tonic.add(ComponentK)
   Tonic.add(ComponentI)
-  Tonic.init()
 
   t.comment('Uses init() instead of <app>')
 
@@ -425,55 +409,55 @@ test('check that composed elements use (and re-use) their initial innerHTML corr
 })
 
 test('mixed order declaration', t => {
-  class App extends Tonic {
+  class AppXx extends Tonic {
     render () {
       return this.html`<div class="app">${this.children}</div>`
     }
   }
 
-  class ComponentA extends Tonic {
+  class ComponentAx extends Tonic {
     render () {
       return `<div class="a">A</div>`
     }
   }
 
-  class ComponentB extends Tonic {
+  class ComponentBx extends Tonic {
     render () {
       return this.html`<div class="b">${this.children}</div>`
     }
   }
 
-  class ComponentC extends Tonic {
+  class ComponentCx extends Tonic {
     render () {
       return this.html`<div class="c">${this.children}</div>`
     }
   }
 
-  class ComponentD extends Tonic {
+  class ComponentDx extends Tonic {
     render () {
       return `<div class="d">D</div>`
     }
   }
 
   document.body.innerHTML = `
-    <App>
-      <component-a>
-      </component-a>
+    <app-xx>
+      <component-ax>
+      </component-ax>
 
-      <component-b>
-        <component-c>
-          <component-d>
-          </component-d>
-        </component-c>
-      </component-b> 
-    </App>
+      <component-bx>
+        <component-cx>
+          <component-dx>
+          </component-dx>
+        </component-cx>
+      </component-bx>
+    </app-xx>
   `
 
-  Tonic.add(ComponentD)
-  Tonic.add(ComponentA)
-  Tonic.add(ComponentC)
-  Tonic.add(ComponentB)
-  Tonic.add(App)
+  Tonic.add(ComponentDx)
+  Tonic.add(ComponentAx)
+  Tonic.add(ComponentCx)
+  Tonic.add(AppXx)
+  Tonic.add(ComponentBx)
 
   {
     const div = document.querySelector('.app')

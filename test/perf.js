@@ -4,33 +4,32 @@ const Tonic = require('../dist/tonic.min.js')
 window.Benchmark = Benchmark
 const suite = new Benchmark.Suite()
 
-class Hello extends Tonic {
+class XHello extends Tonic {
   render () {
     return this.html`<h1>${this.props.message}</h1>`
   }
 }
 
-class App extends Tonic {
+class XApp extends Tonic {
   render () {
     return this.html`
-      <hello message="${Math.random()}">
-      </hello>
+      <x-hello message="${Math.random()}">
+      </x-hello>
     `
   }
 }
 
 document.body.innerHTML = `
   <script></script>
-  <App></app>
+  <x-app></x-app>
 `
 
-Tonic.add(Hello)
+Tonic.add(XHello)
+Tonic.add(XApp)
 
 document.addEventListener('DOMContentLoaded', () => {
-  Tonic.add(App)
-
-  const app = document.querySelector('hello')
-  const hello = document.querySelector('hello')
+  const app = document.querySelector('x-app')
+  const hello = document.querySelector('x-hello')
 
   suite
     .add('re-render a single component', () => {
