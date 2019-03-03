@@ -1,12 +1,11 @@
 class Tonic extends window.HTMLElement {
   constructor () {
     super()
-
     const state = Tonic._states[this.id]
     delete Tonic._states[this.id]
-
     this.state = state || {}
     this.props = {}
+    this.root = this.shadowRoot || this
     this._events()
   }
 
@@ -21,14 +20,16 @@ class Tonic extends window.HTMLElement {
 
   static add (c, root) {
     c.prototype._props = Object.getOwnPropertyNames(c.prototype)
-    if (!c.name || c.name.length === 1) throw Error('Mangling. https://bit.ly/2TkJ6zP')
+
+    if (!c.name || c.name.length === 1) {
+      throw Error('Mangling. https://bit.ly/2TkJ6zP')
+    }
 
     const name = Tonic._splitName(c.name).toLowerCase()
     if (window.customElements.get(name)) return
 
     Tonic._reg[name.toUpperCase()] = c
     Tonic._tags = Object.keys(Tonic._reg)
-
     window.customElements.define(name, c)
   }
 
@@ -52,15 +53,19 @@ class Tonic extends window.HTMLElement {
   html ([s, ...strings], ...values) {
     const reduce = (a, b) => a.concat(b, strings.shift())
     const filter = s => s && (s !== true || s === 0)
-    const ref = v => {
-      if (({}).toString.call(v) === '[object HTMLCollection]') {
-        return this._placehold([...v].map(node => node.cloneNode(true)))
+    const ref = o => {
+      const oo = ({}).toString.call(o).slice(8, -1)
+      switch (oo) {
+        case 'HTMLCollection':
+          const v = [...o].map(node => node.cloneNode(true))
+          return this._placehold(v)
+        case 'Array':
+        case 'Object':
+        case 'Function': return this._prop(o)
+        case 'Number': return `${o}__float`
+        case 'Boolean': return `${o}__boolean`
       }
-
-      if (typeof v === 'object' || typeof v === 'function') return this._prop(v)
-      if (typeof v === 'number') return `${v}__float`
-      if (typeof v === 'boolean') return `${v.toString()}`
-      return v
+      return o
     }
     return values.map(ref).reduce(reduce, [s]).filter(filter).join('')
   }
@@ -75,10 +80,14 @@ class Tonic extends window.HTMLElement {
 
   reRender (o = this.props) {
     if (!this.root) return
-    const oldProps = JSON.parse(JSON.stringify(this.props))
-    this.props = Tonic.sanitize(typeof o === 'function' ? o(this.props) : o)
+    const p = typeof o === 'function' ? o(this.props) : o
+    this.props = Tonic.sanitize(p)
     this._set(this.root, this.render(this.state, this.props))
-    this.updated && this.updated(oldProps)
+
+    if (this.updated) {
+      const oldProps = JSON.parse(JSON.stringify(this.props))
+      this.updated(oldProps)
+    }
   }
 
   getProps () {
@@ -126,6 +135,13 @@ class Tonic extends window.HTMLElement {
       target.appendChild(content.cloneNode(true))
     }
 
+    if (typeof this.stylesheet === 'function') {
+      const styleNode = document.createElement('style')
+      const source = document.createTextNode(this.stylesheet())
+      styleNode.appendChild(source)
+      target.insertBefore(styleNode, target.firstChild)
+    }
+
     this.root = target
   }
 
@@ -163,25 +179,19 @@ class Tonic extends window.HTMLElement {
       if (/__\w+__\w+__/.test(p)) {
         const { 1: root } = p.split('__')
         this.props[name] = Tonic._data[root][p]
-        continue
       } else if (/\d+__float/.test(p)) {
         this.props[name] = parseFloat(p, 10)
+      } else if (/\w+__boolean/.test(p)) {
+        this.props[name] = p.includes('true')
       }
     }
 
-    const defaults = this.defaults && this.defaults()
-    this.props = Object.assign(Tonic.sanitize(this.props), defaults)
+    this.props = Object.assign(
+      (this.defaults && this.defaults()) || {},
+      Tonic.sanitize(this.props))
 
     this.willConnect && this.willConnect()
     this._set(this.root, this.render(this.state, this.props))
-
-    if (this.stylesheet) {
-      const styleNode = document.createElement('style')
-      const source = document.createTextNode(this.stylesheet())
-      styleNode.appendChild(source)
-      this.root.insertBefore(styleNode, this.root.firstChild)
-    }
-
     this.connected && this.connected()
   }
 
@@ -193,8 +203,6 @@ class Tonic extends window.HTMLElement {
     Tonic._refs.splice(index, 1)
   }
 }
-
-Tonic.render = Tonic.add
 
 Object.assign(Tonic, {
   _tags: [],

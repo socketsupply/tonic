@@ -1,6 +1,6 @@
 {
   "name": "@conductorlab/tonic",
-  "version": "8.1.0",
+  "version": "9.0.0",
   "description": "A composable component inspired by React.",
   "main": "events.js",
   "scripts": {
