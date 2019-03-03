@@ -9,7 +9,7 @@
     "test:browser:min": "MIN=true browserify --bare ./test | tape-run --node",
     "test:perf": "browserify --bare ./test/perf.js | tape-run",
     "build:demo": "browserify --bare ./demo > ./docs/bundle.js",
-    "minify": "uglifyjs index.js -c unused,dead_code,hoist_vars,loops=false,ecma=6 -o dist/tonic.min.js"
+    "minify": "uglifyjs index.js -c unused,dead_code,hoist_vars,loops=false,ecma=7,hoist_props=true,hoist_funs,toplevel,keep_classnames,keep_fargs=false -o dist/tonic.min.js"
   },
   "author": "heapwolf",
   "license": "MIT",
