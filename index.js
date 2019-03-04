@@ -111,9 +111,10 @@ class Tonic extends window.HTMLElement {
     if (typeof content === 'string') {
       content = content.replace(Tonic.SPREAD, (_, p) => {
         const o = Tonic._data[p.split('__')[1]][p]
-        return Object.entries(o).map(([key, value]) =>
-          `${key}="${Tonic.escape(String(value))}"`
-        ).join(' ')
+        return Object.entries(o).map(([key, value]) => {
+          const k = key.replace(/([a-z])([A-Z])/g, '$1-$2').toLowerCase()
+          return `${k}="${Tonic.escape(String(value))}"`
+        }).join(' ')
       })
 
       target.innerHTML = content.trim()

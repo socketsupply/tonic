@@ -498,7 +498,11 @@ test('spread props', t => {
 
   class AppContainer extends Tonic {
     render () {
-      const o = { a: 'testing', b: 2.2, c: '"ok"' }
+      const o = {
+        a: 'testing',
+        b: 2.2,
+        FooBar: '"ok"'
+      }
 
       return this.html`
         <spread-component ...${o}>
@@ -520,7 +524,10 @@ test('spread props', t => {
   const component = document.querySelector('spread-component')
   t.equal(component.getAttribute('a'), 'testing')
   t.equal(component.getAttribute('b'), '2.2')
-  t.equal(component.getAttribute('c'), '"ok"')
+  t.equal(component.getAttribute('foo-bar'), '"ok"')
+  const div = document.querySelector('spread-component div')
+  t.equal(div.attributes.length, 3, 'div also got expanded attributes')
+  console.log(document.body.innerHTML)
   t.end()
 })
 
