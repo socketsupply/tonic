@@ -6,7 +6,7 @@ const suite = new Benchmark.Suite()
 
 class XHello extends Tonic {
   render () {
-    return this.html`<h1>${this.props.message}</h1>`
+    return `<h1>${this.props.message}</h1>`
   }
 }
 

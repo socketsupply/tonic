@@ -487,6 +487,43 @@ test('mixed order declaration', t => {
   t.end()
 })
 
+test('spread props', t => {
+  class SpreadComponent extends Tonic {
+    render () {
+      return this.html`
+        <div ...${this.props}></div>
+      `
+    }
+  }
+
+  class AppContainer extends Tonic {
+    render () {
+      const o = { a: 'testing', b: 2.2, c: '"ok"' }
+
+      return this.html`
+        <spread-component ...${o}>
+        </spread-component>
+
+        <div ...${o}>
+        </div>
+      `
+    }
+  }
+
+  document.body.innerHTML = `
+    <app-container></app-container>
+  `
+
+  Tonic.add(AppContainer)
+  Tonic.add(SpreadComponent)
+
+  const component = document.querySelector('spread-component')
+  t.equal(component.getAttribute('a'), 'testing')
+  t.equal(component.getAttribute('b'), '2.2')
+  t.equal(component.getAttribute('c'), '"ok"')
+  t.end()
+})
+
 test('cleanup, ensure exist', t => {
   t.end()
   process.exit(0)

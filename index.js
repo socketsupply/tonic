@@ -29,12 +29,12 @@ class Tonic extends window.HTMLElement {
     if (window.customElements.get(name)) return
 
     Tonic._reg[name] = c
-    Tonic._tags = Object.keys(Tonic._reg)
+    Tonic._tags = Object.keys(Tonic._reg).join()
     window.customElements.define(name, c)
   }
 
   static sanitize (o) {
-    if (o === null) return o
+    if (!o) return o
     for (const [k, v] of Object.entries(o)) {
       if (typeof v === 'object') o[k] = Tonic.sanitize(v)
       if (typeof v === 'string') o[k] = Tonic.escape(v)
@@ -43,7 +43,7 @@ class Tonic extends window.HTMLElement {
   }
 
   static escape (s) {
-    return s.replace(Tonic.ERE, ch => Tonic.MAP[ch])
+    return s.replace(Tonic.ESC, c => Tonic.MAP[c])
   }
 
   static _splitName (s) {
@@ -51,23 +51,20 @@ class Tonic extends window.HTMLElement {
   }
 
   html ([s, ...strings], ...values) {
-    const reduce = (a, b) => a.concat(b, strings.shift())
-    const filter = s => s && (s !== true || s === 0)
-    const ref = o => {
-      switch (({}).toString.call(o).slice(8, -1)) {
-        case 'HTMLCollection':
-        case 'NodeList':
-          const v = [...o].map(node => node.cloneNode(true))
-          return this._placehold(v)
-        case 'Array':
-        case 'Object':
-        case 'Function': return this._prop(o)
-        case 'Number': return `${o}__float`
-        case 'Boolean': return `${o}__boolean`
+    const refs = o => {
+      switch (({}).toString.call(o)) {
+        case '[object HTMLCollection]':
+        case '[object NodeList]': return this._placehold([...o])
+        case '[object Array]':
+        case '[object Object]':
+        case '[object Function]': return this._prop(o)
+        case '[object Number]': return `${o}__float`
+        case '[object Boolean]': return `${o}__boolean`
       }
       return o
     }
-    return values.map(ref).reduce(reduce, [s]).filter(filter).join('')
+    const reduce = (a, b) => a.concat(b, strings.shift())
+    return values.map(refs).reduce(reduce, [s]).join('')
   }
 
   setState (o) {
@@ -80,8 +77,7 @@ class Tonic extends window.HTMLElement {
 
   reRender (o = this.props) {
     if (!this.root) return
-    const p = typeof o === 'function' ? o(this.props) : o
-    this.props = Tonic.sanitize(p)
+    this.props = Tonic.sanitize(typeof o === 'function' ? o(this.props) : o)
     this._set(this.root, this.render())
 
     if (this.updated) {
@@ -107,29 +103,38 @@ class Tonic extends window.HTMLElement {
   }
 
   _set (target, content = '') {
-    target.querySelectorAll(Tonic._tags.join()).forEach(node => {
-      const index = Tonic._refs.findIndex(ref => ref === node)
-      if (index === -1) return
+    for (const node of target.querySelectorAll(Tonic._tags)) {
+      if (Tonic._refs.findIndex(ref => ref === node) === -1) continue
       Tonic._states[node.id] = node.getState()
-    })
+    }
 
     if (typeof content === 'string') {
+      content = content.replace(Tonic.SPREAD, (_, p) => {
+        const o = Tonic._data[p.split('__')[1]][p]
+        return Object.entries(o).map(([key, value]) =>
+          `${key}="${Tonic.escape(String(value))}"`
+        ).join(' ')
+      })
+
       target.innerHTML = content.trim()
 
       if (this.styles) {
         const styles = this.styles()
-        target.querySelectorAll('[styles]').forEach(el =>
-          el.getAttribute('styles').split(/\s+/).forEach(s =>
-            Object.assign(el.style, styles[s.trim()])))
+        for (const node of target.querySelectorAll('[styles]')) {
+          for (const s of node.getAttribute('styles').split(/\s+/)) {
+            Object.assign(node.style, styles[s.trim()])
+          }
+        }
       }
 
-      target.querySelectorAll('tonic-children').forEach(el => {
-        const nodes = Tonic._children[this._id][el.id]
-        nodes.forEach(node => el.parentNode.insertBefore(node, el))
+      for (const node of target.querySelectorAll('tonic-children')) {
+        for (const child of Tonic._children[this._id][node.id]) {
+          node.parentNode.insertBefore(child, node)
+        }
 
-        delete Tonic._children[el.id]
-        el.parentNode.removeChild(el)
-      })
+        delete Tonic._children[node.id]
+        node.parentNode.removeChild(node)
+      }
     } else {
       target.innerHTML = ''
       target.appendChild(content.cloneNode(true))
@@ -137,32 +142,32 @@ class Tonic extends window.HTMLElement {
 
     if (this.stylesheet) {
       const styleNode = document.createElement('style')
-      const source = document.createTextNode(this.stylesheet())
-      styleNode.appendChild(source)
+      styleNode.appendChild(document.createTextNode(this.stylesheet()))
       target.insertBefore(styleNode, target.firstChild)
     }
+
     this.root = target
   }
 
   _prop (o) {
     const id = this._id
     const p = `__${id}__${Tonic._createId()}__`
-    if (!Tonic._data[id]) Tonic._data[id] = {}
     Tonic._data[id][p] = o
     return p
   }
 
   _placehold (r) {
-    const id = this._id
     const ref = Tonic._createId()
-    if (!Tonic._children[id]) Tonic._children[id] = {}
-    Tonic._children[id][ref] = r
-    return `<tonic-children id="${ref}"/></tonic-children>`
+    Tonic._children[this._id][ref] = r
+    return `<tonic-children id="${ref}"></tonic-children>`
   }
 
   connectedCallback () {
     this.root = (this.shadowRoot || this)
+    this.childElements = this.children
     this._id = Tonic._createId()
+    Tonic._data[this._id] = {}
+    Tonic._children[this._id] = {}
 
     if (this.wrap) {
       const render = this.render
@@ -170,9 +175,10 @@ class Tonic extends window.HTMLElement {
     }
 
     Tonic._refs.push(this)
+    const cc = s => s.replace(/-(.)/g, (_, m) => m.toUpperCase())
 
-    for (let { name, value } of this.attributes) {
-      name = name.replace(/-(.)/g, (_, m) => m.toUpperCase())
+    for (const { name: _name, value } of this.attributes) {
+      const name = cc(_name)
       const p = this.props[name] = value
 
       if (/__\w+__\w+__/.test(p)) {
@@ -184,6 +190,7 @@ class Tonic extends window.HTMLElement {
         this.props[name] = p.includes('true')
       }
     }
+
     this.props = Object.assign(
       (this.defaults && this.defaults()) || {},
       Tonic.sanitize(this.props))
@@ -203,13 +210,14 @@ class Tonic extends window.HTMLElement {
 }
 
 Object.assign(Tonic, {
-  _tags: [],
+  _tags: '',
   _refs: [],
   _data: {},
   _states: {},
   _children: {},
   _reg: {},
-  ERE: /["&'<>`]/g,
+  SPREAD: /\.\.\.(__\w+__\w+__)/g,
+  ESC: /["&'<>`]/g,
   MAP: { '"': '&quot;', '&': '&amp;', '\'': '&#x27;', '<': '&lt;', '>': '&gt;', '`': '&#x60;' }
 })
 
