@@ -25,10 +25,10 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/hxoht/tonic.git"
+    "url": "git+https://github.com/heapwolf/tonic.git"
   },
   "bugs": {
-    "url": "https://github.com/hxoht/tonic/issues"
+    "url": "https://github.com/heapwolf/tonic/issues"
   },
-  "homepage": "https://github.com/hxoht/tonic#readme"
+  "homepage": "https://github.com/heapwolf/tonic#readme"
 }
