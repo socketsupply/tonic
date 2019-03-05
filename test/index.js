@@ -349,6 +349,56 @@ test('compose sugar (this.children)', t => {
   t.end()
 })
 
+test('compose sugar (children with children, etc)', t => {
+  class ComposeA extends Tonic {
+    render () {
+      return this.html`
+        ${this.children}
+      `
+    }
+  }
+
+  class ComposeB extends Tonic {
+    render () {
+      return this.html`
+        <select>
+          ${this.childNodes}
+        </select>
+      `
+    }
+  }
+
+  class ComposeC extends Tonic {
+    render () {
+      return this.html`
+
+      `
+    }
+  }
+
+  document.body.innerHTML = `
+    <compose-a>
+      <compose-b>
+        <option value="a">1</option>
+        <option value="b">2</option>
+        <option value="c">3</option>
+      </compose-b>
+    </compose-a>
+    <compose-a>
+      <compose-b>
+        <option value="a">1</option>
+        <option value="b">2</option>
+      </compose-b>
+    </compose-a>
+  `
+
+  Tonic.add(ComposeA)
+  Tonic.add(ComposeB)
+  Tonic.add(ComposeC)
+
+  t.end()
+})
+
 test('check that composed elements use (and re-use) their initial innerHTML correctly', t => {
   class ComponentI extends Tonic {
     render () {

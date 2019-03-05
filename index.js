@@ -10,7 +10,7 @@ class Tonic extends window.HTMLElement {
   }
 
   static _createId () {
-    return Math.random().toString(16).slice(2, 8)
+    return Math.random().toString(16).slice(2)
   }
 
   static match (el, s) {
@@ -123,7 +123,7 @@ class Tonic extends window.HTMLElement {
         }).join(' ')
       })
 
-      target.innerHTML = content.trim()
+      target.innerHTML = content
 
       if (this.styles) {
         const styles = this.styles()
@@ -134,14 +134,27 @@ class Tonic extends window.HTMLElement {
         }
       }
 
-      for (const node of target.querySelectorAll('tonic-children')) {
-        for (const child of Tonic._children[this._id][node.id]) {
-          node.parentNode.insertBefore(child, node)
-        }
+      const children = Tonic._children[this._id]
 
-        delete Tonic._children[node.id]
-        node.parentNode.removeChild(node)
+      const walk = (node, fn) => {
+        if (node.nodeType === 3) {
+          const id = node.textContent.trim()
+          if (children[id]) return fn(node, children[id])
+        }
+        node = node.firstChild
+        while (node) {
+          walk(node, fn)
+          node = node.nextSibling
+        }
       }
+
+      walk(target, (node, children) => {
+        for (const child of children) {
+          node.parentNode.appendChild(child)
+        }
+        delete Tonic._children[this._id][node.id]
+        node.parentNode.removeChild(node)
+      })
     } else {
       target.innerHTML = ''
       target.appendChild(content.cloneNode(true))
@@ -164,9 +177,9 @@ class Tonic extends window.HTMLElement {
   }
 
   _placehold (r) {
-    const ref = Tonic._createId()
+    const ref = `__${Tonic._createId()}__`
     Tonic._children[this._id][ref] = r
-    return `<tonic-children id="${ref}"></tonic-children>`
+    return ref
   }
 
   connectedCallback () {
@@ -223,6 +236,7 @@ Object.assign(Tonic, {
   _states: {},
   _children: {},
   _reg: {},
+  _index: 0,
   SPREAD: /\.\.\.(__\w+__\w+__)/g,
   ESC: /["&'<>`]/g,
   MAP: { '"': '&quot;', '&': '&amp;', '\'': '&#x27;', '<': '&lt;', '>': '&gt;', '`': '&#x60;' }
