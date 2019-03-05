@@ -50,6 +50,11 @@ class Tonic extends window.HTMLElement {
     return s.match(/[A-Z][a-z]*/g).join('-')
   }
 
+  static _normalizeAttrs (o, x = {}) {
+    [...o].forEach(o => (x[o.name] = o.value))
+    return x
+  }
+
   html ([s, ...strings], ...values) {
     const refs = o => {
       switch (({}).toString.call(o)) {
@@ -58,6 +63,7 @@ class Tonic extends window.HTMLElement {
         case '[object Array]':
         case '[object Object]':
         case '[object Function]': return this._prop(o)
+        case '[object NamedNodeMap]': return this._prop(Tonic._normalizeAttrs(o))
         case '[object Number]': return `${o}__float`
         case '[object Boolean]': return `${o}__boolean`
       }

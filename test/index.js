@@ -504,18 +504,23 @@ test('spread props', t => {
         FooBar: '"ok"'
       }
 
+      const el = document.querySelector('#el').attributes
+
       return this.html`
         <spread-component ...${o}>
         </spread-component>
 
         <div ...${o}>
         </div>
+
+        <span ...${el}></span>
       `
     }
   }
 
   document.body.innerHTML = `
     <app-container></app-container>
+    <div id="el" d="1" e="3.3" f="xxx"></div>
   `
 
   Tonic.add(AppContainer)
@@ -525,9 +530,10 @@ test('spread props', t => {
   t.equal(component.getAttribute('a'), 'testing')
   t.equal(component.getAttribute('b'), '2.2')
   t.equal(component.getAttribute('foo-bar'), '"ok"')
-  const div = document.querySelector('spread-component div')
+  const div = document.querySelector('div:first-of-type')
+  const span = document.querySelector('span:first-of-type')
   t.equal(div.attributes.length, 3, 'div also got expanded attributes')
-  console.log(document.body.innerHTML)
+  t.equal(span.attributes.length, 4, 'span got all attributes from div#el')
   t.end()
 })
 
