@@ -1,4 +1,4 @@
-![tonic](https://github.com/hxoht/tonic/raw/addimage/readme-tonic.png)
+![tonic](https://raw.githubusercontent.com/heapwolf/tonic/master/readme-tonic.png)
 
 <p align="center">
   https://tonic.technology

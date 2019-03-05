@@ -1,25 +1,12 @@
-class Tonic {
-  constructor ({ node, state } = {}) {
-    this.props = {}
+class Tonic extends window.HTMLElement {
+  constructor () {
+    super()
+    const state = Tonic._states[this.id]
+    delete Tonic._states[this.id]
     this.state = state || {}
-    const name = Tonic._splitName(this.constructor.name)
-    const r = this.root = node || document.createElement(name)
-    r._id = Tonic._createId()
-    r._unmount = index => this._unmount(index)
-    r.reRender = v => this.reRender(v)
-    r.setState = v => this.setState(v)
-    r.getProps = () => this.getProps()
-    r.getState = () => this.getState()
-
+    this.props = {}
+    this.root = this.shadowRoot || this
     this._events()
-
-    if (this.wrap) {
-      const render = this.render
-      this.render = () => this.wrap(render.bind(this))
-    }
-
-    this._connect()
-    Tonic._refs.push(this.root)
   }
 
   static _createId () {
@@ -33,43 +20,21 @@ class Tonic {
 
   static add (c, root) {
     c.prototype._props = Object.getOwnPropertyNames(c.prototype)
-    if (!c.name || c.name.length === 1) throw Error('Mangling. https://bit.ly/2TkJ6zP')
 
-    const d = document
-    const name = Tonic._splitName(c.name)
-    Tonic._reg[name.toUpperCase()] = c
-    Tonic._tags = Object.keys(Tonic._reg)
-    if (c.registered) return
-    c.registered = true
-
-    if (!Tonic.styleNode) {
-      const t = d.createElement('style')
-      Tonic.nonce && t.setAttribute('nonce', Tonic.nonce)
-      Tonic.styleNode = d.head.appendChild(t)
+    if (!c.name || c.name.length === 1) {
+      throw Error('Mangling. https://bit.ly/2TkJ6zP')
     }
 
-    if (root || c.name === 'App') Tonic.init(root || d.firstElementChild)
-  }
+    const name = Tonic._splitName(c.name).toLowerCase()
+    if (window.customElements.get(name)) return
 
-  static init (node = document.firstElementChild, states = {}) {
-    node = node.firstElementChild
-
-    while (node) {
-      const t = node.tagName
-
-      if (Tonic._tags.includes(t) && !node._id) { /* eslint-disable no-new */
-        new Tonic._reg[t]({ node, state: states[node.id] })
-        node = node.nextElementSibling
-        continue
-      }
-
-      Tonic.init(node, states)
-      node = node.nextElementSibling
-    }
+    Tonic._reg[name] = c
+    Tonic._tags = Object.keys(Tonic._reg).join()
+    window.customElements.define(name, c)
   }
 
   static sanitize (o) {
-    if (o === null) return o
+    if (!o) return o
     for (const [k, v] of Object.entries(o)) {
       if (typeof v === 'object') o[k] = Tonic.sanitize(v)
       if (typeof v === 'string') o[k] = Tonic.escape(v)
@@ -78,25 +43,34 @@ class Tonic {
   }
 
   static escape (s) {
-    return s.replace(Tonic.escapeRe, ch => Tonic.escapeMap[ch])
+    return s.replace(Tonic.ESC, c => Tonic.MAP[c])
   }
 
   static _splitName (s) {
     return s.match(/[A-Z][a-z]*/g).join('-')
   }
 
+  static _normalizeAttrs (o, x = {}) {
+    [...o].forEach(o => (x[o.name] = o.value))
+    return x
+  }
+
   html ([s, ...strings], ...values) {
-    const reduce = (a, b) => a.concat(b, strings.shift())
-    const filter = s => s && (s !== true || s === 0)
-    const ref = v => {
-      const isObject = typeof v === 'object'
-      if (isObject && v.__children__) return this._children(v)
-      if (isObject || typeof v === 'function') return this._prop(v)
-      if (typeof v === 'number') return `${v}__float`
-      if (typeof v === 'boolean') return `${v.toString()}`
-      return v
+    const refs = o => {
+      switch (({}).toString.call(o)) {
+        case '[object HTMLCollection]':
+        case '[object NodeList]': return this._placehold([...o])
+        case '[object Array]':
+        case '[object Object]':
+        case '[object Function]': return this._prop(o)
+        case '[object NamedNodeMap]': return this._prop(Tonic._normalizeAttrs(o))
+        case '[object Number]': return `${o}__float`
+        case '[object Boolean]': return `${o}__boolean`
+      }
+      return o
     }
-    return values.map(ref).reduce(reduce, [s]).filter(filter).join('')
+    const reduce = (a, b) => a.concat(b, strings.shift())
+    return values.map(refs).reduce(reduce, [s]).join('')
   }
 
   setState (o) {
@@ -109,10 +83,13 @@ class Tonic {
 
   reRender (o = this.props) {
     if (!this.root) return
-    const oldProps = JSON.parse(JSON.stringify(this.props))
     this.props = Tonic.sanitize(typeof o === 'function' ? o(this.props) : o)
-    Tonic.init(this.root, this._set(this.root, this.render()))
-    this.updated && this.updated(oldProps)
+    this._set(this.root, this.render())
+
+    if (this.updated) {
+      const oldProps = JSON.parse(JSON.stringify(this.props))
+      this.updated(oldProps)
+    }
   }
 
   getProps () {
@@ -132,111 +109,123 @@ class Tonic {
   }
 
   _set (target, content = '') {
-    const states = {}
-
-    // for (const t of Tonic._tags) {
-      // for (const node of target.getElementsByTagName(t)) {
-    target.querySelectorAll(Tonic._tags.join()).forEach(node => {
-      const index = Tonic._refs.findIndex(ref => ref === node)
-      if (index === -1) return
-      states[node.id] = node.getState()
-      node._unmount(index)
-    })
-      // }
-    // }
+    for (const node of target.querySelectorAll(Tonic._tags)) {
+      if (Tonic._refs.findIndex(ref => ref === node) === -1) continue
+      Tonic._states[node.id] = node.getState()
+    }
 
     if (typeof content === 'string') {
+      content = content.replace(Tonic.SPREAD, (_, p) => {
+        const o = Tonic._data[p.split('__')[1]][p]
+        return Object.entries(o).map(([key, value]) => {
+          const k = key.replace(/([a-z])([A-Z])/g, '$1-$2').toLowerCase()
+          return `${k}="${Tonic.escape(String(value))}"`
+        }).join(' ')
+      })
+
       target.innerHTML = content.trim()
 
       if (this.styles) {
         const styles = this.styles()
-        target.querySelectorAll('[styles]').forEach(el =>
-          el.getAttribute('styles').split(/\s+/).forEach(s =>
-            Object.assign(el.style, styles[s.trim()])))
+        for (const node of target.querySelectorAll('[styles]')) {
+          for (const s of node.getAttribute('styles').split(/\s+/)) {
+            Object.assign(node.style, styles[s.trim()])
+          }
+        }
       }
 
-      target.querySelectorAll('tonic-children').forEach(el => {
-        const root = Tonic._elements[this.root._id]
-        root[el.id].forEach(node => {
-          el.parentNode.insertBefore(node, el)
-        })
-        delete root[el.id]
-        el.parentNode.removeChild(el)
-      })
+      for (const node of target.querySelectorAll('tonic-children')) {
+        for (const child of Tonic._children[this._id][node.id]) {
+          node.parentNode.insertBefore(child, node)
+        }
+
+        delete Tonic._children[node.id]
+        node.parentNode.removeChild(node)
+      }
     } else {
       target.innerHTML = ''
       target.appendChild(content.cloneNode(true))
     }
+
+    if (this.stylesheet) {
+      const styleNode = document.createElement('style')
+      styleNode.appendChild(document.createTextNode(this.stylesheet()))
+      target.insertBefore(styleNode, target.firstChild)
+    }
+
     this.root = target
-    return states
   }
 
   _prop (o) {
-    const id = this.root._id
+    const id = this._id
     const p = `__${id}__${Tonic._createId()}__`
-    if (!Tonic._data[id]) Tonic._data[id] = {}
     Tonic._data[id][p] = o
     return p
   }
 
-  _children (r) {
-    const id = this.root._id
+  _placehold (r) {
     const ref = Tonic._createId()
-    if (!Tonic._elements[id]) Tonic._elements[id] = {}
-    Tonic._elements[id][ref] = r
-    return `<tonic-children id="${ref}"/></tonic-children>`
+    Tonic._children[this._id][ref] = r
+    return `<tonic-children id="${ref}"></tonic-children>`
   }
 
-  _connect () {
-    for (let { name, value } of this.root.attributes) {
-      name = name.replace(/-(.)/g, (_, m) => m.toUpperCase())
+  connectedCallback () {
+    this.root = (this.shadowRoot || this)
+    this.childElements = this.children
+    this._id = Tonic._createId()
+    Tonic._data[this._id] = {}
+    Tonic._children[this._id] = {}
+
+    if (this.wrap) {
+      const render = this.render
+      this.render = () => this.wrap(render.bind(this))
+    }
+
+    Tonic._refs.push(this)
+    const cc = s => s.replace(/-(.)/g, (_, m) => m.toUpperCase())
+
+    for (const { name: _name, value } of this.attributes) {
+      const name = cc(_name)
       const p = this.props[name] = value
 
       if (/__\w+__\w+__/.test(p)) {
         const { 1: root } = p.split('__')
         this.props[name] = Tonic._data[root][p]
-        continue
       } else if (/\d+__float/.test(p)) {
         this.props[name] = parseFloat(p, 10)
+      } else if (/\w+__boolean/.test(p)) {
+        this.props[name] = p.includes('true')
       }
     }
 
-    const defaults = this.defaults && this.defaults()
-    this.props = Object.assign(Tonic.sanitize(this.props), defaults)
+    this.props = Object.assign(
+      (this.defaults && this.defaults()) || {},
+      Tonic.sanitize(this.props))
 
     this.willConnect && this.willConnect()
-    this.children = [...this.root.childNodes].map(node => node.cloneNode(true))
-    this.children.__children__ = true
     this._set(this.root, this.render())
-    Tonic.init(this.root)
-
-    if (this.stylesheet && !Tonic._reg[this.root.tagName].styled) {
-      Tonic._reg[this.root.tagName].styled = true
-      Tonic.styleNode.appendChild(document.createTextNode(this.stylesheet()))
-    }
-
     this.connected && this.connected()
   }
 
-  _unmount (index) {
+  disconnectedCallback (index) {
     this.disconnected && this.disconnected()
-    delete Tonic._data[this.root._id]
-    delete Tonic._elements[this.root._id]
+    delete Tonic._data[this._id]
+    delete Tonic._children[this._id]
     delete this.root
     Tonic._refs.splice(index, 1)
   }
 }
 
-Tonic.render = Tonic.add
-
 Object.assign(Tonic, {
-  _tags: [],
+  _tags: '',
   _refs: [],
   _data: {},
-  _elements: {},
+  _states: {},
+  _children: {},
   _reg: {},
-  escapeRe: /["&'<>`]/g,
-  escapeMap: { '"': '&quot;', '&': '&amp;', '\'': '&#x27;', '<': '&lt;', '>': '&gt;', '`': '&#x60;' }
+  SPREAD: /\.\.\.(__\w+__\w+__)/g,
+  ESC: /["&'<>`]/g,
+  MAP: { '"': '&quot;', '&': '&amp;', '\'': '&#x27;', '<': '&lt;', '>': '&gt;', '`': '&#x60;' }
 })
 
 if (typeof module === 'object') module.exports = Tonic
