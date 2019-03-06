@@ -5,7 +5,6 @@ class Tonic extends window.HTMLElement {
     delete Tonic._states[this.id]
     this.state = state || {}
     this.props = {}
-    this.root = this.shadowRoot || this
     this._events()
   }
 
@@ -18,7 +17,7 @@ class Tonic extends window.HTMLElement {
     return el.matches(s) ? el : el.closest(s)
   }
 
-  static add (c, root) {
+  static add (c) {
     c.prototype._props = Object.getOwnPropertyNames(c.prototype)
 
     if (!c.name || c.name.length === 1) {
@@ -82,9 +81,8 @@ class Tonic extends window.HTMLElement {
   }
 
   reRender (o = this.props) {
-    if (!this.root) return
     this.props = Tonic.sanitize(typeof o === 'function' ? o(this.props) : o)
-    this._set(this.root, this.render())
+    this._set(this, this.render())
 
     if (this.updated) {
       const oldProps = JSON.parse(JSON.stringify(this.props))
@@ -104,7 +102,7 @@ class Tonic extends window.HTMLElement {
     const hp = Object.getOwnPropertyNames(window.HTMLElement.prototype)
     for (const p of this._props) {
       if (hp.indexOf('on' + p) === -1) continue
-      this.root.addEventListener(p, this)
+      this.addEventListener(p, this)
     }
   }
 
@@ -165,8 +163,6 @@ class Tonic extends window.HTMLElement {
       styleNode.appendChild(document.createTextNode(this.stylesheet()))
       target.insertBefore(styleNode, target.firstChild)
     }
-
-    this.root = target
   }
 
   _prop (o) {
@@ -183,13 +179,8 @@ class Tonic extends window.HTMLElement {
   }
 
   connectedCallback () {
-    if (this._id) return
-
-    this.root = (this.shadowRoot || this)
+    this.root = this.shadowRoot || this
     this.childElements = this.children
-    this._id = Tonic._createId()
-    Tonic._data[this._id] = {}
-    Tonic._children[this._id] = {}
 
     if (this.wrap) {
       const render = this.render
@@ -217,8 +208,18 @@ class Tonic extends window.HTMLElement {
       (this.defaults && this.defaults()) || {},
       Tonic.sanitize(this.props))
 
+    if (!this._id) {
+      this.source = this.innerHTML
+    } else {
+      this.innerHTML = this.source
+    }
+
+    this._id = Tonic._createId()
+    Tonic._data[this._id] = {}
+    Tonic._children[this._id] = {}
+
     this.willConnect && this.willConnect()
-    this._set(this.root, this.render())
+    this._set(this, this.render())
     this.connected && this.connected()
   }
 
@@ -226,7 +227,6 @@ class Tonic extends window.HTMLElement {
     this.disconnected && this.disconnected()
     delete Tonic._data[this._id]
     delete Tonic._children[this._id]
-    delete this.root
     Tonic._refs.splice(index, 1)
   }
 }
