@@ -183,6 +183,8 @@ class Tonic extends window.HTMLElement {
   }
 
   connectedCallback () {
+    if (this._id) return
+
     this.root = (this.shadowRoot || this)
     this.childElements = this.children
     this._id = Tonic._createId()

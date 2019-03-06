@@ -349,11 +349,13 @@ test('compose sugar (this.children)', t => {
   t.end()
 })
 
-test('compose sugar (children with children, etc)', t => {
+test('ensure registration order does not affect rendering', t => {
   class ComposeA extends Tonic {
     render () {
       return this.html`
-        ${this.children}
+        <div class="a">
+          ${this.children}
+        </div>
       `
     }
   }
@@ -368,14 +370,6 @@ test('compose sugar (children with children, etc)', t => {
     }
   }
 
-  class ComposeC extends Tonic {
-    render () {
-      return this.html`
-
-      `
-    }
-  }
-
   document.body.innerHTML = `
     <compose-a>
       <compose-b>
@@ -384,17 +378,14 @@ test('compose sugar (children with children, etc)', t => {
         <option value="c">3</option>
       </compose-b>
     </compose-a>
-    <compose-a>
-      <compose-b>
-        <option value="a">1</option>
-        <option value="b">2</option>
-      </compose-b>
-    </compose-a>
   `
 
-  Tonic.add(ComposeA)
   Tonic.add(ComposeB)
-  Tonic.add(ComposeC)
+  Tonic.add(ComposeA)
+
+  const select = document.querySelectorAll('.a select')
+  t.equal(select.length, 1, 'there is only one select')
+  t.equal(select[0].children.length, 3, 'there are 3 options')
 
   t.end()
 })
