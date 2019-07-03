@@ -1,3 +1,6 @@
+const { constructor: AsyncFunction } = async function () {}
+const { constructor: AsyncFunctionGenerator } = async function * () {}
+
 class Tonic extends window.HTMLElement {
   constructor () {
     super()
@@ -111,21 +114,16 @@ class Tonic extends window.HTMLElement {
     }
   }
 
-  async _set (target, render, text = '') {
-    const name = render && render.constructor.name
-    let content = ''
-
-    if (name === 'AsyncFunction') {
+  async _set (target, render, content = '') {
+    if (render instanceof AsyncFunction) {
       content = await render.call(this) || ''
-    } else if (name === 'AsyncGeneratorFunction') {
+    } else if (render instanceof AsyncFunctionGenerator) {
       for await (const value of render.call(this)) {
         this._set(target, null, value)
       }
       return
-    } else if (name === 'Function') {
+    } else if (render instanceof Function) {
       content = render.call(this) || ''
-    } else {
-      content = text
     }
 
     for (const node of target.querySelectorAll(Tonic._tags)) {
