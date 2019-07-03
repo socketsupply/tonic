@@ -7,6 +7,8 @@ const src = path.join(__dirname, process.env['MIN']
 
 const Tonic = require(src)
 
+const sleep = t => new Promise(resolve => setTimeout(resolve, t))
+
 test('sanity', t => {
   t.ok(true)
   t.end()
@@ -31,19 +33,9 @@ test('attach to dom', t => {
 })
 
 test('pass props', t => {
-  document.body.innerHTML = `
-
-    <component-b
-      id="x"
-      test-item="true"
-      disabled
-      empty=''>
-    </component-b>
-  `
-
   Tonic.add(class ComponentBB extends Tonic {
     render () {
-      return `<div>${this.props.data[0].foo}</div>`
+      return this.html`<div>${this.props.data[0].foo}</div>`
     }
   })
 
@@ -69,7 +61,18 @@ test('pass props', t => {
         </component-b-b>
       `
     }
-  }, document.body)
+  })
+
+  document.body.innerHTML = `
+    <component-b
+      id="x"
+      test-item="true"
+      disabled
+      empty=''>
+    </component-b>
+  `
+
+  console.log(document.body.outerHTML)
 
   const bb = document.getElementById('y')
   {
@@ -575,6 +578,71 @@ test('spread props', t => {
   const span = document.querySelector('span:first-of-type')
   t.equal(div.attributes.length, 3, 'div also got expanded attributes')
   t.equal(span.attributes.length, 4, 'span got all attributes from div#el')
+  t.end()
+})
+
+test('async render', async t => {
+  class AsyncRender extends Tonic {
+    async getSomeData () {
+      await sleep(1024)
+      return 'Some Data'
+    }
+
+    async render () {
+      const value = await this.getSomeData()
+      return this.html`
+        <p>${value}</p>
+      `
+    }
+  }
+
+  Tonic.add(AsyncRender)
+
+  document.body.innerHTML = `
+    <async-render></async-render>
+  `
+
+  let ar = document.body.querySelector('async-render')
+  t.equal(ar.innerHTML, '')
+
+  await sleep(2048)
+
+  ar = document.body.querySelector('async-render')
+  t.equal(ar.innerHTML.trim(), '<p>Some Data</p>')
+  t.end()
+})
+
+test('async generator render', async t => {
+  class AsyncRender extends Tonic {
+    async getSomeData () {
+      await sleep(1024)
+      return 'Some Data'
+    }
+
+    async * render () {
+      yield this.html`Loading...`
+
+      const value = await this.getSomeData()
+
+      yield this.html`
+        <p>${value}</p>
+      `
+    }
+  }
+
+  Tonic.add(AsyncRender)
+
+  document.body.innerHTML = `
+    <async-render></async-render>
+  `
+
+  let ar = document.body.querySelector('async-render')
+  t.equal(ar.innerHTML, 'Loading...')
+
+  await sleep(2048)
+
+  ar = document.body.querySelector('async-render')
+  t.equal(ar.innerHTML.trim(), '<p>Some Data</p>')
   t.end()
 })
 

@@ -17,10 +17,13 @@
 | <code>reRender(Object &#124; Function)</code> | Set the properties of a component instance. Can also take a function which will receive the current props as an argument. |
 | `getProps()` | Get the properties of a component instance. |
 | <code>setState(Object &#124; Function)</code> | Set the state of a component instance. Can also take a function which will receive the current props as an argument. |
+| html\`...\` | Interpolated HTML string (use as a [tagged template][2]). |
+
+## INSTANCE METHODS IMPLEMENTED BY THE DEVELOPER
+
 | `stylesheet()` | Should return a string of css to be lazily added to a `style` tag in the head. |
 | `styles()` | Should return an object that represents inline-styles to be applied to the component. Styles are applied by adding a keys from the object to the `styles` attribute of an html tag in the render function, for example `styles="key1 key2"`. Each object's key-value pair are added to the element's style object. |
-| `render()` | Should return HTML or nodes to be parsed or a dom node that will overwrite. There is usually no need to call this directly, prefer `componentInstance.reRender({ ... })`. |
-| html\`...\` | Tidy up an HTML string (use as a [tagged template][2]). |
+| `render()` | Required, should return HTML or nodes to be parsed or a dom node that will overwrite. There is usually no need to call this directly, prefer `foo.reRender({ ... })`. This function can be async or an async generator. |
 
 ## INSTANCE PROPERTIES
 
