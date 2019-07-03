@@ -118,8 +118,11 @@ class Tonic extends window.HTMLElement {
     if (render instanceof AsyncFunction) {
       content = await render.call(this) || ''
     } else if (render instanceof AsyncFunctionGenerator) {
-      for await (const value of render.call(this)) {
+      const itr = render.call(this)
+      while (true) {
+        const { value, done } = await itr.next()
         this._set(target, null, value)
+        if (done) break
       }
       return
     } else if (render instanceof Function) {
