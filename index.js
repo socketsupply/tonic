@@ -1,3 +1,6 @@
+const { constructor: AsyncFunction } = async function () {}
+const { constructor: AsyncFunctionGenerator } = async function * () {}
+
 class Tonic extends window.HTMLElement {
   constructor () {
     super()
@@ -87,7 +90,7 @@ class Tonic extends window.HTMLElement {
 
   reRender (o = this.props) {
     this.props = Tonic.sanitize(typeof o === 'function' ? o(this.props) : o)
-    this._set(this, this.render())
+    this._set(this, this.render)
 
     if (this.updated) {
       const oldProps = JSON.parse(JSON.stringify(this.props))
@@ -111,7 +114,21 @@ class Tonic extends window.HTMLElement {
     }
   }
 
-  _set (target, content = '') {
+  async _set (target, render, content = '') {
+    if (render instanceof AsyncFunction) {
+      content = await render.call(this) || ''
+    } else if (render instanceof AsyncFunctionGenerator) {
+      const itr = render.call(this)
+      while (true) {
+        const { value, done } = await itr.next()
+        this._set(target, null, value)
+        if (done) break
+      }
+      return
+    } else if (render instanceof Function) {
+      content = render.call(this) || ''
+    }
+
     for (const node of target.querySelectorAll(Tonic._tags)) {
       if (Tonic._refs.findIndex(ref => ref === node) === -1) continue
       Tonic._states[node.id] = node.getState()
@@ -224,7 +241,7 @@ class Tonic extends window.HTMLElement {
     this._id = this._id || Tonic._createId()
 
     this.willConnect && this.willConnect()
-    this._set(this, this.render())
+    this._set(this, this.render)
     this.connected && this.connected()
   }
 

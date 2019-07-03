@@ -1,6 +1,6 @@
 {
   "name": "@conductorlab/tonic",
-  "version": "9.0.5",
+  "version": "10.0.0",
   "description": "A composable component inspired by React.",
   "main": "events.js",
   "scripts": {
@@ -9,16 +9,16 @@
     "test:browser:min": "MIN=true browserify --bare ./test | tape-run --node",
     "test:perf": "npm run minify && browserify --bare ./test/perf.js | tape-run",
     "build:demo": "browserify --bare ./demo > ./docs/bundle.js",
-    "minify": "uglifyjs index.js -c unused,dead_code,hoist_vars,loops=false,ecma=7,hoist_props=true,hoist_funs,toplevel,keep_classnames,keep_fargs=false -o dist/tonic.min.js"
+    "minify": "terser index.js -c unused,dead_code,hoist_vars,loops=false,hoist_props=true,hoist_funs,toplevel,keep_classnames,keep_fargs=false -o dist/tonic.min.js"
   },
   "author": "heapwolf",
   "license": "MIT",
   "devDependencies": {
+    "benchmark": "^2.1.4",
     "browserify": "^16.2.2",
-    "tape": "^4.9.1",
+    "tape": "^4.11.0",
     "tape-run": "^4.0.0",
-    "uglify-es": "^3.3.9",
-    "benchmark": "^2.1.4"
+    "terser": "^4.0.2"
   },
   "directories": {
     "test": "test"
@@ -30,5 +30,6 @@
   "bugs": {
     "url": "https://github.com/heapwolf/tonic/issues"
   },
-  "homepage": "https://github.com/heapwolf/tonic#readme"
+  "homepage": "https://github.com/heapwolf/tonic#readme",
+  "dependencies": {}
 }
