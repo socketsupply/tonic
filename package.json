@@ -15,9 +15,9 @@
   "license": "MIT",
   "devDependencies": {
     "benchmark": "^2.1.4",
+    "puppeteer": "*",
     "browserify": "^16.2.2",
     "tape": "^4.11.0",
-    "tape-run": "^4.0.0",
     "terser": "^4.0.2"
   },
   "directories": {
