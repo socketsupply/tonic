@@ -204,7 +204,6 @@ class Tonic extends window.HTMLElement {
 
   connectedCallback () {
     this.root = this.shadowRoot || this
-    this.childElements = this.children
 
     if (this.wrap) {
       const render = this.render

@@ -29,8 +29,6 @@
 
 | Name | Description |
 | :--- | :--- |
-| <code>childElements</code> | A NodeList of the current child *elements* of the component. |
-| <code>childNodes</code> | A NodeList of the current child *nodes* of the component. |
 | <code>elements</code> | An array of the original child *elements* of the component. |
 | <code>nodes</code> | An array of the original child *nodes* of the component. |
 | <code>props</code> | An object that contains the properties that were passed to the component. |
