@@ -31,8 +31,8 @@
 | :--- | :--- |
 | <code>childElements</code> | A NodeList of the current child *elements* of the component. |
 | <code>childNodes</code> | A NodeList of the current child *nodes* of the component. |
-| <code>initialChildElements</code> | An array of the original child *elements* of the component. |
-| <code>initialChildNodes</code> | An array of the original child *nodes* of the component. |
+| <code>elements</code> | An array of the original child *elements* of the component. |
+| <code>nodes</code> | An array of the original child *nodes* of the component. |
 | <code>props</code> | An object that contains the properties that were passed to the component. |
 | <code>state</code> | A plain-old JSON object that contains the state of the component. |
 
