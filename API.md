@@ -21,6 +21,8 @@
 
 ## INSTANCE METHODS IMPLEMENTED BY THE DEVELOPER
 
+| Name | Description |
+| :--- | :--- |
 | `stylesheet()` | Should return a string of css to be lazily added to a `style` tag in the head. |
 | `styles()` | Should return an object that represents inline-styles to be applied to the component. Styles are applied by adding a keys from the object to the `styles` attribute of an html tag in the render function, for example `styles="key1 key2"`. Each object's key-value pair are added to the element's style object. |
 | `render()` | Required, should return HTML or nodes to be parsed or a dom node that will overwrite. There is usually no need to call this directly, prefer `foo.reRender({ ... })`. This function can be async or an async generator. |
