@@ -206,8 +206,8 @@ class Tonic extends window.HTMLElement {
     this.root = this.shadowRoot || this
 
     if (this.wrap) {
-      const render = this.render
-      this.render = () => this.wrap(render.bind(this))
+      this.wrapped = this.render
+      this.render = this.wrap
     }
 
     Tonic._refs.push(this)
