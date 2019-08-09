@@ -264,6 +264,8 @@ Object.assign(Tonic, {
   _index: 0,
   SPREAD: /\.\.\.(__\w+__\w+__)/g,
   ESC: /["&'<>`]/g,
+  AsyncFunctionGenerator,
+  AsyncFunction,
   MAP: { '"': '&quot;', '&': '&amp;', '\'': '&#x27;', '<': '&lt;', '>': '&gt;', '`': '&#x60;' }
 })
 
