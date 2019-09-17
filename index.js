@@ -1,6 +1,3 @@
-const { constructor: AsyncFunction } = async function () {}
-const { constructor: AsyncFunctionGenerator } = async function * () {}
-
 class Tonic extends window.HTMLElement {
   constructor () {
     super()
@@ -115,9 +112,9 @@ class Tonic extends window.HTMLElement {
   }
 
   async _set (target, render, content = '') {
-    if (render instanceof AsyncFunction) {
+    if (render instanceof Tonic.AsyncFunction) {
       content = await render.call(this) || ''
-    } else if (render instanceof AsyncFunctionGenerator) {
+    } else if (render instanceof Tonic.AsyncFunctionGenerator) {
       const itr = render.call(this)
       while (true) {
         const { value, done } = await itr.next()
@@ -264,8 +261,8 @@ Object.assign(Tonic, {
   _index: 0,
   SPREAD: /\.\.\.(__\w+__\w+__)/g,
   ESC: /["&'<>`]/g,
-  AsyncFunctionGenerator,
-  AsyncFunction,
+  AsyncFunctionGenerator: async function * () {}.constructor,
+  AsyncFunction: async function () {}.constructor,
   MAP: { '"': '&quot;', '&': '&amp;', '\'': '&#x27;', '<': '&lt;', '>': '&gt;', '`': '&#x60;' }
 })
 
