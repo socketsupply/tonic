@@ -635,6 +635,30 @@ test('async generator render', async t => {
   t.end()
 })
 
+test('default props', t => {
+  class InstanceProps extends Tonic {
+    props = { num: 100 }
+
+    render () {
+      return `<div>${JSON.stringify(this.props)}</div>`
+    }
+  }
+
+  Tonic.add(InstanceProps)
+
+  document.body.innerHTML = `
+    <instance-props str="0x">
+    </instance-props>
+  `
+
+  const actual = document.body.innerHTML.trim()
+
+  const expected = '<instance-props str="0x"><div>{"num":100,"str":"0x"}</div></instance-props>'
+
+  t.equal(actual, expected, 'elements match')
+  t.end()
+})
+
 test('cleanup, ensure exist', t => {
   t.end()
   document.body.classList.add('finished')
