@@ -224,9 +224,7 @@ class Tonic extends window.HTMLElement {
       }
     }
 
-    this.props = Object.assign(
-      (this.defaults && this.defaults()) || {},
-      Tonic.sanitize(this.props))
+    this.props = Tonic.sanitize(this.props)
 
     if (!this._id) {
       this.source = this.innerHTML
