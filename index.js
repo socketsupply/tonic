@@ -100,7 +100,12 @@ class Tonic extends window.HTMLElement {
   }
 
   handleEvent (e) {
-    this[e.type](e)
+    const p = this[e.type](e)
+    if (p && typeof p.then === 'function' && typeof p.catch === 'function') {
+      p.catch((err) => {
+        setImmediate(() => { throw err })
+      })
+    }
   }
 
   _events () {
