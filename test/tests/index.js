@@ -111,8 +111,11 @@ test('get element by id and set properties via the api', t => {
 
   const div = document.getElementById('test')
   div.reRender({ number: 2 })
-  t.equal(div.textContent, '2', 'the value was changed by reRender')
-  t.end()
+
+  requestAnimationFrame(() => {
+    t.equal(div.textContent, '2', 'the value was changed by reRender')
+    t.end()
+  })
 })
 
 test('construct from api', t => {
@@ -129,13 +132,19 @@ test('construct from api', t => {
   document.body.appendChild(d)
 
   d.reRender({ number: 3 })
-  const div1 = document.body.querySelector('div')
-  t.equal(div1.getAttribute('number'), '3', 'attribute was set in component')
 
-  d.reRender({ number: 6 })
-  const div2 = document.body.querySelector('div')
-  t.equal(div2.getAttribute('number'), '6', 'attribute was set in component')
-  t.end()
+  requestAnimationFrame(() => {
+    const div1 = document.body.querySelector('div')
+    t.equal(div1.getAttribute('number'), '3', 'attribute was set in component')
+
+    d.reRender({ number: 6 })
+
+    requestAnimationFrame(() => {
+      const div2 = document.body.querySelector('div')
+      t.equal(div2.getAttribute('number'), '6', 'attribute was set in component')
+      t.end()
+    })
+  })
 })
 
 test('stylesheets and inline styles', t => {
@@ -243,10 +252,13 @@ test('persist named component state after re-renering', t => {
 
   const parent = document.getElementsByTagName('stateful-parent')[0]
   parent.reRender()
-  const child = document.getElementsByTagName('stateful-child')[0]
-  const { count } = child.getState()
-  t.equal(count, 2, `the named element's state was persisted after re-rendering`)
-  t.end()
+
+  requestAnimationFrame(() => {
+    const child = document.getElementsByTagName('stateful-child')[0]
+    const { count } = child.getState()
+    t.equal(count, 2, `the named element's state was persisted after re-rendering`)
+    t.end()
+  })
 })
 
 test('lifecycle events', t => {
@@ -339,10 +351,12 @@ test('compose sugar (this.children)', t => {
     value: 'y'
   })
 
-  const childrenAfterSetProps = g.querySelectorAll('.child')
-  t.equal(childrenAfterSetProps.length, 1, 'child element was replaced')
-  t.equal(childrenAfterSetProps[0].innerHTML, 'y')
-  t.end()
+  requestAnimationFrame(() => {
+    const childrenAfterSetProps = g.querySelectorAll('.child')
+    t.equal(childrenAfterSetProps.length, 1, 'child element was replaced')
+    t.equal(childrenAfterSetProps[0].innerHTML, 'y')
+    t.end()
+  })
 })
 
 test('ensure registration order does not affect rendering', t => {
@@ -435,14 +449,16 @@ test('check that composed elements use (and re-use) their initial innerHTML corr
     value: 1
   })
 
-  const kTagsAfterSetProps = i.getElementsByTagName('component-k')
-  t.equal(kTagsAfterSetProps.length, 1, 'correct number of components rendered')
+  requestAnimationFrame(() => {
+    const kTagsAfterSetProps = i.getElementsByTagName('component-k')
+    t.equal(kTagsAfterSetProps.length, 1, 'correct number of components rendered')
 
-  const kClassesAfterSetProps = i.querySelectorAll('.k')
-  t.equal(kClassesAfterSetProps.length, 1, 'correct number of elements rendered')
-  const kTextAfterSetProps = kClassesAfterSetProps[0].textContent
-  t.equal(kTextAfterSetProps, '1', 'The text of the inner-most child was rendered correctly')
-  t.end()
+    const kClassesAfterSetProps = i.querySelectorAll('.k')
+    t.equal(kClassesAfterSetProps.length, 1, 'correct number of elements rendered')
+    const kTextAfterSetProps = kClassesAfterSetProps[0].textContent
+    t.equal(kTextAfterSetProps, '1', 'The text of the inner-most child was rendered correctly')
+    t.end()
+  })
 })
 
 test('mixed order declaration', t => {
