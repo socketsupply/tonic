@@ -87,12 +87,15 @@ class Tonic extends window.HTMLElement {
 
   reRender (o = this.props) {
     this.props = Tonic.sanitize(typeof o === 'function' ? o(this.props) : o)
-    this._set(this, this.render)
 
-    if (this.updated) {
-      const oldProps = JSON.parse(JSON.stringify(this.props))
-      this.updated(oldProps)
-    }
+    requestAnimationFrame(() => {
+      this._set(this, this.render)
+
+      if (this.updated) {
+        const oldProps = JSON.parse(JSON.stringify(this.props))
+        this.updated(oldProps)
+      }
+    })
   }
 
   getProps () {
