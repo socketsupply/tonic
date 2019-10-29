@@ -17,6 +17,14 @@ class Tonic extends window.HTMLElement {
     return Math.random().toString(16).slice(2)
   }
 
+  static _handleMaybePromise(p) {
+    if (p && typeof p.then === 'function' && typeof p.catch === 'function') {
+      p.catch((err) => {
+        setImmediate(() => { throw err })
+      })
+    }
+  }
+
   static match (el, s) {
     if (!el.matches) el = el.parentElement
     return el.matches(s) ? el : el.closest(s)
@@ -108,7 +116,7 @@ class Tonic extends window.HTMLElement {
 
   handleEvent (e) {
     const p = this[e.type](e)
-    handleMaybePromise(p)
+    Tonis._handleMaybePromise(p)
   }
 
   _events () {
@@ -247,12 +255,12 @@ class Tonic extends window.HTMLElement {
     this.willConnect && this.willConnect()
     this._set(this, this.render)
     const p = (this.connected && this.connected())
-    handleMaybePromise(p)
+    Tonic._handleMaybePromise(p)
   }
 
   disconnectedCallback (index) {
     const p = (this.disconnected && this.disconnected())
-    handleMaybePromise(p)
+    Tonic._handleMaybePromise(p)
     this.elements.length = 0
     this.nodes.length = 0
     delete Tonic._data[this._id]
@@ -277,11 +285,3 @@ Object.assign(Tonic, {
 })
 
 if (typeof module === 'object') module.exports = Tonic
-
-function handleMaybePromise(p) {
-  if (p && typeof p.then === 'function' && typeof p.catch === 'function') {
-    p.catch((err) => {
-      setImmediate(() => { throw err })
-    })
-  }
-}
