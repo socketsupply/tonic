@@ -116,7 +116,7 @@ class Tonic extends window.HTMLElement {
 
   handleEvent (e) {
     const p = this[e.type](e)
-    Tonis._handleMaybePromise(p)
+    Tonic._handleMaybePromise(p)
   }
 
   _events () {
