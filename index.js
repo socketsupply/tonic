@@ -3,6 +3,7 @@ class Tonic extends window.HTMLElement {
     super()
     const state = Tonic._states[this.id]
     delete Tonic._states[this.id]
+    this.isTonicComponent = true
     this.state = state || {}
     this.props = {}
     this.elements = [...this.children].map(el => el.cloneNode(true))
@@ -39,6 +40,7 @@ class Tonic extends window.HTMLElement {
   static sanitize (o) {
     if (!o) return o
     for (const [k, v] of Object.entries(o)) {
+      if (({}).toString.call(v) === '[object HTMLElement]') continue
       if (typeof v === 'object') o[k] = Tonic.sanitize(v)
       if (typeof v === 'string') o[k] = Tonic.escape(v)
     }
@@ -70,6 +72,8 @@ class Tonic extends window.HTMLElement {
         case '[object NamedNodeMap]': return this._prop(Tonic._normalizeAttrs(o))
         case '[object Number]': return `${o}__float`
         case '[object Boolean]': return `${o}__boolean`
+        case '[object HTMLElement]':
+          return o.isTonicComponent ? this._prop(o) : o
       }
       return o
     }
