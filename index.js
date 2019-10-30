@@ -17,11 +17,9 @@ class Tonic extends window.HTMLElement {
     return Math.random().toString(16).slice(2)
   }
 
-  static _handleMaybePromise(p) {
+  static _handleMaybePromise (p) {
     if (p && typeof p.then === 'function' && typeof p.catch === 'function') {
-      p.catch((err) => {
-        setImmediate(() => { throw err })
-      })
+      p.catch(err => setImmediate(() => { throw err }))
     }
   }
 
@@ -100,7 +98,7 @@ class Tonic extends window.HTMLElement {
   reRender (o = this.props) {
     this.props = Tonic.sanitize(typeof o === 'function' ? o(this.props) : o)
 
-    requestAnimationFrame(() => {
+    window.requestAnimationFrame(() => {
       this._set(this, this.render)
 
       if (this.updated) {

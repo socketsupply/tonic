@@ -21,6 +21,7 @@ async function main (browserName) {
 
   if (err) {
     console.error(`Unable to bundle ${src}.`)
+    console.log(err)
     process.exit(1)
   }
 

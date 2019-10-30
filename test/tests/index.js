@@ -653,7 +653,10 @@ test('async generator render', async t => {
 
 test('default props', t => {
   class InstanceProps extends Tonic {
-    props = { num: 100 }
+    constructor () {
+      super()
+      this.props = { num: 100 }
+    }
 
     render () {
       return `<div>${JSON.stringify(this.props)}</div>`
