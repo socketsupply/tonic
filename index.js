@@ -141,7 +141,7 @@ class Tonic extends window.HTMLElement {
     }
 
     for (const node of target.querySelectorAll(Tonic._tags)) {
-      if (Tonic._refs.findIndex(ref => ref === node) === -1) continue
+      if (!node.id || !Tonic._refIds.includes(node.id)) continue
       Tonic._states[node.id] = node.getState()
     }
 
@@ -221,7 +221,9 @@ class Tonic extends window.HTMLElement {
       this.render = this.wrap
     }
 
-    Tonic._refs.push(this)
+    if (this.id && !Tonic._refIds.includes(this.id)) {
+      Tonic._refIds.push(this.id)
+    }
     const cc = s => s.replace(/-(.)/g, (_, m) => m.toUpperCase())
 
     for (const { name: _name, value } of this.attributes) {
@@ -256,20 +258,19 @@ class Tonic extends window.HTMLElement {
     Tonic._handleMaybePromise(p)
   }
 
-  disconnectedCallback (index) {
+  disconnectedCallback () {
     const p = (this.disconnected && this.disconnected())
     Tonic._handleMaybePromise(p)
     this.elements.length = 0
     this.nodes.length = 0
     delete Tonic._data[this._id]
     delete Tonic._children[this._id]
-    Tonic._refs.splice(index, 1)
   }
 }
 
 Object.assign(Tonic, {
   _tags: '',
-  _refs: [],
+  _refIds: [],
   _data: {},
   _states: {},
   _children: {},
