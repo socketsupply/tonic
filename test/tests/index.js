@@ -306,15 +306,15 @@ test('lifecycle events', t => {
   Tonic.add(XQuxx)
   const q = document.querySelector('x-quxx')
   q.reRender({})
-  const refsLength = Tonic._refs.length
+  const refsLength = Tonic._refIds.length
 
   // once again to overwrite the old instances
   q.reRender({})
-  t.equal(Tonic._refs.length, refsLength, 'Cleanup, refs correct count')
+  t.equal(Tonic._refIds.length, refsLength, 'Cleanup, refs correct count')
 
   // once again to check that the refs length is the same
   q.reRender({})
-  t.equal(Tonic._refs.length, refsLength, 'Cleanup, refs still correct count')
+  t.equal(Tonic._refIds.length, refsLength, 'Cleanup, refs still correct count')
   t.end()
 })
 
