@@ -126,6 +126,11 @@ class Tonic extends window.HTMLElement {
   }
 
   async _set (target, render, content = '') {
+    for (const node of target.querySelectorAll(Tonic._tags)) {
+      if (!node.id || !Tonic._refIds.includes(node.id)) continue
+      Tonic._states[node.id] = node.getState()
+    }
+
     if (render instanceof Tonic.AsyncFunction) {
       content = await render.call(this) || ''
     } else if (render instanceof Tonic.AsyncFunctionGenerator) {
@@ -138,11 +143,6 @@ class Tonic extends window.HTMLElement {
       return
     } else if (render instanceof Function) {
       content = render.call(this) || ''
-    }
-
-    for (const node of target.querySelectorAll(Tonic._tags)) {
-      if (!node.id || !Tonic._refIds.includes(node.id)) continue
-      Tonic._states[node.id] = node.getState()
     }
 
     if (typeof content === 'string') {
