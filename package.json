@@ -1,5 +1,5 @@
 {
-  "name": "@conductorlab/tonic",
+  "name": "@optoolco/tonic",
   "version": "10.1.1",
   "description": "A composable component inspired by React.",
   "main": "events.js",
@@ -9,7 +9,7 @@
     "build:demo": "browserify --bare ./demo > ./docs/bundle.js",
     "minify": "terser index.js -c unused,dead_code,hoist_vars,loops=false,hoist_props=true,hoist_funs,toplevel,keep_classnames,keep_fargs=false -o dist/tonic.min.js"
   },
-  "author": "heapwolf",
+  "author": "optoolco",
   "license": "MIT",
   "devDependencies": {
     "benchmark": "^2.1.4",
@@ -23,11 +23,11 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/heapwolf/tonic.git"
+    "url": "git+https://github.com/optoolco/tonic.git"
   },
   "bugs": {
-    "url": "https://github.com/heapwolf/tonic/issues"
+    "url": "https://github.com/optoolco/tonic/issues"
   },
-  "homepage": "https://github.com/heapwolf/tonic#readme",
+  "homepage": "https://github.com/optoolco/tonic#readme",
   "dependencies": {}
 }
