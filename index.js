@@ -128,6 +128,7 @@ class Tonic extends window.HTMLElement {
 
   async _set (target, render, content = '') {
     for (const node of target.querySelectorAll(Tonic._tags)) {
+      if (!node.isTonicComponent) continue
       if (!node.id || !Tonic._refIds.includes(node.id)) continue
       Tonic._states[node.id] = node.getState()
     }
