@@ -95,18 +95,31 @@ class Tonic extends window.HTMLElement {
     return this.state
   }
 
+  scheduleReRender(oldProps) {
+    if (this.pendingReRender) {
+      return this.pendingReRender
+    }
+
+    this.pendingReRender = new Promise((resolve) => {
+      window.requestAnimationFrame(() => {
+        this._set(this, this.render)
+
+        if (this.updated) {
+          this.updated(oldProps)
+        }
+
+        this.pendingReRender = null
+        resolve()
+      })
+    })
+    return this.pendingReRender
+  }
+
   reRender (o = this.props) {
     const oldProps = { ...this.props }
     this.props = Tonic.sanitize(typeof o === 'function' ? o(this.props) : o)
 
-    return new Promise(resolve => window.requestAnimationFrame(() => {
-      this._set(this, this.render)
-
-      if (this.updated) {
-        this.updated(oldProps)
-      }
-      resolve()
-    }))
+    return this.scheduleReRender(oldProps)
   }
 
   getProps () {
