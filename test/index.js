@@ -1,5 +1,5 @@
 const test = require('tape')
-const Tonic = require('../..')
+const Tonic = require('..')
 
 const sleep = t => new Promise(resolve => setTimeout(resolve, t))
 
