@@ -4,8 +4,7 @@
   "description": "A composable component inspired by React.",
   "main": "events.js",
   "scripts": {
-    "test": "npm run minify && npm run test:browser",
-    "test:browser": "node test",
+    "test": "browserify test/index.js | tape-puppet",
     "build:demo": "browserify --bare ./demo > ./docs/bundle.js",
     "minify": "terser index.js -c unused,dead_code,hoist_vars,loops=false,hoist_props=true,hoist_funs,toplevel,keep_classnames,keep_fargs=false -o dist/tonic.min.js"
   },
@@ -14,8 +13,9 @@
   "devDependencies": {
     "benchmark": "^2.1.4",
     "browserify": "^16.2.2",
-    "puppeteer": "^1.19.0",
+    "standard": "14.3.1",
     "tape": "^4.11.0",
+    "tape-puppet": "0.1.7",
     "terser": "^4.0.2"
   },
   "directories": {
