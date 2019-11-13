@@ -1,6 +1,6 @@
 {
   "name": "@optoolco/tonic",
-  "version": "10.1.3",
+  "version": "10.1.4",
   "description": "A composable component inspired by React.",
   "main": "events.js",
   "scripts": {
