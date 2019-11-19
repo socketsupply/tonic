@@ -178,7 +178,8 @@ test('automatically remember the state of a component', t => {
   container.reRender()
 
   window.requestAnimationFrame(() => {
-    t.equal(child.getState().foo, true, 'the state persisted')
+    const child2 = container.querySelector('component-stateful')
+    t.equal(child2.getState().foo, true, 'the state persisted')
     t.end()
   })
 })
