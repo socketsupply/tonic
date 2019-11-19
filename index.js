@@ -17,10 +17,42 @@ class Tonic extends window.HTMLElement {
     return Math.random().toString(16).slice(2)
   }
 
-  static _handleMaybePromise (p) {
+  static _maybePromise (p) {
     if (p && typeof p.then === 'function' && typeof p.catch === 'function') {
       p.catch(err => setImmediate(() => { throw err }))
     }
+  }
+
+  static _splitName (s) {
+    return s.match(/[A-Z][a-z]*/g).join('-')
+  }
+
+  static _normalizeAttrs (o, x = {}) {
+    [...o].forEach(o => (x[o.name] = o.value))
+    return x
+  }
+
+  _events () {
+    const hp = Object.getOwnPropertyNames(window.HTMLElement.prototype)
+    for (const p of this._props) {
+      if (hp.indexOf('on' + p) === -1) continue
+      this.addEventListener(p, this)
+    }
+  }
+
+  _prop (o) {
+    const id = this._id
+    const p = `__${id}__${Tonic._createId()}__`
+    Tonic._data[id] = Tonic._data[id] || {}
+    Tonic._data[id][p] = o
+    return p
+  }
+
+  _placehold (r) {
+    const ref = `__${Tonic._createId()}__`
+    Tonic._children[this._id] = Tonic._children[this._id] || {}
+    Tonic._children[this._id][ref] = r
+    return ref
   }
 
   static match (el, s) {
@@ -46,7 +78,7 @@ class Tonic extends window.HTMLElement {
   static sanitize (o) {
     if (!o) return o
     for (const [k, v] of Object.entries(o)) {
-      if (({}).toString.call(v) === '[object HTMLElement]') continue
+      if (Object.prototype.toString.call(v) === '[object HTMLElement]') continue
       if (typeof v === 'object') o[k] = Tonic.sanitize(v)
       if (typeof v === 'string') o[k] = Tonic.escape(v)
     }
@@ -57,25 +89,17 @@ class Tonic extends window.HTMLElement {
     return s.replace(Tonic.ESC, c => Tonic.MAP[c])
   }
 
-  static _splitName (s) {
-    return s.match(/[A-Z][a-z]*/g).join('-')
-  }
-
-  static _normalizeAttrs (o, x = {}) {
-    [...o].forEach(o => (x[o.name] = o.value))
-    return x
-  }
-
   html ([s, ...strings], ...values) {
     const refs = o => {
       if (o && o.__children__) return this._placehold(o)
-      switch (({}).toString.call(o)) {
+      switch (Object.prototype.toString.call(o)) {
         case '[object HTMLCollection]':
         case '[object NodeList]': return this._placehold([...o])
         case '[object Array]':
         case '[object Object]':
         case '[object Function]': return this._prop(o)
-        case '[object NamedNodeMap]': return this._prop(Tonic._normalizeAttrs(o))
+        case '[object NamedNodeMap]':
+          return this._prop(Tonic._normalizeAttrs(o))
         case '[object Number]': return `${o}__float`
         case '[object Boolean]': return `${o}__boolean`
         case '[object HTMLElement]':
@@ -83,6 +107,7 @@ class Tonic extends window.HTMLElement {
       }
       return o
     }
+
     const reduce = (a, b) => a.concat(b, strings.shift())
     return values.map(refs).reduce(reduce, [s]).join('')
   }
@@ -95,23 +120,20 @@ class Tonic extends window.HTMLElement {
     return this.state
   }
 
-  scheduleReRender(oldProps) {
-    if (this.pendingReRender) {
-      return this.pendingReRender
-    }
+  scheduleReRender (oldProps) {
+    if (this.pendingReRender) return this.pendingReRender
 
-    this.pendingReRender = new Promise((resolve) => {
+    this.pendingReRender = new Promise(resolve => {
       window.requestAnimationFrame(() => {
-        this._set(this, this.render)
+        this._set(this.root, this.render)
 
-        if (this.updated) {
-          this.updated(oldProps)
-        }
+        if (this.updated) this.updated(oldProps)
 
         this.pendingReRender = null
         resolve()
       })
     })
+
     return this.pendingReRender
   }
 
@@ -128,15 +150,7 @@ class Tonic extends window.HTMLElement {
 
   handleEvent (e) {
     const p = this[e.type](e)
-    Tonic._handleMaybePromise(p)
-  }
-
-  _events () {
-    const hp = Object.getOwnPropertyNames(window.HTMLElement.prototype)
-    for (const p of this._props) {
-      if (hp.indexOf('on' + p) === -1) continue
-      this.addEventListener(p, this)
-    }
+    Tonic._maybePromise(p)
   }
 
   async _set (target, render, content = '') {
@@ -213,21 +227,6 @@ class Tonic extends window.HTMLElement {
     }
   }
 
-  _prop (o) {
-    const id = this._id
-    const p = `__${id}__${Tonic._createId()}__`
-    Tonic._data[id] = Tonic._data[id] || {}
-    Tonic._data[id][p] = o
-    return p
-  }
-
-  _placehold (r) {
-    const ref = `__${Tonic._createId()}__`
-    Tonic._children[this._id] = Tonic._children[this._id] || {}
-    Tonic._children[this._id][ref] = r
-    return ref
-  }
-
   connectedCallback () {
     this.root = this.shadowRoot || this
 
@@ -268,14 +267,12 @@ class Tonic extends window.HTMLElement {
     this._id = this._id || Tonic._createId()
 
     this.willConnect && this.willConnect()
-    this._set(this, this.render)
-    const p = (this.connected && this.connected())
-    Tonic._handleMaybePromise(p)
+    this._set(this.root, this.render)
+    Tonic._maybePromise(this.connected && this.connected())
   }
 
   disconnectedCallback () {
-    const p = (this.disconnected && this.disconnected())
-    Tonic._handleMaybePromise(p)
+    Tonic._maybePromise(this.disconnected && this.disconnected())
     this.elements.length = 0
     this.nodes.length = 0
     delete Tonic._data[this._id]
