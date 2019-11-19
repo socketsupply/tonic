@@ -19,10 +19,40 @@ test('attach to dom', t => {
     <component-a></component-a>
   `
 
-  Tonic.add(ComponentA, document.body)
+  Tonic.add(ComponentA)
 
   const div = document.querySelector('div')
   t.ok(div, 'a div was created and attached')
+  t.end()
+})
+
+test('attach to dom with shadow', t => {
+  Tonic.add(class ShadowComponent extends Tonic {
+    constructor (o) {
+      super(o)
+      this.attachShadow({ mode: 'open' })
+    }
+
+    render () {
+      return this.html`
+        <div ...${{ num: 1, str: 'X' }}>
+          <component-a></component-a>
+        </div>
+      `
+    }
+  })
+
+  document.body.innerHTML = `
+    <shadow-component></shadow-component>
+  `
+
+  const c = document.querySelector('shadow-component')
+  const el = document.querySelector('div')
+  t.ok(!el, 'no div found in document')
+  const div = c.shadowRoot.querySelector('div')
+  t.ok(div, 'a div was created and attached to the shadow root')
+  t.ok(div.hasAttribute('num'), 'attributes added correctly')
+  t.ok(div.hasAttribute('str'), 'attributes added correctly')
   t.end()
 })
 
