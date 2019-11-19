@@ -11,7 +11,7 @@ test('sanity', t => {
 test('attach to dom', t => {
   class ComponentA extends Tonic {
     render () {
-      return `<div></div>`
+      return '<div></div>'
     }
   }
 
@@ -95,6 +95,7 @@ test('get element by id and set properties via the api', t => {
     willConnect () {
       this.setAttribute('id', 'test')
     }
+
     render () {
       return `<div>${this.props.number}</div>`
     }
@@ -112,7 +113,7 @@ test('get element by id and set properties via the api', t => {
   const div = document.getElementById('test')
   div.reRender({ number: 2 })
 
-  requestAnimationFrame(() => {
+  window.requestAnimationFrame(() => {
     t.equal(div.textContent, '2', 'the value was changed by reRender')
     t.end()
   })
@@ -133,13 +134,13 @@ test('construct from api', t => {
 
   d.reRender({ number: 3 })
 
-  requestAnimationFrame(() => {
+  window.requestAnimationFrame(() => {
     const div1 = document.body.querySelector('div')
     t.equal(div1.getAttribute('number'), '3', 'attribute was set in component')
 
     d.reRender({ number: 6 })
 
-    requestAnimationFrame(() => {
+    window.requestAnimationFrame(() => {
       const div2 = document.body.querySelector('div')
       t.equal(div2.getAttribute('number'), '6', 'attribute was set in component')
       t.end()
@@ -154,7 +155,7 @@ test('stylesheets and inline styles', t => {
 
   class ComponentF extends Tonic {
     stylesheet () {
-      return `component-f div { color: red; }`
+      return 'component-f div { color: red; }'
     }
 
     styles () {
@@ -169,13 +170,13 @@ test('stylesheets and inline styles', t => {
     }
 
     render () {
-      return `<div styles="foo bar"></div>`
+      return '<div styles="foo bar"></div>'
     }
   }
 
   Tonic.add(ComponentF)
 
-  const expected = `component-f div { color: red; }`
+  const expected = 'component-f div { color: red; }'
   const style = document.querySelector('component-f style')
   t.equal(style.textContent, expected, 'style was prefixed')
   const div = document.querySelector('component-f div')
@@ -197,7 +198,7 @@ test('component composition', t => {
 
   class XFoo extends Tonic {
     render () {
-      return `<div class="foo"></div>`
+      return '<div class="foo"></div>'
     }
   }
 
@@ -243,7 +244,7 @@ test('persist named component state after re-renering', t => {
     }
 
     render () {
-      return `<div>CHILD</div>`
+      return '<div>CHILD</div>'
     }
   }
 
@@ -253,16 +254,16 @@ test('persist named component state after re-renering', t => {
   const parent = document.getElementsByTagName('stateful-parent')[0]
   parent.reRender()
 
-  requestAnimationFrame(() => {
+  window.requestAnimationFrame(() => {
     const child = document.getElementsByTagName('stateful-child')[0]
     const { count } = child.getState()
-    t.equal(count, 2, `the named element's state was persisted after re-rendering`)
+    t.equal(count, 2, 'the named element\'s state was persisted after re-rendering')
     t.end()
   })
 })
 
 test('lifecycle events', t => {
-  document.body.innerHTML = `<x-quxx></x-quxx>`
+  document.body.innerHTML = '<x-quxx></x-quxx>'
 
   class XBazz extends Tonic {
     constructor (p) {
@@ -273,8 +274,9 @@ test('lifecycle events', t => {
     disconnected () {
       t.ok(true, 'disconnected event fired')
     }
+
     render () {
-      return `<div class="bar"></div>`
+      return '<div class="bar"></div>'
     }
   }
 
@@ -286,19 +288,19 @@ test('lifecycle events', t => {
 
     willConnect () {
       t.ok(true, 'willConnect event fired')
-      const expected = `<x-quxx></x-quxx>`
+      const expected = '<x-quxx></x-quxx>'
       t.equal(document.body.innerHTML, expected, 'nothing added yet')
     }
 
     connected () {
       t.ok(true, 'connected event fired')
-      const expected = `<x-quxx><div class="quxx"><x-bazz><div class="bar"></div></x-bazz></div></x-quxx>`
+      const expected = '<x-quxx><div class="quxx"><x-bazz><div class="bar"></div></x-bazz></div></x-quxx>'
       t.equal(document.body.innerHTML, expected, 'rendered')
     }
 
     render () {
       t.ok(true, 'render event fired')
-      return `<div class="quxx"><x-bazz></x-bazz></div>`
+      return '<div class="quxx"><x-bazz></x-bazz></div>'
     }
   }
 
@@ -351,7 +353,7 @@ test('compose sugar (this.children)', t => {
     value: 'y'
   })
 
-  requestAnimationFrame(() => {
+  window.requestAnimationFrame(() => {
     const childrenAfterSetProps = g.querySelectorAll('.child')
     t.equal(childrenAfterSetProps.length, 1, 'child element was replaced')
     t.equal(childrenAfterSetProps[0].innerHTML, 'y')
@@ -449,7 +451,7 @@ test('check that composed elements use (and re-use) their initial innerHTML corr
     value: 1
   })
 
-  requestAnimationFrame(() => {
+  window.requestAnimationFrame(() => {
     const kTagsAfterSetProps = i.getElementsByTagName('component-k')
     t.equal(kTagsAfterSetProps.length, 1, 'correct number of components rendered')
 
@@ -470,7 +472,7 @@ test('mixed order declaration', t => {
 
   class ComponentAx extends Tonic {
     render () {
-      return `<div class="a">A</div>`
+      return '<div class="a">A</div>'
     }
   }
 
@@ -488,7 +490,7 @@ test('mixed order declaration', t => {
 
   class ComponentDx extends Tonic {
     render () {
-      return `<div class="d">D</div>`
+      return '<div class="d">D</div>'
     }
   }
 
@@ -624,11 +626,11 @@ test('async render', async t => {
 test('async generator render', async t => {
   class AsyncGeneratorRender extends Tonic {
     async * render () {
-      yield `X`
+      yield 'X'
 
       await sleep(1024)
 
-      return `Y`
+      return 'Y'
     }
   }
 
