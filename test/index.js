@@ -1,4 +1,6 @@
 const test = require('tape')
+const simulateEvent = require('simulate-event')
+
 const Tonic = require('..')
 
 const sleep = t => new Promise(resolve => setTimeout(resolve, t))
@@ -739,6 +741,61 @@ test('default props', t => {
   const expectedRE = /<instance-props str="0x" id="tonic_\d*"><div>{"num":100,"str":"0x","id":"tonic_\d*"}<\/div><\/instance-props>/
 
   t.ok(expectedRE.test(actual), 'elements match')
+  t.end()
+})
+
+test('persist phantom component', async t => {
+  class InputStatePhantom extends Tonic {
+    constructor () {
+      super()
+      this.state = {
+        value: '',
+        ...this.state
+      }
+    }
+
+    input () {
+      this.state.value = this.querySelector('input').value
+    }
+
+    render () {
+      return this.html`
+        <input value="${this.state.value}" />
+      `
+    }
+  }
+  Tonic.add(InputStatePhantom)
+
+  class PhantomTestContainer extends Tonic {
+    render () {
+      return this.html`
+        <input-state-phantom></input-state-phantom>
+      `
+    }
+  }
+  Tonic.add(PhantomTestContainer)
+
+  document.body.innerHTML = `
+    <phantom-test-container>
+    </phantom-test-container>
+  `
+
+  const elem = document.body.firstElementChild
+  t.ok(elem)
+  t.equal(elem.tagName, 'PHANTOM-TEST-CONTAINER')
+
+  t.ok(elem.reRender)
+
+  const input = elem.querySelector('input')
+  input.value = 'foo'
+  simulateEvent.simulate(input, 'input')
+  t.equal(input.value, 'foo')
+
+  await elem.reRender()
+
+  const input2 = elem.querySelector('input')
+  t.equal(input2.value, 'foo')
+
   t.end()
 })
 
