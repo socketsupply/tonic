@@ -149,38 +149,6 @@ test('get element by id and set properties via the api', t => {
   })
 })
 
-test('automatically remember the state of a component', t => {
-  document.body.innerHTML = `
-    <component-container>
-    </component-container>
-  `
-
-  Tonic.add(class ComponentContainer extends Tonic {
-    render () {
-      return `
-        <component-stateful>
-        </component-stateful>
-      `
-    }
-  })
-
-  Tonic.add(class ComponentStateful extends Tonic {
-    render () {
-      return '<div></div>'
-    }
-  })
-
-  const container = document.querySelector('component-container')
-  const child = container.querySelector('component-stateful')
-  child.setState({ foo: true })
-  container.reRender()
-
-  window.requestAnimationFrame(() => {
-    t.equal(child.getState().foo, true, 'the state persisted')
-    t.end()
-  })
-})
-
 test('construct from api', t => {
   document.body.innerHTML = ''
 
@@ -283,47 +251,6 @@ test('component composition', t => {
   t.end()
 })
 
-test('persist named component state after re-renering', t => {
-  document.body.innerHTML = `
-    <stateful-parent>
-    </stateful-parent>
-  `
-
-  class StatefulParent extends Tonic {
-    render () {
-      return `<div>
-        <stateful-child id="stateful-child">
-        </stateful-child>
-      </div>`
-    }
-  }
-
-  class StatefulChild extends Tonic {
-    connected () {
-      this.setState(state => Object.assign({}, state, {
-        count: (state.count || 0) + 1
-      }))
-    }
-
-    render () {
-      return '<div>CHILD</div>'
-    }
-  }
-
-  Tonic.add(StatefulChild)
-  Tonic.add(StatefulParent)
-
-  const parent = document.getElementsByTagName('stateful-parent')[0]
-  parent.reRender()
-
-  window.requestAnimationFrame(() => {
-    const child = document.getElementsByTagName('stateful-child')[0]
-    const { count } = child.getState()
-    t.equal(count, 2, 'the named element\'s state was persisted after re-rendering')
-    t.end()
-  })
-})
-
 test('lifecycle events', t => {
   document.body.innerHTML = '<x-quxx></x-quxx>'
 
@@ -350,13 +277,13 @@ test('lifecycle events', t => {
 
     willConnect () {
       t.ok(true, 'willConnect event fired')
-      const expectedRE = /<x-quxx id="tonic_\d*"><\/x-quxx>/
+      const expectedRE = /<x-quxx><\/x-quxx>/
       t.ok(expectedRE.test(document.body.innerHTML), 'nothing added yet')
     }
 
     connected () {
       t.ok(true, 'connected event fired')
-      const expectedRE = /<x-quxx id="tonic_\d*"><div class="quxx"><x-bazz id="tonic_\d*"><div class="bar"><\/div><\/x-bazz><\/div><\/x-quxx>/
+      const expectedRE = /<x-quxx><div class="quxx"><x-bazz><div class="bar"><\/div><\/x-bazz><\/div><\/x-quxx>/
       t.ok(expectedRE.test(document.body.innerHTML), 'rendered')
     }
 
@@ -649,7 +576,7 @@ test('spread props', t => {
   t.equal(component.getAttribute('foo-bar'), '"ok"')
   const div = document.querySelector('div:first-of-type')
   const span = document.querySelector('span:first-of-type')
-  t.equal(div.attributes.length, 4, 'div also got expanded attributes')
+  t.equal(div.attributes.length, 3, 'div also got expanded attributes')
   t.equal(span.attributes.length, 4, 'span got all attributes from div#el')
   t.end()
 })
@@ -736,7 +663,7 @@ test('default props', t => {
 
   const actual = document.body.innerHTML.trim()
 
-  const expectedRE = /<instance-props str="0x" id="tonic_\d*"><div>{"num":100,"str":"0x","id":"tonic_\d*"}<\/div><\/instance-props>/
+  const expectedRE = /<instance-props str="0x"><div>{"num":100,"str":"0x"}<\/div><\/instance-props>/
 
   t.ok(expectedRE.test(actual), 'elements match')
   t.end()

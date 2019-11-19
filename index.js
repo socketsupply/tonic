@@ -1,9 +1,8 @@
 class Tonic extends window.HTMLElement {
   constructor () {
     super()
-    this.id = this.id || Tonic._createId()
-    const state = Tonic._states[this.id]
-    delete Tonic._states[this.id]
+    const state = Tonic._states[this._id]
+    delete Tonic._states[this._id]
     this.isTonicComponent = true
     this.state = state || {}
     this.props = {}
@@ -15,7 +14,7 @@ class Tonic extends window.HTMLElement {
   }
 
   static _createId () {
-    return `tonic_${Tonic._index++}`
+    return `tonic${Tonic._index++}`
   }
 
   static _maybePromise (p) {
@@ -259,10 +258,10 @@ class Tonic extends window.HTMLElement {
       (this.defaults && this.defaults()) || {},
       Tonic.sanitize(this.props))
 
-    if (!this._id) {
-      this.source = this.innerHTML
+    if (!this._source) {
+      this._source = this.innerHTML
     } else {
-      this.innerHTML = this.source
+      this.innerHTML = this._source
     }
 
     this._id = this._id || Tonic._createId()
