@@ -1,6 +1,7 @@
 class Tonic extends window.HTMLElement {
   constructor () {
     super()
+    this.id = this.id || Tonic._createId()
     const state = Tonic._states[this.id]
     delete Tonic._states[this.id]
     this.isTonicComponent = true
@@ -14,7 +15,7 @@ class Tonic extends window.HTMLElement {
   }
 
   static _createId () {
-    return Math.random().toString(16).slice(2)
+    return `tonic_${Tonic._index++}`
   }
 
   static _maybePromise (p) {
