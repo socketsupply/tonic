@@ -60,8 +60,17 @@ class Tonic extends window.HTMLElement {
     return el.matches(s) ? el : el.closest(s)
   }
 
+  static getPropertyNames (proto) {
+    const props = []
+    while (proto && proto !== Tonic.prototype) {
+      props.push(...Object.getOwnPropertyNames(proto))
+      proto = Object.getPrototypeOf(proto)
+    }
+    return props
+  }
+
   static add (c) {
-    c.prototype._props = Object.getOwnPropertyNames(c.prototype)
+    c.prototype._props = Tonic.getPropertyNames(c.prototype)
 
     if (!c.name || c.name.length === 1) {
       throw Error('Mangling. https://bit.ly/2TkJ6zP')
