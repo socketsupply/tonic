@@ -134,7 +134,7 @@ class Tonic extends window.HTMLElement {
 
     this.pendingReRender = new Promise(resolve => {
       window.requestAnimationFrame(() => {
-        this._set(this.root, this.render)
+        Tonic._maybePromise(this._set(this.root, this.render))
 
         if (this.updated) this.updated(oldProps)
 
@@ -276,7 +276,7 @@ class Tonic extends window.HTMLElement {
     this._id = this._id || Tonic._createId()
 
     this.willConnect && this.willConnect()
-    this._set(this.root, this.render)
+    Tonic._maybePromise(this._set(this.root, this.render))
     Tonic._maybePromise(this.connected && this.connected())
   }
 
