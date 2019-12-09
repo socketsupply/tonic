@@ -1,8 +1,8 @@
 class Tonic extends window.HTMLElement {
   constructor () {
     super()
-    const state = Tonic._states[this._id]
-    delete Tonic._states[this._id]
+    const state = Tonic._states[this.id]
+    delete Tonic._states[this.id]
     this.isTonicComponent = true
     this.state = state || {}
     this.props = {}
