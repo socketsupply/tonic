@@ -2,7 +2,6 @@
   "name": "@optoolco/tonic",
   "version": "10.2.0",
   "description": "A composable component inspired by React.",
-  "main": "events.js",
   "scripts": {
     "test": "browserify test/index.js | tape-puppet",
     "build:demo": "browserify --bare ./demo > ./docs/bundle.js",
