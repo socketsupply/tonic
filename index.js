@@ -1,8 +1,8 @@
 class Tonic extends window.HTMLElement {
   constructor () {
     super()
-    const state = Tonic._states[this._id]
-    delete Tonic._states[this._id]
+    const state = Tonic._states[this.id]
+    delete Tonic._states[this.id]
     this.isTonicComponent = true
     this.state = state || {}
     this.props = {}
@@ -69,19 +69,22 @@ class Tonic extends window.HTMLElement {
     return props
   }
 
-  static add (c) {
+  static add (c, htmlName) {
     c.prototype._props = Tonic.getPropertyNames(c.prototype)
 
-    if (!c.name || c.name.length === 1) {
+    const hasValidName = htmlName || (c.name && c.name.length > 1)
+    if (!hasValidName) {
       throw Error('Mangling. https://bit.ly/2TkJ6zP')
     }
 
-    const name = Tonic._splitName(c.name).toLowerCase()
-    if (window.customElements.get(name)) return
+    if (!htmlName) {
+      htmlName = Tonic._splitName(c.name).toLowerCase()
+    }
+    if (window.customElements.get(htmlName)) return
 
-    Tonic._reg[name] = c
+    Tonic._reg[htmlName] = c
     Tonic._tags = Object.keys(Tonic._reg).join()
-    window.customElements.define(name, c)
+    window.customElements.define(htmlName, c)
   }
 
   static sanitize (o) {

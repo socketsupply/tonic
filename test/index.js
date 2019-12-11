@@ -1,4 +1,5 @@
 const test = require('tape')
+const uuid = require('uuid')
 const Tonic = require('..')
 
 const sleep = t => new Promise(resolve => setTimeout(resolve, t))
@@ -584,7 +585,7 @@ test('spread props', t => {
 test('async render', async t => {
   class AsyncRender extends Tonic {
     async getSomeData () {
-      await sleep(1024)
+      await sleep(100)
       return 'Some Data'
     }
 
@@ -605,7 +606,7 @@ test('async render', async t => {
   let ar = document.body.querySelector('async-render')
   t.equal(ar.innerHTML, '')
 
-  await sleep(2048)
+  await sleep(200)
 
   ar = document.body.querySelector('async-render')
   t.equal(ar.innerHTML.trim(), '<p>Some Data</p>')
@@ -617,7 +618,7 @@ test('async generator render', async t => {
     async * render () {
       yield 'X'
 
-      await sleep(1024)
+      await sleep(100)
 
       return 'Y'
     }
@@ -630,12 +631,12 @@ test('async generator render', async t => {
     </async-generator-render>
   `
 
-  await sleep(64)
+  await sleep(10)
 
   let ar = document.body.querySelector('async-generator-render')
   t.equal(ar.innerHTML, 'X')
 
-  await sleep(2048)
+  await sleep(200)
 
   ar = document.body.querySelector('async-generator-render')
   t.equal(ar.innerHTML, 'Y')
@@ -672,4 +673,83 @@ test('default props', t => {
 test('cleanup, ensure exist', t => {
   t.end()
   document.body.classList.add('finished')
+})
+
+test('re-render nested component', t => {
+  const pName = `x-${uuid()}`
+  const cName = `x-${uuid()}`
+  class ParentComponent extends Tonic {
+    render () {
+      const message = this.props.message
+      return this.html`
+        <div>
+          <${cName} id="persist" message="${message}"></${cName}>
+        </div>
+      `
+    }
+  }
+
+  class ChildStateComponent extends Tonic {
+    updateText (newText) {
+      this.state.text = newText
+      this.reRender()
+    }
+
+    render () {
+      const message = this.props.message
+      const text = this.state.text || ''
+
+      return this.html`
+        <div>
+          <label>${message}</label>
+          <input type="text" value="${text}" />
+        </div>
+      `
+    }
+  }
+
+  Tonic.add(ParentComponent, pName)
+  Tonic.add(ChildStateComponent, cName)
+
+  document.body.innerHTML = `
+    <${pName} message="initial"></${pName}>
+  `
+
+  const pElem = document.querySelector(pName)
+  t.ok(pElem)
+
+  const label = pElem.querySelector('label')
+  t.equal(label.textContent, 'initial')
+
+  const input = pElem.querySelector('input')
+  t.equal(input.value, '')
+
+  const cElem = pElem.querySelector(cName)
+  cElem.updateText('new text')
+
+  window.requestAnimationFrame(onUpdate)
+
+  function onUpdate () {
+    const label = pElem.querySelector('label')
+    t.equal(label.textContent, 'initial')
+
+    const input = pElem.querySelector('input')
+    t.equal(input.value, 'new text')
+
+    pElem.reRender({
+      message: 'new message'
+    })
+
+    window.requestAnimationFrame(onReRender)
+  }
+
+  function onReRender () {
+    const label = pElem.querySelector('label')
+    t.equal(label.textContent, 'new message')
+
+    const input = pElem.querySelector('input')
+    t.equal(input.value, 'new text')
+
+    t.end()
+  }
 })

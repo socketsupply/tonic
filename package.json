@@ -16,7 +16,8 @@
     "raynos-tape-puppet": "0.1.7-raynos2",
     "standard": "14.3.1",
     "tape": "^4.11.0",
-    "terser": "^4.0.2"
+    "terser": "^4.0.2",
+    "uuid": "3.3.3"
   },
   "directories": {
     "test": "test"
