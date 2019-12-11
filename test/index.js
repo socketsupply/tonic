@@ -1,4 +1,5 @@
 const test = require('tape')
+const uuid = require('uuid')
 const Tonic = require('..')
 
 const sleep = t => new Promise(resolve => setTimeout(resolve, t))
@@ -672,4 +673,83 @@ test('default props', t => {
 test('cleanup, ensure exist', t => {
   t.end()
   document.body.classList.add('finished')
+})
+
+test('re-render nested component', t => {
+  const pName = `x-${uuid()}`
+  const cName = `x-${uuid()}`
+  class ParentComponent extends Tonic {
+    render () {
+      const message = this.props.message
+      return this.html`
+        <div>
+          <${cName} id="persist" message="${message}"></${cName}>
+        </div>
+      `
+    }
+  }
+
+  class ChildStateComponent extends Tonic {
+    updateText (newText) {
+      this.state.text = newText
+      this.reRender()
+    }
+
+    render () {
+      const message = this.props.message
+      const text = this.state.text || ''
+
+      return this.html`
+        <div>
+          <label>${message}</label>
+          <input type="text" value="${text}" />
+        </div>
+      `
+    }
+  }
+
+  Tonic.add(ParentComponent, pName)
+  Tonic.add(ChildStateComponent, cName)
+
+  document.body.innerHTML = `
+    <${pName} message="initial"></${pName}>
+  `
+
+  const pElem = document.querySelector(pName)
+  t.ok(pElem)
+
+  const label = pElem.querySelector('label')
+  t.equal(label.textContent, 'initial')
+
+  const input = pElem.querySelector('input')
+  t.equal(input.value, '')
+
+  const cElem = pElem.querySelector(cName)
+  cElem.updateText('new text')
+
+  window.requestAnimationFrame(onUpdate)
+
+  function onUpdate () {
+    const label = pElem.querySelector('label')
+    t.equal(label.textContent, 'initial')
+
+    const input = pElem.querySelector('input')
+    t.equal(input.value, 'new text')
+
+    pElem.reRender({
+      message: 'new message'
+    })
+
+    window.requestAnimationFrame(onReRender)
+  }
+
+  function onReRender () {
+    const label = pElem.querySelector('label')
+    t.equal(label.textContent, 'new message')
+
+    const input = pElem.querySelector('input')
+    t.equal(input.value, 'new text')
+
+    t.end()
+  }
 })
