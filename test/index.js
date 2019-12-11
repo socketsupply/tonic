@@ -585,7 +585,7 @@ test('spread props', t => {
 test('async render', async t => {
   class AsyncRender extends Tonic {
     async getSomeData () {
-      await sleep(1024)
+      await sleep(100)
       return 'Some Data'
     }
 
@@ -606,7 +606,7 @@ test('async render', async t => {
   let ar = document.body.querySelector('async-render')
   t.equal(ar.innerHTML, '')
 
-  await sleep(2048)
+  await sleep(200)
 
   ar = document.body.querySelector('async-render')
   t.equal(ar.innerHTML.trim(), '<p>Some Data</p>')
@@ -618,7 +618,7 @@ test('async generator render', async t => {
     async * render () {
       yield 'X'
 
-      await sleep(1024)
+      await sleep(100)
 
       return 'Y'
     }
@@ -631,12 +631,12 @@ test('async generator render', async t => {
     </async-generator-render>
   `
 
-  await sleep(64)
+  await sleep(10)
 
   let ar = document.body.querySelector('async-generator-render')
   t.equal(ar.innerHTML, 'X')
 
-  await sleep(2048)
+  await sleep(200)
 
   ar = document.body.querySelector('async-generator-render')
   t.equal(ar.innerHTML, 'Y')
