@@ -19,7 +19,7 @@ class Tonic extends window.HTMLElement {
 
   static _maybePromise (p) {
     if (p && typeof p.then === 'function' && typeof p.catch === 'function') {
-      p.catch(err => setImmediate(() => { throw err }))
+      p.catch(err => setTimeout(() => { throw err }, 0))
     }
   }
 
