@@ -643,6 +643,60 @@ test('async generator render', async t => {
   t.end()
 })
 
+test('pass in references to children', t => {
+  const cName = `x-${uuid()}`
+  const dName = `x-${uuid()}`
+
+  class DividerComponent extends Tonic {
+    willConnect () {
+      this.left = this.querySelector('.left')
+      this.right = this.querySelector('.right')
+    }
+
+    render () {
+      return this.html`
+        ${this.left}<br/>
+        ${this.right}
+      `
+    }
+  }
+  Tonic.add(DividerComponent, cName)
+
+  class TextComp extends Tonic {
+    render () {
+      return this.html`<span>${this.props.text}</span>`
+    }
+  }
+  Tonic.add(TextComp, dName)
+
+  document.body.innerHTML = `
+    <${cName}>
+      <div class="left"><span>left</span></div>
+      <${dName} class="right" text="right"></${dName}>
+    </${cName}>
+  `
+
+  const pElem = document.querySelector(cName)
+
+  const first = pElem.children[0]
+  t.ok(first)
+  t.equal(first.tagName, 'DIV')
+  t.equal(first.className, 'left')
+  t.equal(first.innerHTML, '<span>left</span>')
+
+  const second = pElem.children[1]
+  t.ok(second)
+  t.equal(second.tagName, 'BR')
+
+  const third = pElem.children[2]
+  t.ok(third)
+  t.equal(third.tagName, dName.toUpperCase())
+  t.equal(third.className, 'right')
+  t.equal(third.innerHTML, '<span>right</span>')
+
+  t.end()
+})
+
 test('pass comp as ref in props', t => {
   const pName = `x-${uuid()}`
   const cName = `x-${uuid()}`
