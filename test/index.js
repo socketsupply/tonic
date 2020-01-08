@@ -643,6 +643,50 @@ test('async generator render', async t => {
   t.end()
 })
 
+test('pass comp as ref in props', t => {
+  const pName = `x-${uuid()}`
+  const cName = `x-${uuid()}`
+
+  class ParentComponent extends Tonic {
+    constructor (o) {
+      super(o)
+
+      this.name = 'hello'
+    }
+
+    render () {
+      return this.html`
+        <div>
+          <${cName} ref=${this}></${cName}>
+        </div>
+      `
+    }
+  }
+
+  class ChildComponent extends Tonic {
+    render () {
+      return this.html`
+        <div>${this.props.ref.name}</div>
+      `
+    }
+  }
+
+  Tonic.add(ParentComponent, pName)
+  Tonic.add(ChildComponent, cName)
+
+  document.body.innerHTML = `<${pName}></${pName}`
+
+  const pElem = document.querySelector(pName)
+  t.ok(pElem)
+
+  const cElem = pElem.querySelector(cName)
+  t.ok(cElem)
+
+  t.equal(cElem.innerHTML.trim(), '<div>hello</div>')
+
+  t.end()
+})
+
 test('default props', t => {
   class InstanceProps extends Tonic {
     constructor () {
