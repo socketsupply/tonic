@@ -49,9 +49,10 @@ class Tonic extends window.HTMLElement {
   }
 
   _placehold (r) {
-    const ref = `__${Tonic._createId()}__`
-    Tonic._children[this._id] = Tonic._children[this._id] || {}
-    Tonic._children[this._id][ref] = r
+    const id = this._id
+    const ref = `placehold:${id}:${Tonic._createId()}__`
+    Tonic._children[id] = Tonic._children[id] || {}
+    Tonic._children[id][ref] = r
     return ref
   }
 
@@ -115,7 +116,13 @@ class Tonic extends window.HTMLElement {
         case '[object Number]': return `${o}__float`
         case '[object Boolean]': return `${o}__boolean`
         case '[object HTMLElement]':
-          return o.isTonicComponent ? this._prop(o) : o
+          return this._placehold([o])
+      }
+      if (
+        typeof o === 'object' && o.nodeType === 1 &&
+        typeof o.cloneNode === 'function'
+      ) {
+        return this._placehold([o])
       }
       return o
     }
@@ -210,18 +217,20 @@ class Tonic extends window.HTMLElement {
       const walk = (node, fn) => {
         if (node.nodeType === 3) {
           const id = node.textContent.trim()
-          if (children[id]) return fn(node, children[id])
+          if (children[id]) fn(node, children[id])
         }
-        node = node.firstChild
-        while (node) {
-          walk(node, fn)
-          node = node.nextSibling
+
+        const childNodes = node.childNodes
+        if (!childNodes) return
+
+        for (let i = 0; i < childNodes.length; i++) {
+          walk(childNodes[i], fn)
         }
       }
 
       walk(target, (node, children) => {
         for (const child of children) {
-          node.parentNode.appendChild(child)
+          node.parentNode.insertBefore(child, node)
         }
         delete Tonic._children[this._id][node.id]
         node.parentNode.removeChild(node)
@@ -262,6 +271,9 @@ class Tonic extends window.HTMLElement {
         this.props[name] = parseFloat(p, 10)
       } else if (/\w+__boolean/.test(p)) {
         this.props[name] = p.includes('true')
+      } else if (/placehold:\w+:\w+__/.test(p)) {
+        const { 1: root } = p.split(':')
+        this.props[name] = Tonic._children[root][p][0]
       }
     }
 
