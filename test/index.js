@@ -126,7 +126,6 @@ test('pass props', t => {
   const bb = document.getElementById('y')
   {
     const props = bb.getProps()
-    console.log(JSON.stringify(props))
     t.equal(props.fn(), 'hello, world', 'passed a function')
     t.equal(props.number, 42.42, 'float parsed properly')
   }
