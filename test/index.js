@@ -27,6 +27,32 @@ test('attach to dom', t => {
   t.end()
 })
 
+test('Tonic escapes text', t => {
+  class Comp extends Tonic {
+    render () {
+      const userInput = this.props.userInput
+      return this.html`<div>${userInput}</div>`
+    }
+  }
+  const compName = `x-${uuid()}`
+  Tonic.add(Comp, compName)
+
+  const userInput = '<pre>lol</pre>'
+  document.body.innerHTML = `
+    <${compName} user-input="${userInput}"></${compName}>
+  `
+
+  const divs = document.querySelectorAll('div')
+  t.equal(divs.length, 1)
+  const div = divs[0]
+  t.equal(div.childNodes.length, 1)
+  t.equal(div.childNodes[0].nodeType, 3)
+  t.equal(div.innerHTML, '&lt;pre&gt;lol&lt;/pre&gt;')
+  t.equal(div.childNodes[0].data, '<pre>lol</pre>')
+
+  t.end()
+})
+
 test('attach to dom with shadow', t => {
   Tonic.add(class ShadowComponent extends Tonic {
     constructor (o) {
