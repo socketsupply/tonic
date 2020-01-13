@@ -92,3 +92,43 @@ Here is a regex you can use to find the one-liner use cases.
 ```
 git grep -E '`(.+)="'
 ```
+
+When building dynamic attribute lists `Tonic` has a spread feature
+in the `this.html()` function you can use instead to make it easier.
+
+For example, you can refactor the above `Icon` class to:
+
+```js
+class Icon extends Tonic {
+  render () {
+    return this.html`<svg ${tabAttr} styles="icon">
+      <use ...${{
+        width: size,
+        fill,
+        color: fill,
+        height: size
+      }}>
+    </svg>`
+  }
+}
+```
+
+Here we use `...${{ ... }}` to expand an object of attributes to
+attribute key value pairs in the HTML. You can also pull out the attrs
+into a reference if you prefer, like:
+
+```js
+class Icon extends Tonic {
+  render () {
+    const useAttrs = {
+      width: size,
+      fill,
+      color: fill,
+      height: size
+    }
+    return this.html`<svg ${tabAttr} styles="icon">
+      <use ...${useAttrs}>
+    </svg>`
+  }
+}
+```
