@@ -96,9 +96,14 @@ class Tonic extends window.HTMLElement {
     return s.replace(Tonic.ESC, c => Tonic.MAP[c])
   }
 
+  static raw (s) {
+    return { isTonicRaw: true, rawText: s }
+  }
+
   html ([s, ...strings], ...values) {
     const refs = o => {
       if (o && o.__children__) return this._placehold(o)
+      if (o && o.isTonicRaw) return o.rawText
       switch (Object.prototype.toString.call(o)) {
         case '[object HTMLCollection]':
         case '[object NodeList]': return this._placehold([...o])
