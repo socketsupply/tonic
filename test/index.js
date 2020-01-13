@@ -175,6 +175,43 @@ test('get element by id and set properties via the api', t => {
   })
 })
 
+test('inheritance and super.render()', t => {
+  class Stuff extends Tonic {
+    render () {
+      return '<div>nice stuff</div>'
+    }
+  }
+
+  class SpecificStuff extends Stuff {
+    render () {
+      return this.html`
+        <div>
+          <header>A header</header>
+          ${Tonic.raw(super.render())}
+        </div>
+      `
+    }
+  }
+
+  const compName = `x-${uuid()}`
+  Tonic.add(SpecificStuff, compName)
+
+  document.body.innerHTML = `
+    <${compName}></${compName}>
+  `
+
+  const divs = document.querySelectorAll('div')
+  t.equal(divs.length, 2)
+
+  const first = divs[0]
+  t.equal(first.childNodes.length, 5)
+  t.equal(first.childNodes[1].tagName, 'HEADER')
+  t.equal(first.childNodes[3].tagName, 'DIV')
+  t.equal(first.childNodes[3].textContent, 'nice stuff')
+
+  t.end()
+})
+
 test('construct from api', t => {
   document.body.innerHTML = ''
 
