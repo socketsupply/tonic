@@ -92,16 +92,6 @@ class Tonic extends window.HTMLElement {
     }
   }
 
-  static sanitize (o) {
-    if (!o) return o
-    for (const [k, v] of Object.entries(o)) {
-      if (Object.prototype.toString.call(v) === '[object HTMLElement]') continue
-      if (typeof v === 'object') o[k] = Tonic.sanitize(v)
-      if (typeof v === 'string') o[k] = Tonic.escape(v)
-    }
-    return o
-  }
-
   static escape (s) {
     return s.replace(Tonic.ESC, c => Tonic.MAP[c])
   }
@@ -118,6 +108,7 @@ class Tonic extends window.HTMLElement {
         case '[object NamedNodeMap]':
           return this._prop(Tonic._normalizeAttrs(o))
         case '[object Number]': return `${o}__float`
+        case '[object String]': return Tonic.escape(o)
         case '[object Boolean]': return `${o}__boolean`
         case '[object HTMLElement]':
           return this._placehold([o])
@@ -161,8 +152,7 @@ class Tonic extends window.HTMLElement {
 
   reRender (o = this.props) {
     const oldProps = { ...this.props }
-    this.props = Tonic.sanitize(typeof o === 'function' ? o(this.props) : o)
-
+    this.props = typeof o === 'function' ? o(oldProps) : o
     return this.scheduleReRender(oldProps)
   }
 
@@ -279,8 +269,9 @@ class Tonic extends window.HTMLElement {
     }
 
     this.props = Object.assign(
-      (this.defaults && this.defaults()) || {},
-      Tonic.sanitize(this.props))
+      this.defaults ? this.defaults() : {},
+      this.props
+    )
 
     if (!this._source) {
       this._source = this.innerHTML
