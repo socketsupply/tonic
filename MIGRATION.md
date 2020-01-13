@@ -6,7 +6,7 @@ of `@optoolco/tonic`.
 The main takeaway is that v10 had a potential XSS injection as
 we only escaped strings that exist on `this.props.someKey`,
 we've now changed the implementation to sanitize all strings
-that are passed into `this.html\`<div>${someStr}<div>\``.
+that are passed into ``this.html`<div>${someStr}<div>```.
 
 This breaks some existing patterns that are common in applications
 like the following
