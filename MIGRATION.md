@@ -63,3 +63,32 @@ update to version `7.4.0` as well
 ```sh
 npm install @optoolco/components@^7.4.0 -ES
 ```
+
+There are other situations in which the increased escaping from
+`Tonic.escape()` like for example escaping the `"` character if
+you dynamically generate optional attributes
+
+Like:
+
+```js
+class Icon extends Tonic {
+  render () {
+    return this.html`<svg ${tabAttr} styles="icon">
+      <use
+        width="${size}"
+        ${fill ? `fill="${fill}" color="${fill}"` : ''}
+        height="${size}">
+    </svg>`
+  }
+}
+```
+
+In the above example we do ``fill ? `fill="${fill}"` : ''`` which
+leads to `"` getting escaped to `&quot;` and leads to the value
+of `use.getAttribute('fill')` to be `"${fill}"` instead of `${fill}`
+
+Here is a regex you can use to find the one-liner use cases.
+
+```
+git grep -E '`(.+)="'
+```
