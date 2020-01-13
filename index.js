@@ -195,8 +195,10 @@ class Tonic extends window.HTMLElement {
         const o = Tonic._data[p.split('__')[1]][p]
         return Object.entries(o).map(([key, value]) => {
           const k = key.replace(/([a-z])([A-Z])/g, '$1-$2').toLowerCase()
-          return `${k}="${Tonic.escape(String(value))}"`
-        }).join(' ')
+          if (value === true) return k
+          else if (value) return `${k}="${Tonic.escape(String(value))}"`
+          else return ''
+        }).filter(Boolean).join(' ')
       })
 
       if (this.stylesheet) {
@@ -308,7 +310,7 @@ Object.assign(Tonic, {
   _children: {},
   _reg: {},
   _index: 0,
-  SPREAD: /\.\.\.(__\w+__\w+__)/g,
+  SPREAD: /\.\.\.\s?(__\w+__\w+__)/g,
   ESC: /["&'<>`]/g,
   AsyncFunctionGenerator: async function * () {}.constructor,
   AsyncFunction: async function () {}.constructor,
