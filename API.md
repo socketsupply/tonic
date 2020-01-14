@@ -4,7 +4,7 @@
 
 | Name | Description |
 | :--- | :--- |
-| `render()` | Required, should return HTML or nodes to be parsed or a dom node that will overwrite. There is usually no need to call this directly, prefer `foo.reRender({ ... })`. This function can be async or an async generator. |
+| `render()` | Required, should return a template literal of HTML. There is no need to call this directly, the browser will call it. Can be `async` or `async generator`. |
 | `stylesheet()` | Optional, Should return a string of css to be added to a `style` tag in the component (ideal for components that use a shadow dom). |
 | `static stylesheet()` | Optional, Should return a string of css to be lazily added to a `style` tag in the head (ideal for custom elements with no shadow dom). |
 | `styles()` | Optional, Should return an object that represents inline-styles to be applied to the component. Styles are applied by adding a keys from the object to the `styles` attribute of an html tag in the render function, for example `styles="key1 key2"`. Each object's key-value pair are added to the element's style object. |
