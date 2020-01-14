@@ -1,3 +1,13 @@
+class TonicRaw {
+  constructor (rawText) {
+    this.isTonicRaw = true
+    this.rawText = rawText
+  }
+
+  valueOf () { return this.rawText }
+  toString () { return this.rawText }
+}
+
 class Tonic extends window.HTMLElement {
   constructor () {
     super()
@@ -97,7 +107,7 @@ class Tonic extends window.HTMLElement {
   }
 
   static raw (s) {
-    return { isTonicRaw: true, rawText: s }
+    return new TonicRaw(s)
   }
 
   html ([s, ...strings], ...values) {
@@ -128,7 +138,8 @@ class Tonic extends window.HTMLElement {
     }
 
     const reduce = (a, b) => a.concat(b, strings.shift())
-    return values.map(refs).reduce(reduce, [s]).join('')
+    const str = values.map(refs).reduce(reduce, [s]).join('')
+    return Tonic.raw(str)
   }
 
   setState (o) {
@@ -188,6 +199,10 @@ class Tonic extends window.HTMLElement {
       return
     } else if (render instanceof Function) {
       content = render.call(this) || ''
+    }
+
+    if (content && content.isTonicRaw) {
+      content = content.rawText
     }
 
     if (typeof content === 'string') {
