@@ -78,14 +78,18 @@ class Tonic extends window.HTMLElement {
       throw Error('Mangling. https://bit.ly/2TkJ6zP')
     }
 
-    if (!htmlName) {
-      htmlName = Tonic._splitName(c.name).toLowerCase()
-    }
+    if (!htmlName) htmlName = Tonic._splitName(c.name).toLowerCase()
     if (window.customElements.get(htmlName)) return
 
     Tonic._reg[htmlName] = c
     Tonic._tags = Object.keys(Tonic._reg).join()
     window.customElements.define(htmlName, c)
+
+    if (c.stylesheet) {
+      const styleNode = document.createElement('style')
+      styleNode.appendChild(document.createTextNode(c.stylesheet()))
+      if (document.head) document.head.appendChild(styleNode)
+    }
   }
 
   static sanitize (o) {
@@ -167,8 +171,7 @@ class Tonic extends window.HTMLElement {
   }
 
   handleEvent (e) {
-    const p = this[e.type](e)
-    Tonic._maybePromise(p)
+    Tonic._maybePromise(this[e.type](e))
   }
 
   async _set (target, render, content = '') {
@@ -200,6 +203,10 @@ class Tonic extends window.HTMLElement {
           return `${k}="${Tonic.escape(String(value))}"`
         }).join(' ')
       })
+
+      if (this.stylesheet) {
+        content = `<style>${this.stylesheet()}</style>${content}`
+      }
 
       target.innerHTML = content
 
@@ -238,12 +245,6 @@ class Tonic extends window.HTMLElement {
     } else {
       target.innerHTML = ''
       target.appendChild(content.cloneNode(true))
-    }
-
-    if (this.stylesheet) {
-      const styleNode = document.createElement('style')
-      styleNode.appendChild(document.createTextNode(this.stylesheet()))
-      target.insertBefore(styleNode, target.firstChild)
     }
   }
 

@@ -218,6 +218,32 @@ test('stylesheets and inline styles', t => {
   t.end()
 })
 
+test('static stylesheet', t => {
+  document.body.innerHTML = `
+    <component-static-styles>
+    </component-static-styles>
+  `
+
+  class ComponentStaticStyles extends Tonic {
+    static stylesheet () {
+      return 'component-static-styles div { color: red; }'
+    }
+
+    render () {
+      return '<div>RED</div>'
+    }
+  }
+
+  Tonic.add(ComponentStaticStyles)
+
+  const style = document.head.querySelector('style')
+  t.ok(style, 'has a style tag')
+  const div = document.querySelector('component-static-styles div')
+  const computed = window.getComputedStyle(div)
+  t.equal(computed.color, 'rgb(255, 0, 0)', 'inline style was set')
+  t.end()
+})
+
 test('component composition', t => {
   document.body.innerHTML = `
     A Few
