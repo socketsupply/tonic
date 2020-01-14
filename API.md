@@ -5,7 +5,6 @@
 | Method | Description |
 | :--- | :--- |
 | `add(Class)` | Register a class as a new custom-tag and provide options for it. |
-| `init(root?)` | Initialize all components (optionally starating at a root node in the DOM). This is called automatically when an <App></App> component is added. |
 | `escape(String)` | Escapes HTML characters from a string (based on [he][3]). |
 | `sanitize(Object)` | Escapes all the strings found in an object literal. |
 | `match(Node, Selector)` | Match the given node against a selector or any matching parent of the given node. This is useful when trying to locate a node from the actual node that was interacted with. |
