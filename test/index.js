@@ -53,6 +53,56 @@ test('Tonic escapes text', t => {
   t.end()
 })
 
+test('Tonic escapes attribute injection', t => {
+  class Comp1 extends Tonic {
+    render () {
+      const userInput2 = '" onload="console.log(42)'
+      const userInput = '"><script>console.log(42)</script>'
+
+      const input = this.props.input === 'script'
+        ? userInput : userInput2
+
+      if (this.props.spread) {
+        return this.html`
+          <div ... ${{ attr: input }}></div>
+        `
+      }
+
+      if (this.props.quoted) {
+        return this.html`
+          <div attr="${input}"></div>
+        `
+      }
+
+      return this.html`
+        <div attr=${input}></div>
+      `
+    }
+  }
+  const compName = `x-${uuid()}`
+  Tonic.add(Comp1, compName)
+
+  document.body.innerHTML = `
+    <${compName} input="script" quoted="1"></${compName}>
+    <${compName} input="script" spread="1"></${compName}>
+    <${compName} input="script"></${compName}>
+    <${compName} quoted="1"></${compName}>
+    <${compName} spread="1"></${compName}>
+    <!-- This is XSS attack below. -->
+    <${compName}></${compName}>
+  `
+
+  const divs = document.querySelectorAll('div')
+  t.equal(divs.length, 6)
+  for (let i = 0; i < divs.length; i++) {
+    const div = divs[i]
+    t.equal(div.childNodes.length, 0)
+    t.equal(div.hasAttribute('onload'), i === 5)
+  }
+
+  t.end()
+})
+
 test('attach to dom with shadow', t => {
   Tonic.add(class ShadowComponent extends Tonic {
     constructor (o) {
