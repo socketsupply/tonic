@@ -58,9 +58,11 @@ test('Tonic escapes attribute injection', t => {
     render () {
       const userInput2 = '" onload="console.log(42)'
       const userInput = '"><script>console.log(42)</script>'
+      const userInput3 = 'a" onmouseover="alert(1)"'
 
       const input = this.props.input === 'script'
-        ? userInput : userInput2
+        ? userInput : this.props.input === 'space'
+          ? userInput3 : userInput2
 
       if (this.props.spread) {
         return this.html`
@@ -83,6 +85,10 @@ test('Tonic escapes attribute injection', t => {
   Tonic.add(Comp1, compName)
 
   document.body.innerHTML = `
+    <${compName} input="space" quoted="1"></${compName}>
+    <${compName} input="space" spread="1"></${compName}>
+    <!-- This is XSS attack below. -->
+    <${compName} input="space"></${compName}>
     <${compName} input="script" quoted="1"></${compName}>
     <${compName} input="script" spread="1"></${compName}>
     <${compName} input="script"></${compName}>
@@ -93,11 +99,12 @@ test('Tonic escapes attribute injection', t => {
   `
 
   const divs = document.querySelectorAll('div')
-  t.equal(divs.length, 6)
+  t.equal(divs.length, 9)
   for (let i = 0; i < divs.length; i++) {
     const div = divs[i]
     t.equal(div.childNodes.length, 0)
-    t.equal(div.hasAttribute('onload'), i === 5)
+    t.equal(div.hasAttribute('onmouseover'), i === 2)
+    t.equal(div.hasAttribute('onload'), i === 8)
   }
 
   t.end()
