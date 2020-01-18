@@ -12,41 +12,46 @@ This breaks some existing patterns that are common in applications
 like the following
 
 ```js
-class Comp extends Windowed {
+class Comp extends Tonic {
+  renderLabel () {
+    return `<label>${this.props.label}</label>`
+  }
+
   render () {
     return this.html`
       <div>
         <header>Some header</header>
-        ${super.render()}
+        ${this.renderLabel()}
       </div>
     `
   }
 }
 ```
 
-Or
+In this case the HTML returned from `this.renderLabel()` is now
+being escaped which is probably not what you meant.
+
+You will have to patch the code to use `this.html` for the
+implementation of `renderLabel()` like
 
 ```js
-class Toaster extends Tonic {
+  renderLabel () {
+    return this.html`<label>${this.props.label}</label>`
+  }
+```
+
+Or to call `Tonic.raw()` manually like
+
+```js
   render () {
     return this.html`
       <div>
-        ${this.renderIcon()}
-        ${this.renderLabel()}
-        <div>${title}</div>
+        <header>Some header</header>
+        ${Tonic.raw(this.renderLabel())}
       </div>
     `
   }
-}
 ```
-
-In both cases the HTML returned from either `super.render()` or
-from `this.renderIcon()` is now being escaped which is probably
-not the desired behavior.
-
-You will have to patch the code to call
-`${Tonic.raw(this.renderIcon())}` or
-`${Tonic.raw(super.render())}`
 
 If you want to quickly find all occurences of the above patterns
 you can run the following git grep on your codebase.
@@ -55,7 +60,7 @@ you can run the following git grep on your codebase.
 git grep -C10 '${' | grep ')}'
 ```
 
-The fix is to add `Tonic.raw()` calls in various places.
+The fix is to add `this.html` calls in various places.
 
 We have updated `@optoolco/components` and you will have to
 update to version `7.4.0` as well
