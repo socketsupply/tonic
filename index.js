@@ -119,11 +119,12 @@ class Tonic extends window.HTMLElement {
           return this._prop(Tonic._normalizeAttrs(o))
         case '[object Number]': return `${o}__float`
         case '[object Boolean]': return `${o}__boolean`
+        case '[object Null]': return `${o}__null`
         case '[object HTMLElement]':
           return this._placehold([o])
       }
       if (
-        typeof o === 'object' && o.nodeType === 1 &&
+        typeof o === 'object' && o && o.nodeType === 1 &&
         typeof o.cloneNode === 'function'
       ) {
         return this._placehold([o])
@@ -270,6 +271,8 @@ class Tonic extends window.HTMLElement {
         this.props[name] = Tonic._data[root][p]
       } else if (/\d+__float/.test(p)) {
         this.props[name] = parseFloat(p, 10)
+      } else if (p === 'null__null') {
+        this.props[name] = null
       } else if (/\w+__boolean/.test(p)) {
         this.props[name] = p.includes('true')
       } else if (/placehold:\w+:\w+__/.test(p)) {
