@@ -794,9 +794,30 @@ test('default props', t => {
   t.end()
 })
 
-test('cleanup, ensure exist', t => {
+test('Tonic comp with null prop', t => {
+  class InnerComp extends Tonic {
+    render () {
+      return this.html`<div>${String(this.props.foo)}</div>`
+    }
+  }
+  const innerName = `x-${uuid()}`
+  Tonic.add(InnerComp, innerName)
+
+  class OuterComp extends Tonic {
+    render () {
+      return this.html`<${innerName} foo=${null}></${innerName}>`
+    }
+  }
+  const outerName = `x-${uuid()}`
+  Tonic.add(OuterComp, outerName)
+
+  document.body.innerHTML = `<${outerName}></${outerName}>`
+
+  const div = document.body.querySelector('div')
+  t.ok(div)
+
+  t.equal(div.textContent, 'null')
   t.end()
-  document.body.classList.add('finished')
 })
 
 test('re-render nested component', t => {
@@ -876,4 +897,9 @@ test('re-render nested component', t => {
 
     t.end()
   }
+})
+
+test('cleanup, ensure exist', t => {
+  t.end()
+  document.body.classList.add('finished')
 })
