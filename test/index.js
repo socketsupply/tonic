@@ -6,6 +6,11 @@ const sleep = t => new Promise(resolve => setTimeout(resolve, t))
 
 test('sanity', t => {
   t.ok(true)
+
+  const version = Tonic.version
+  const parts = version.split('.')
+  t.ok(parseInt(parts[0]) >= 10)
+
   t.end()
 })
 
