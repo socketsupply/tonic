@@ -6,6 +6,11 @@ const sleep = t => new Promise(resolve => setTimeout(resolve, t))
 
 test('sanity', t => {
   t.ok(true)
+
+  const version = Tonic.version
+  const parts = version.split('.')
+  t.ok(parseInt(parts[0]) >= 10)
+
   t.end()
 })
 
@@ -24,6 +29,89 @@ test('attach to dom', t => {
 
   const div = document.querySelector('div')
   t.ok(div, 'a div was created and attached')
+  t.end()
+})
+
+test('Tonic escapes text', t => {
+  class Comp extends Tonic {
+    render () {
+      const userInput = this.props.userInput
+      return this.html`<div>${userInput}</div>`
+    }
+  }
+  const compName = `x-${uuid()}`
+  Tonic.add(Comp, compName)
+
+  const userInput = '<pre>lol</pre>'
+  document.body.innerHTML = `
+    <${compName} user-input="${userInput}"></${compName}>
+  `
+
+  const divs = document.querySelectorAll('div')
+  t.equal(divs.length, 1)
+  const div = divs[0]
+  t.equal(div.childNodes.length, 1)
+  t.equal(div.childNodes[0].nodeType, 3)
+  t.equal(div.innerHTML, '&lt;pre&gt;lol&lt;/pre&gt;')
+  t.equal(div.childNodes[0].data, '<pre>lol</pre>')
+
+  t.end()
+})
+
+test('Tonic escapes attribute injection', t => {
+  class Comp1 extends Tonic {
+    render () {
+      const userInput2 = '" onload="console.log(42)'
+      const userInput = '"><script>console.log(42)</script>'
+      const userInput3 = 'a" onmouseover="alert(1)"'
+
+      const input = this.props.input === 'script'
+        ? userInput : this.props.input === 'space'
+          ? userInput3 : userInput2
+
+      if (this.props.spread) {
+        return this.html`
+          <div ... ${{ attr: input }}></div>
+        `
+      }
+
+      if (this.props.quoted) {
+        return this.html`
+          <div attr="${input}"></div>
+        `
+      }
+
+      return this.html`
+        <div attr=${input}></div>
+      `
+    }
+  }
+  const compName = `x-${uuid()}`
+  Tonic.add(Comp1, compName)
+
+  document.body.innerHTML = `
+    <${compName} input="space" quoted="1"></${compName}>
+    <${compName} input="space" spread="1"></${compName}>
+    <!-- This is XSS attack below. -->
+    <${compName} input="space"></${compName}>
+    <${compName} input="script" quoted="1"></${compName}>
+    <${compName} input="script" spread="1"></${compName}>
+    <${compName} input="script"></${compName}>
+    <${compName} quoted="1"></${compName}>
+    <${compName} spread="1"></${compName}>
+    <!-- This is XSS attack below. -->
+    <${compName}></${compName}>
+  `
+
+  const divs = document.querySelectorAll('div')
+  t.equal(divs.length, 9)
+  for (let i = 0; i < divs.length; i++) {
+    const div = divs[i]
+    t.equal(div.childNodes.length, 0)
+    t.equal(div.hasAttribute('onmouseover'), i === 2)
+    t.equal(div.hasAttribute('onload'), i === 8)
+  }
+
   t.end()
 })
 
@@ -100,7 +188,6 @@ test('pass props', t => {
   const bb = document.getElementById('y')
   {
     const props = bb.getProps()
-    console.log(JSON.stringify(props))
     t.equal(props.fn(), 'hello, world', 'passed a function')
     t.equal(props.number, 42.42, 'float parsed properly')
   }
@@ -148,6 +235,80 @@ test('get element by id and set properties via the api', t => {
     t.equal(div.textContent, '2', 'the value was changed by reRender')
     t.end()
   })
+})
+
+test('inheritance and super.render()', t => {
+  class Stuff extends Tonic {
+    render () {
+      return '<div>nice stuff</div>'
+    }
+  }
+
+  class SpecificStuff extends Stuff {
+    render () {
+      return this.html`
+        <div>
+          <header>A header</header>
+          ${Tonic.raw(super.render())}
+        </div>
+      `
+    }
+  }
+
+  const compName = `x-${uuid()}`
+  Tonic.add(SpecificStuff, compName)
+
+  document.body.innerHTML = `
+    <${compName}></${compName}>
+  `
+
+  const divs = document.querySelectorAll('div')
+  t.equal(divs.length, 2)
+
+  const first = divs[0]
+  t.equal(first.childNodes.length, 5)
+  t.equal(first.childNodes[1].tagName, 'HEADER')
+  t.equal(first.childNodes[3].tagName, 'DIV')
+  t.equal(first.childNodes[3].textContent, 'nice stuff')
+
+  t.end()
+})
+
+test('Tonic#html returns raw string', t => {
+  class Stuff extends Tonic {
+    render () {
+      return this.html`<div>nice stuff</div>`
+    }
+  }
+
+  class SpecificStuff extends Stuff {
+    render () {
+      return this.html`
+        <div>
+          <header>A header</header>
+          ${super.render()}
+        </div>
+      `
+    }
+  }
+
+  const compName = `x-${uuid()}`
+  Tonic.add(SpecificStuff, compName)
+
+  document.body.innerHTML = `
+    <${compName}></${compName}>
+  `
+
+  const divs = document.querySelectorAll('div')
+  t.equal(divs.length, 2)
+
+  const first = divs[0]
+  t.equal(first.childNodes.length, 5)
+  t.equal(first.childNodes[1].tagName, 'HEADER')
+  t.equal(first.childNodes[3].tagName, 'DIV')
+  t.equal(first.childNodes[3].textContent, 'nice stuff')
+
+  t.end()
 })
 
 test('construct from api', t => {

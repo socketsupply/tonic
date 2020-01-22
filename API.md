@@ -13,9 +13,9 @@
 
 | Method | Description |
 | :--- | :--- |
-| `add(Class)` | Register a class as a new custom-tag and provide options for it. |
+| `add(Class, String?)` | Register a class as a new custom-tag and provide options for it. You can pass an optional string that is the HTML tagName for the custom component.|
 | `escape(String)` | Escapes HTML characters from a string (based on [he][3]). |
-| `sanitize(Object)` | Escapes all the strings found in an object literal. |
+| `raw(String)` | Insert raw text in html\`...\`. Useful when calling `super.render()` or otherwise delegating to `render()` of another component. Be careful with calling `raw` on untrusted text like user input as that is an XSS attack vector.
 | `match(Node, Selector)` | Match the given node against a selector or any matching parent of the given node. This is useful when trying to locate a node from the actual node that was interacted with. |
 
 ## INSTANCE METHODS

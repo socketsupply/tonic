@@ -1,3 +1,13 @@
+class TonicRaw {
+  constructor (rawText) {
+    this.isTonicRaw = true
+    this.rawText = rawText
+  }
+
+  valueOf () { return this.rawText }
+  toString () { return this.rawText }
+}
+
 class Tonic extends window.HTMLElement {
   constructor () {
     super()
@@ -92,23 +102,18 @@ class Tonic extends window.HTMLElement {
     }
   }
 
-  static sanitize (o) {
-    if (!o) return o
-    for (const [k, v] of Object.entries(o)) {
-      if (Object.prototype.toString.call(v) === '[object HTMLElement]') continue
-      if (typeof v === 'object') o[k] = Tonic.sanitize(v)
-      if (typeof v === 'string') o[k] = Tonic.escape(v)
-    }
-    return o
-  }
-
   static escape (s) {
     return s.replace(Tonic.ESC, c => Tonic.MAP[c])
+  }
+
+  static raw (s) {
+    return new TonicRaw(s)
   }
 
   html ([s, ...strings], ...values) {
     const refs = o => {
       if (o && o.__children__) return this._placehold(o)
+      if (o && o.isTonicRaw) return o.rawText
       switch (Object.prototype.toString.call(o)) {
         case '[object HTMLCollection]':
         case '[object NodeList]': return this._placehold([...o])
@@ -118,6 +123,7 @@ class Tonic extends window.HTMLElement {
         case '[object NamedNodeMap]':
           return this._prop(Tonic._normalizeAttrs(o))
         case '[object Number]': return `${o}__float`
+        case '[object String]': return Tonic.escape(o)
         case '[object Boolean]': return `${o}__boolean`
         case '[object Null]': return `${o}__null`
         case '[object HTMLElement]':
@@ -133,7 +139,8 @@ class Tonic extends window.HTMLElement {
     }
 
     const reduce = (a, b) => a.concat(b, strings.shift())
-    return values.map(refs).reduce(reduce, [s]).join('')
+    const str = values.map(refs).reduce(reduce, [s]).join('')
+    return Tonic.raw(str)
   }
 
   setState (o) {
@@ -162,8 +169,7 @@ class Tonic extends window.HTMLElement {
 
   reRender (o = this.props) {
     const oldProps = { ...this.props }
-    this.props = Tonic.sanitize(typeof o === 'function' ? o(this.props) : o)
-
+    this.props = typeof o === 'function' ? o(oldProps) : o
     return this.scheduleReRender(oldProps)
   }
 
@@ -196,13 +202,19 @@ class Tonic extends window.HTMLElement {
       content = render.call(this) || ''
     }
 
+    if (content && content.isTonicRaw) {
+      content = content.rawText
+    }
+
     if (typeof content === 'string') {
       content = content.replace(Tonic.SPREAD, (_, p) => {
         const o = Tonic._data[p.split('__')[1]][p]
         return Object.entries(o).map(([key, value]) => {
           const k = key.replace(/([a-z])([A-Z])/g, '$1-$2').toLowerCase()
-          return `${k}="${Tonic.escape(String(value))}"`
-        }).join(' ')
+          if (value === true) return k
+          else if (value) return `${k}="${Tonic.escape(String(value))}"`
+          else return ''
+        }).filter(Boolean).join(' ')
       })
 
       if (this.stylesheet) {
@@ -282,8 +294,9 @@ class Tonic extends window.HTMLElement {
     }
 
     this.props = Object.assign(
-      (this.defaults && this.defaults()) || {},
-      Tonic.sanitize(this.props))
+      this.defaults ? this.defaults() : {},
+      this.props
+    )
 
     if (!this._source) {
       this._source = this.innerHTML
@@ -315,7 +328,8 @@ Object.assign(Tonic, {
   _children: {},
   _reg: {},
   _index: 0,
-  SPREAD: /\.\.\.(__\w+__\w+__)/g,
+  version: require ? require('./package').version : null,
+  SPREAD: /\.\.\.\s?(__\w+__\w+__)/g,
   ESC: /["&'<>`]/g,
   AsyncFunctionGenerator: async function * () {}.constructor,
   AsyncFunction: async function () {}.constructor,
