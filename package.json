@@ -3,7 +3,7 @@
   "version": "11.0.1",
   "description": "A composable component inspired by React.",
   "scripts": {
-    "test": "browserify test/index.js | tape-puppet",
+    "test": "npm run minify && browserify test/index.js | tape-puppet",
     "build:demo": "browserify --bare ./demo > ./docs/bundle.js",
     "minify": "terser index.js -c unused,dead_code,hoist_vars,loops=false,hoist_props=true,hoist_funs,toplevel,keep_classnames,keep_fargs=false -o dist/tonic.min.js"
   },
