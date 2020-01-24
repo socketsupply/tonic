@@ -328,7 +328,7 @@ Object.assign(Tonic, {
   _children: {},
   _reg: {},
   _index: 0,
-  version: require ? require('./package').version : null,
+  version: typeof require !== 'undefined' ? require('./package').version : null,
   SPREAD: /\.\.\.\s?(__\w+__\w+__)/g,
   ESC: /["&'<>`]/g,
   AsyncFunctionGenerator: async function * () {}.constructor,
