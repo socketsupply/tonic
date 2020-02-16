@@ -16,9 +16,9 @@ class Tonic extends window.HTMLElement {
     this.isTonicComponent = true
     this.state = state || {}
     this.props = {}
-    this.elements = [...this.children].map(el => el.cloneNode(true))
+    this.elements = [...this.children]
     this.elements.__children__ = true
-    this.nodes = [...this.childNodes].map(el => el.cloneNode(true))
+    this.nodes = [...this.childNodes]
     this.nodes.__children__ = true
     this._events()
   }
