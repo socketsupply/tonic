@@ -1060,6 +1060,99 @@ test('re-render nested component', t => {
   }
 })
 
+test('alternating component', async t => {
+  const cName = `x-${uuid()}`
+  const pName = `x-${uuid()}`
+
+  class ParentComponent extends Tonic {
+    render () {
+      return this.html`
+        <${cName} id="alternating">
+          <div>Child Text</div>
+          <span>Span Text</span>
+          Raw Text Node
+        </${cName}>
+      `
+    }
+  }
+  Tonic.add(ParentComponent, pName)
+
+  class AlternatingComponent extends Tonic {
+    constructor () {
+      super()
+
+      this.state = {
+        renderCount: 0,
+        ...this.state
+      }
+    }
+
+    render () {
+      this.state.renderCount++
+      if (this.state.renderCount % 2) {
+        return this.html`
+          <div>New content</div>
+        `
+      } else {
+        return this.html`${this.nodes}`
+      }
+    }
+  }
+  Tonic.add(AlternatingComponent, cName)
+
+  document.body.innerHTML = `<${pName}></${pName}>`
+
+  const pElem = document.querySelector(pName)
+  t.ok(pElem)
+
+  let cElem = document.querySelector(cName)
+  t.ok(cElem)
+
+  t.equal(cElem.children.length, 1)
+  t.equal(cElem.children[0].textContent, 'New content')
+
+  await pElem.reRender()
+
+  cElem = document.querySelector(cName)
+  t.ok(cElem)
+
+  t.equal(cElem.children.length, 2)
+  t.equal(cElem.children[0].textContent, 'Child Text')
+  t.equal(cElem.children[1].textContent, 'Span Text')
+
+  t.equal(cElem.childNodes.length, 5)
+  t.equal(cElem.childNodes[4].data.trim(), 'Raw Text Node')
+
+  await pElem.reRender()
+
+  cElem = document.querySelector(cName)
+  t.equal(cElem.children.length, 1)
+  t.equal(cElem.children[0].textContent, 'New content')
+
+  await pElem.reRender()
+
+  cElem = document.querySelector(cName)
+  t.equal(cElem.children.length, 2)
+  t.equal(cElem.children[0].textContent, 'Child Text')
+  t.equal(cElem.children[1].textContent, 'Span Text')
+
+  const child1Ref = cElem.children[0]
+  const child2Ref = cElem.children[1]
+
+  await cElem.reRender()
+  t.equal(cElem.textContent.trim(), 'New content')
+  await cElem.reRender()
+  t.equal(
+    cElem.textContent.trim().replace(/\s+/g, ' '),
+    'Child Text Span Text Raw Text Node'
+  )
+
+  t.equal(cElem.children[0], child1Ref)
+  t.equal(cElem.children[1], child2Ref)
+
+  t.end()
+})
+
 test('cleanup, ensure exist', t => {
   t.end()
   document.body.classList.add('finished')
