@@ -1060,6 +1060,31 @@ test('re-render nested component', t => {
   }
 })
 
+test('async rendering component', async t => {
+  const cName = `x-${uuid()}`
+  class AsyncComponent extends Tonic {
+    async render () {
+      await sleep(100)
+
+      return this.html`<div>${this.props.text}</div>`
+    }
+  }
+  Tonic.add(AsyncComponent, cName)
+  document.body.innerHTML = `<${cName}></${cName}>`
+
+  const cElem = document.querySelector(cName)
+  t.ok(cElem)
+  t.equal(cElem.textContent, '')
+
+  cElem.reRender({ text: 'new text' })
+  t.equal(cElem.textContent, '')
+
+  await cElem.reRender({ text: 'new text2' })
+  t.equal(cElem.textContent, 'new text2')
+
+  t.end()
+})
+
 test('alternating component', async t => {
   const cName = `x-${uuid()}`
   const pName = `x-${uuid()}`

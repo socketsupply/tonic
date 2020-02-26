@@ -156,8 +156,16 @@ class Tonic extends window.HTMLElement {
 
     this.pendingReRender = new Promise(resolve => {
       window.requestAnimationFrame(() => {
-        Tonic._maybePromise(this._set(this.root, this.render))
+        const p = this._set(this.root, this.render)
         this.pendingReRender = null
+
+        if (p && p.then) {
+          Tonic._maybePromise(p.then(() => {
+            if (this.updated) this.updated(oldProps)
+            resolve()
+          }))
+          return
+        }
 
         if (this.updated) this.updated(oldProps)
         resolve()
