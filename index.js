@@ -95,7 +95,7 @@ class Tonic extends window.HTMLElement {
     Tonic._tags = Object.keys(Tonic._reg).join()
     window.customElements.define(htmlName, c)
 
-    if (c.stylesheet) {
+    if (Object.prototype.hasOwnProperty.call(c, 'stylesheet')) {
       const styleNode = document.createElement('style')
       styleNode.appendChild(document.createTextNode(c.stylesheet()))
       if (document.head) document.head.appendChild(styleNode)
