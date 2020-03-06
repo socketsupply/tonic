@@ -101,8 +101,8 @@ class Tonic extends window.HTMLElement {
   }
 
   static registerStyles (stylesheetFn) {
-    if (Tonic._seenStylesheets.includes(stylesheetFn)) return
-    Tonic._seenStylesheets.push(stylesheetFn)
+    if (Tonic._stylesheetRegistry.includes(stylesheetFn)) return
+    Tonic._stylesheetRegistry.push(stylesheetFn)
 
     const styleNode = document.createElement('style')
     styleNode.appendChild(document.createTextNode(stylesheetFn()))
@@ -354,7 +354,7 @@ Object.assign(Tonic, {
   _states: {},
   _children: {},
   _reg: {},
-  _seenStylesheets: [],
+  _stylesheetRegistry: [],
   _index: 0,
   version: typeof require !== 'undefined' ? require('./package').version : null,
   SPREAD: /\.\.\.\s?(__\w+__\w+__)/g,
