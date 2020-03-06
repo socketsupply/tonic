@@ -95,15 +95,18 @@ class Tonic extends window.HTMLElement {
     Tonic._tags = Object.keys(Tonic._reg).join()
     window.customElements.define(htmlName, c)
 
-    Tonic.addStyles(c)
+    if (c.stylesheet) {
+      Tonic.registerStyles(c.stylesheet)
+    }
   }
 
-  static addStyles (c) {
-    if (Object.prototype.hasOwnProperty.call(c, 'stylesheet')) {
-      const styleNode = document.createElement('style')
-      styleNode.appendChild(document.createTextNode(c.stylesheet()))
-      if (document.head) document.head.appendChild(styleNode)
-    }
+  static registerStyles (stylesheetFn) {
+    if (Tonic._seenStylesheets.includes(stylesheetFn)) return
+    Tonic._seenStylesheets.push(stylesheetFn)
+
+    const styleNode = document.createElement('style')
+    styleNode.appendChild(document.createTextNode(stylesheetFn()))
+    if (document.head) document.head.appendChild(styleNode)
   }
 
   static escape (s) {
@@ -351,6 +354,7 @@ Object.assign(Tonic, {
   _states: {},
   _children: {},
   _reg: {},
+  _seenStylesheets: [],
   _index: 0,
   version: typeof require !== 'undefined' ? require('./package').version : null,
   SPREAD: /\.\.\.\s?(__\w+__\w+__)/g,
