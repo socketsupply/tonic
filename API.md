@@ -14,7 +14,6 @@
 | Method | Description |
 | :--- | :--- |
 | `add(Class, String?)` | Register a class as a new custom-tag and provide options for it. You can pass an optional string that is the HTML tagName for the custom component.|
-| `addStyles(Class)` | Calls `static stylesheet()` and adds styles. If you have a base class like `TonicDialog` that should not be added as a custom elements but should have it's `static stylesheet()` called then you should call `Tonic.addStyles()` for your BaseClass instead of `Tonic.add()` |
 | `escape(String)` | Escapes HTML characters from a string (based on [he][3]). |
 | `raw(String)` | Insert raw text in html\`...\`. Useful when calling `super.render()` or otherwise delegating to `render()` of another component. Be careful with calling `raw` on untrusted text like user input as that is an XSS attack vector.
 | `match(Node, Selector)` | Match the given node against a selector or any matching parent of the given node. This is useful when trying to locate a node from the actual node that was interacted with. |
