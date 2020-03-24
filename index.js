@@ -13,7 +13,6 @@ class Tonic extends window.HTMLElement {
     super()
     const state = Tonic._states[this.id]
     delete Tonic._states[this.id]
-    this.isTonicComponent = true
     this.state = state || {}
     this.props = {}
     this.elements = [...this.children]
@@ -81,8 +80,6 @@ class Tonic extends window.HTMLElement {
   }
 
   static add (c, htmlName) {
-    c.prototype._props = Tonic.getPropertyNames(c.prototype)
-
     const hasValidName = htmlName || (c.name && c.name.length > 1)
     if (!hasValidName) {
       throw Error('Mangling. https://bit.ly/2TkJ6zP')
@@ -90,6 +87,14 @@ class Tonic extends window.HTMLElement {
 
     if (!htmlName) htmlName = Tonic._splitName(c.name).toLowerCase()
     if (window.customElements.get(htmlName)) return
+
+    if (!c.prototype.isTonicComponent) {
+      const tmp = { [c.name]: class extends Tonic {} }[c.name]
+      tmp.prototype.render = c
+      c = tmp
+    }
+
+    c.prototype._props = Tonic.getPropertyNames(c.prototype)
 
     Tonic._reg[htmlName] = c
     Tonic._tags = Object.keys(Tonic._reg).join()
@@ -346,6 +351,8 @@ class Tonic extends window.HTMLElement {
     delete Tonic._children[this._id]
   }
 }
+
+Tonic.prototype.isTonicComponent = true
 
 Object.assign(Tonic, {
   _tags: '',

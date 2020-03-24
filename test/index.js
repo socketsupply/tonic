@@ -32,6 +32,25 @@ test('attach to dom', t => {
   t.end()
 })
 
+test('render-only component', t => {
+  function ComponentFun () {
+    return this.html`
+      <div>
+      </div>
+    `
+  }
+
+  document.body.innerHTML = `
+    <component-fun></component-fun>
+  `
+
+  Tonic.add(ComponentFun)
+
+  const div = document.querySelector('div')
+  t.ok(div, 'a div was created and attached')
+  t.end()
+})
+
 test('Tonic escapes text', t => {
   class Comp extends Tonic {
     render () {
