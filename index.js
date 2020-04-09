@@ -1,7 +1,8 @@
 class TonicRaw {
-  constructor (rawText) {
+  constructor (rawText, templateStrings) {
     this.isTonicRaw = true
     this.rawText = rawText
+    this.templateStrings = templateStrings
   }
 
   valueOf () { return this.rawText }
@@ -118,11 +119,11 @@ class Tonic extends window.HTMLElement {
     return s.replace(Tonic.ESC, c => Tonic.MAP[c])
   }
 
-  static raw (s) {
-    return new TonicRaw(s)
+  static raw (s, templateStrings) {
+    return new TonicRaw(s, templateStrings)
   }
 
-  html ([s, ...strings], ...values) {
+  html (strings, ...values) {
     const refs = o => {
       if (o && o.__children__) return this._placehold(o)
       if (o && o.isTonicRaw) return o.rawText
@@ -150,9 +151,14 @@ class Tonic extends window.HTMLElement {
       return o
     }
 
-    const reduce = (a, b) => a.concat(b, strings.shift())
-    const str = values.map(refs).reduce(reduce, [s]).join('')
-    return Tonic.raw(str)
+    let out = ''
+    for (let i = 0; i < strings.length - 1; i++) {
+      out += strings[i]
+      out += refs(values[i])
+    }
+    out += strings[strings.length - 1]
+
+    return Tonic.raw(out, strings)
   }
 
   setState (o) {
