@@ -151,14 +151,12 @@ class Tonic extends window.HTMLElement {
       return o
     }
 
-    let out = ''
+    const out = []
     for (let i = 0; i < strings.length - 1; i++) {
-      out += strings[i]
-      out += refs(values[i])
+      out.push(strings[i], refs(values[i]))
     }
-    out += strings[strings.length - 1]
-
-    return Tonic.raw(out, strings)
+    out.push(strings[strings.length - 1])
+    return Tonic.raw(out.join(''), strings)
   }
 
   setState (o) {
