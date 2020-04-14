@@ -156,8 +156,8 @@ class Tonic extends window.HTMLElement {
       out.push(strings[i], refs(values[i]))
     }
     out.push(strings[strings.length - 1])
-    let htmlStr = out.join('')
-    htmlStr = htmlStr.replace(Tonic.SPREAD, (_, p) => {
+
+    const htmlStr = out.join('').replace(Tonic.SPREAD, (_, p) => {
       const o = Tonic._data[p.split('__')[1]][p]
       return Object.entries(o).map(([key, value]) => {
         const k = key.replace(/([a-z])([A-Z])/g, '$1-$2').toLowerCase()
