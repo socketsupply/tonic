@@ -1,7 +1,8 @@
 class TonicRaw {
-  constructor (rawText) {
+  constructor (rawText, templateStrings) {
     this.isTonicRaw = true
     this.rawText = rawText
+    this.templateStrings = templateStrings
   }
 
   valueOf () { return this.rawText }
@@ -118,11 +119,11 @@ class Tonic extends window.HTMLElement {
     return s.replace(Tonic.ESC, c => Tonic.MAP[c])
   }
 
-  static raw (s) {
-    return new TonicRaw(s)
+  static raw (s, templateStrings) {
+    return new TonicRaw(s, templateStrings)
   }
 
-  html ([s, ...strings], ...values) {
+  html (strings, ...values) {
     const refs = o => {
       if (o && o.__children__) return this._placehold(o)
       if (o && o.isTonicRaw) return o.rawText
@@ -150,9 +151,22 @@ class Tonic extends window.HTMLElement {
       return o
     }
 
-    const reduce = (a, b) => a.concat(b, strings.shift())
-    const str = values.map(refs).reduce(reduce, [s]).join('')
-    return Tonic.raw(str)
+    const out = []
+    for (let i = 0; i < strings.length - 1; i++) {
+      out.push(strings[i], refs(values[i]))
+    }
+    out.push(strings[strings.length - 1])
+
+    const htmlStr = out.join('').replace(Tonic.SPREAD, (_, p) => {
+      const o = Tonic._data[p.split('__')[1]][p]
+      return Object.entries(o).map(([key, value]) => {
+        const k = key.replace(/([a-z])([A-Z])/g, '$1-$2').toLowerCase()
+        if (value === true) return k
+        else if (value) return `${k}="${Tonic.escape(String(value))}"`
+        else return ''
+      }).filter(Boolean).join(' ')
+    })
+    return Tonic.raw(htmlStr, strings)
   }
 
   setState (o) {
@@ -239,16 +253,6 @@ class Tonic extends window.HTMLElement {
     }
 
     if (typeof content === 'string') {
-      content = content.replace(Tonic.SPREAD, (_, p) => {
-        const o = Tonic._data[p.split('__')[1]][p]
-        return Object.entries(o).map(([key, value]) => {
-          const k = key.replace(/([a-z])([A-Z])/g, '$1-$2').toLowerCase()
-          if (value === true) return k
-          else if (value) return `${k}="${Tonic.escape(String(value))}"`
-          else return ''
-        }).filter(Boolean).join(' ')
-      })
-
       if (this.stylesheet) {
         content = `<style>${this.stylesheet()}</style>${content}`
       }
