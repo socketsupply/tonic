@@ -349,8 +349,6 @@ class Tonic extends window.HTMLElement {
 
   disconnectedCallback () {
     Tonic._maybePromise(this.disconnected && this.disconnected())
-    this.elements.length = 0
-    this.nodes.length = 0
     delete Tonic._data[this._id]
     delete Tonic._children[this._id]
   }
