@@ -111,6 +111,7 @@ class Tonic extends window.HTMLElement {
     Tonic._stylesheetRegistry.push(stylesheetFn)
 
     const styleNode = document.createElement('style')
+    if (Tonic.nonce) styleNode.setAttribute('nonce', Tonic.nonce)
     styleNode.appendChild(document.createTextNode(stylesheetFn()))
     if (document.head) document.head.appendChild(styleNode)
   }
@@ -254,7 +255,7 @@ class Tonic extends window.HTMLElement {
 
     if (typeof content === 'string') {
       if (this.stylesheet) {
-        content = `<style>${this.stylesheet()}</style>${content}`
+        content = `<style ${Tonic.nonce || ''}>${this.stylesheet()}</style>${content}`
       }
 
       target.innerHTML = content
