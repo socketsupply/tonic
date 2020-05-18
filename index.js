@@ -255,7 +255,7 @@ class Tonic extends window.HTMLElement {
 
     if (typeof content === 'string') {
       if (this.stylesheet) {
-        content = `<style ${Tonic.nonce || ''}>${this.stylesheet()}</style>${content}`
+        content = `<style nonce=${Tonic.nonce || ''}>${this.stylesheet()}</style>${content}`
       }
 
       target.innerHTML = content
