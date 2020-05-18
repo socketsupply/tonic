@@ -188,14 +188,6 @@ class Tonic extends window.HTMLElement {
     return Tonic.raw(htmlStr, strings)
   }
 
-  setState (o) {
-    this.state = typeof o === 'function' ? o(this.state) : o
-  }
-
-  getState () {
-    return this.state
-  }
-
   scheduleReRender (oldProps) {
     if (this.pendingReRender) return this.pendingReRender
 
@@ -249,7 +241,7 @@ class Tonic extends window.HTMLElement {
 
       const id = node.getAttribute('id')
       if (!id || !Tonic._refIds.includes(id)) continue
-      Tonic._states[id] = node.getState()
+      Tonic._states[id] = node.state
     }
 
     if (render instanceof Tonic.AsyncFunction) {
