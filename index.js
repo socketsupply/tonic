@@ -49,22 +49,16 @@ class Tonic extends window.HTMLElement {
   }
 
   get state () {
-    this._checkId()
-    return this._state
+    return (this._checkId(), this._state)
   }
 
   set state (newState) {
-    this._checkId()
-    this._state = newState
+    this._state = (this._checkId(), newState)
   }
 
-  get id () {
-    return this._checkId()
-  }
+  get id () { return this._checkId() }
 
-  set id (newId) {
-    super.id = newId
-  }
+  set id (newId) { super.id = newId }
 
   _events () {
     const hp = Object.getOwnPropertyNames(window.HTMLElement.prototype)
