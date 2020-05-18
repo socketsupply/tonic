@@ -1,3 +1,37 @@
+# Migrating from v11 to v12
+
+We made a breaking change where the `id` attribute is mandatory
+for any tonic components that access `this.id` or `this.state`.
+
+Previously `id` attribute was not mandatory but the component
+was in a half broken state since the `this.state` was not
+stored upon re-render.
+
+Now tonic warns you that the component is stateful and that the
+`id` is mandatory as its the primary key by which we store the
+`state` and get the previous state upon re-render.
+
+Basically `this.state` is semi-broken without an `id` attribute.
+
+You will get exceptions and you will have to refactor; for example
+
+```js
+-            <app-search-filter-combo>
++            <app-search-filter-combo id="app-search-filter-combo">
+
+   render () {
+-    return `
++    return this.html`
+       <header>New Folder</header>
+       <main>
+         <tonic-input
++          id="new-folder"
+           name="new-folder"
+           label="Name"
+```
+
+Basically just add the `id` attributes.
+
 # Migrating from v10 to v11
 
 The implementation of HTML escaping changed between v10 and v11
