@@ -42,26 +42,30 @@ class Tonic extends window.HTMLElement {
     return x
   }
 
-  get state () {
-    if (!super.id) {
+  _checkId () {
+    const _id = super.id
+    if (!_id) {
+      console.warn('Found TonicComponent without id')
+      console.warn('')
+      console.warn(this.outerHTML)
+      console.warn('')
       throw new Error(`Component: ${this.tagName} has no id`)
     }
+    return _id
+  }
+
+  get state () {
+    this._checkId()
     return this._state
   }
 
   set state (newState) {
-    if (!super.id) {
-      throw new Error(`Component: ${this.tagName} has no id`)
-    }
+    this._checkId()
     this._state = newState
   }
 
   get id () {
-    const _id = super.id
-    if (!_id) {
-      throw new Error(`Component: ${this.tagName} has no id`)
-    }
-    return _id
+    return this._checkId()
   }
 
   set id (newId) {
