@@ -44,13 +44,7 @@ class Tonic extends window.HTMLElement {
 
   _checkId () {
     const _id = super.id
-    if (!_id) {
-      console.warn('Found TonicComponent without id')
-      console.warn('')
-      console.warn(this.outerHTML)
-      console.warn('')
-      throw new Error(`Component: ${this.tagName} has no id`)
-    }
+    if (!_id) throw new Error(`Component: ${this.tagName} has no id`)
     return _id
   }
 
