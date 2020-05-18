@@ -42,6 +42,32 @@ class Tonic extends window.HTMLElement {
     return x
   }
 
+  get state () {
+    if (!super.id) {
+      throw new Error(`Component: ${this.tagName} has no id`)
+    }
+    return this._state
+  }
+
+  set state (newState) {
+    if (!super.id) {
+      throw new Error(`Component: ${this.tagName} has no id`)
+    }
+    this._state = newState
+  }
+
+  get id () {
+    const _id = super.id
+    if (!_id) {
+      throw new Error(`Component: ${this.tagName} has no id`)
+    }
+    return _id
+  }
+
+  set id (newId) {
+    super.id = newId
+  }
+
   _events () {
     const hp = Object.getOwnPropertyNames(window.HTMLElement.prototype)
     for (const p of this._props) {
