@@ -12,9 +12,9 @@ class TonicRaw {
 class Tonic extends window.HTMLElement {
   constructor () {
     super()
-    const state = Tonic._states[this.id]
-    delete Tonic._states[this.id]
-    this.state = state || {}
+    const state = Tonic._states[super.id]
+    delete Tonic._states[super.id]
+    this._state = state || {}
     this.props = {}
     this.elements = [...this.children]
     this.elements.__children__ = true
@@ -41,6 +41,24 @@ class Tonic extends window.HTMLElement {
     [...o].forEach(o => (x[o.name] = o.value))
     return x
   }
+
+  _checkId () {
+    const _id = super.id
+    if (!_id) throw new Error(`Component: ${this.tagName} has no id`)
+    return _id
+  }
+
+  get state () {
+    return (this._checkId(), this._state)
+  }
+
+  set state (newState) {
+    this._state = (this._checkId(), newState)
+  }
+
+  get id () { return this._checkId() }
+
+  set id (newId) { super.id = newId }
 
   _events () {
     const hp = Object.getOwnPropertyNames(window.HTMLElement.prototype)
@@ -228,8 +246,10 @@ class Tonic extends window.HTMLElement {
   _set (target, render, content = '') {
     for (const node of target.querySelectorAll(Tonic._tags)) {
       if (!node.isTonicComponent) continue
-      if (!node.id || !Tonic._refIds.includes(node.id)) continue
-      Tonic._states[node.id] = node.getState()
+
+      const id = node.getAttribute('id')
+      if (!id || !Tonic._refIds.includes(id)) continue
+      Tonic._states[id] = node.getState()
     }
 
     if (render instanceof Tonic.AsyncFunction) {
@@ -274,7 +294,7 @@ class Tonic extends window.HTMLElement {
       const walk = (node, fn) => {
         if (node.nodeType === 3) {
           const id = node.textContent.trim()
-          if (children[id]) fn(node, children[id])
+          if (children[id]) fn(node, children[id], id)
         }
 
         const childNodes = node.childNodes
@@ -285,11 +305,11 @@ class Tonic extends window.HTMLElement {
         }
       }
 
-      walk(target, (node, children) => {
+      walk(target, (node, children, id) => {
         for (const child of children) {
           node.parentNode.insertBefore(child, node)
         }
-        delete Tonic._children[this._id][node.id]
+        delete Tonic._children[this._id][id]
         node.parentNode.removeChild(node)
       })
     } else {
@@ -306,8 +326,8 @@ class Tonic extends window.HTMLElement {
       this.render = this.wrap
     }
 
-    if (this.id && !Tonic._refIds.includes(this.id)) {
-      Tonic._refIds.push(this.id)
+    if (super.id && !Tonic._refIds.includes(super.id)) {
+      Tonic._refIds.push(super.id)
     }
     const cc = s => s.replace(/-(.)/g, (_, m) => m.toUpperCase())
 
