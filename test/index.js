@@ -250,10 +250,10 @@ test('get element by id and set properties via the api', t => {
   const div = document.getElementById('test')
   div.reRender({ number: 2 })
 
-  window.requestAnimationFrame(() => {
+  window.setTimeout(() => {
     t.equal(div.textContent, '2', 'the value was changed by reRender')
     t.end()
-  })
+  }, 0)
 })
 
 test('inheritance and super.render()', t => {
@@ -345,18 +345,18 @@ test('construct from api', t => {
 
   d.reRender({ number: 3 })
 
-  window.requestAnimationFrame(() => {
+  window.setTimeout(() => {
     const div1 = document.body.querySelector('div')
     t.equal(div1.getAttribute('number'), '3', 'attribute was set in component')
 
     d.reRender({ number: 6 })
 
-    window.requestAnimationFrame(() => {
+    window.setTimeout(() => {
       const div2 = document.body.querySelector('div')
       t.equal(div2.getAttribute('number'), '6', 'attribute was set in component')
       t.end()
-    })
-  })
+    }, 0)
+  }, 0)
 })
 
 test('stylesheets and inline styles', t => {
@@ -549,12 +549,12 @@ test('compose sugar (this.children)', t => {
     value: 'y'
   })
 
-  window.requestAnimationFrame(() => {
+  window.setTimeout(() => {
     const childrenAfterSetProps = g.querySelectorAll('.child')
     t.equal(childrenAfterSetProps.length, 1, 'child element was replaced')
     t.equal(childrenAfterSetProps[0].innerHTML, 'y')
     t.end()
-  })
+  }, 0)
 })
 
 test('ensure registration order does not affect rendering', t => {
@@ -647,7 +647,7 @@ test('check that composed elements use (and re-use) their initial innerHTML corr
     value: 1
   })
 
-  window.requestAnimationFrame(() => {
+  window.setTimeout(() => {
     const kTagsAfterSetProps = i.getElementsByTagName('component-k')
     t.equal(kTagsAfterSetProps.length, 1, 'correct number of components rendered')
 
@@ -656,7 +656,7 @@ test('check that composed elements use (and re-use) their initial innerHTML corr
     const kTextAfterSetProps = kClassesAfterSetProps[0].textContent
     t.equal(kTextAfterSetProps, '1', 'The text of the inner-most child was rendered correctly')
     t.end()
-  })
+  }, 0)
 })
 
 test('mixed order declaration', t => {
@@ -1052,7 +1052,7 @@ test('re-render nested component', t => {
   const cElem = pElem.querySelector(cName)
   cElem.updateText('new text')
 
-  window.requestAnimationFrame(onUpdate)
+  window.setTimeout(onUpdate, 0)
 
   function onUpdate () {
     const label = pElem.querySelector('label')
@@ -1065,7 +1065,7 @@ test('re-render nested component', t => {
       message: 'new message'
     })
 
-    window.requestAnimationFrame(onReRender)
+    window.setTimeout(onReRender, 0)
   }
 
   function onReRender () {

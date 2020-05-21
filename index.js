@@ -195,7 +195,7 @@ class Tonic extends window.HTMLElement {
     if (this.pendingReRender) return this.pendingReRender
 
     this.pendingReRender = new Promise(resolve => {
-      window.requestAnimationFrame(() => {
+      window.setTimeout(() => {
         const p = this._set(this.root, this.render)
         this.pendingReRender = null
 
@@ -209,7 +209,7 @@ class Tonic extends window.HTMLElement {
 
         if (this.updated) this.updated(oldProps)
         resolve()
-      })
+      }, 0)
     })
 
     return this.pendingReRender
