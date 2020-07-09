@@ -15,7 +15,7 @@ class Tonic extends window.HTMLElement {
     const state = Tonic._states[super.id]
     delete Tonic._states[super.id]
     this._state = state || {}
-    this.shouldRender = true
+    this.preventRender = false
     this.props = {}
     this.elements = [...this.children]
     this.elements.__children__ = true
@@ -315,7 +315,6 @@ class Tonic extends window.HTMLElement {
   }
 
   connectedCallback () {
-    this.shouldRender = true
     this.root = this.shadowRoot || this
 
     if (this.wrap) {
@@ -355,7 +354,7 @@ class Tonic extends window.HTMLElement {
     this._id = this._id || Tonic._createId()
 
     this.willConnect && this.willConnect()
-    if (this.shouldRender) {
+    if (this.preventRender) {
       if (!this._source) {
         this._source = this.innerHTML
       } else {
