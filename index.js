@@ -355,15 +355,15 @@ class Tonic extends window.HTMLElement {
     this._id = this._id || Tonic._createId()
 
     this.willConnect && this.willConnect()
-    if (!this.shouldRender) return
+    if (this.shouldRender) {
+      if (!this._source) {
+        this._source = this.innerHTML
+      } else {
+        this.innerHTML = this._source
+      }
 
-    if (!this._source) {
-      this._source = this.innerHTML
-    } else {
-      this.innerHTML = this._source
+      Tonic._maybePromise(this._set(this.root, this.render))
     }
-
-    Tonic._maybePromise(this._set(this.root, this.render))
     Tonic._maybePromise(this.connected && this.connected())
   }
 
