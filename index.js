@@ -350,11 +350,12 @@ class Tonic extends window.HTMLElement {
       this.props
     )
 
-    if (!this._source) {
-      this._source = this.innerHTML
-    } else {
-      this.innerHTML = this._source
-    }
+    // TODO: Identify why this was ever here ?
+    // if (!this._source) {
+    //   this._source = this.innerHTML
+    // } else {
+    //   this.innerHTML = this._source
+    // }
 
     this._id = this._id || Tonic._createId()
 
