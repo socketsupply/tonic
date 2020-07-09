@@ -588,6 +588,7 @@ test('ensure registration order does not affect rendering', t => {
     </compose-a>
   `
 
+  // When you add() in inside out order it will render too early.
   Tonic.add(ComposeB)
   Tonic.add(ComposeA)
 

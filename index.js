@@ -15,6 +15,7 @@ class Tonic extends window.HTMLElement {
     const state = Tonic._states[super.id]
     delete Tonic._states[super.id]
     this._state = state || {}
+    this.previousTransaction = null
     this.props = {}
     this.elements = [...this.children]
     this.elements.__children__ = true
@@ -314,6 +315,23 @@ class Tonic extends window.HTMLElement {
   }
 
   connectedCallback () {
+    let cleanupTranscation = false
+    if (Tonic.CURRENT_TRANSACTION === null) {
+      cleanupTranscation = true
+      Tonic.CURRENT_TRANSACTION = ++Tonic.TRANSACTION_COUNTER
+    } else if (Tonic.CURRENT_TRANSACTION === this.previousTransaction) {
+      /**
+       * This DOM element was disconnected & re-connected in the
+       * same rendering phase of some parent component.
+       *
+       * This basically means that someone used `${this.childNodes}`
+       * in the render() function and moved the element.
+       */
+      this.willMove && this.willMove()
+      Tonic._maybePromise(this.moved && this.moved())
+      return
+    }
+
     this.root = this.shadowRoot || this
 
     if (this.wrap) {
@@ -350,24 +368,23 @@ class Tonic extends window.HTMLElement {
       this.props
     )
 
-    // TODO: Identify why this was ever here ?
-    // if (!this._source) {
-    //   this._source = this.innerHTML
-    // } else {
-    //   this.innerHTML = this._source
-    // }
-
     this._id = this._id || Tonic._createId()
 
     this.willConnect && this.willConnect()
     Tonic._maybePromise(this._set(this.root, this.render))
     Tonic._maybePromise(this.connected && this.connected())
+
+    if (cleanupTranscation) {
+      Tonic.CURRENT_TRANSACTION = null
+    }
   }
 
   disconnectedCallback () {
     Tonic._maybePromise(this.disconnected && this.disconnected())
     delete Tonic._data[this._id]
     delete Tonic._children[this._id]
+
+    this.previousTransaction = Tonic.CURRENT_TRANSACTION
   }
 }
 
@@ -383,6 +400,8 @@ Object.assign(Tonic, {
   _stylesheetRegistry: [],
   _index: 0,
   version: typeof require !== 'undefined' ? require('./package').version : null,
+  CURRENT_TRANSACTION: null,
+  TRANSACTION_COUNTER: 1,
   SPREAD: /\.\.\.\s?(__\w+__\w+__)/g,
   ESC: /["&'<>`]/g,
   AsyncFunctionGenerator: async function * () {}.constructor,
