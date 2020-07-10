@@ -15,6 +15,7 @@ class Tonic extends window.HTMLElement {
     const state = Tonic._states[super.id]
     delete Tonic._states[super.id]
     this._state = state || {}
+    this.preventRenderOnReconnect = false
     this.props = {}
     this.elements = [...this.children]
     this.elements.__children__ = true
@@ -350,16 +351,18 @@ class Tonic extends window.HTMLElement {
       this.props
     )
 
-    if (!this._source) {
-      this._source = this.innerHTML
-    } else {
-      this.innerHTML = this._source
-    }
-
     this._id = this._id || Tonic._createId()
 
     this.willConnect && this.willConnect()
-    Tonic._maybePromise(this._set(this.root, this.render))
+    if (!this.preventRenderOnReconnect) {
+      if (!this._source) {
+        this._source = this.innerHTML
+      } else {
+        this.innerHTML = this._source
+      }
+
+      Tonic._maybePromise(this._set(this.root, this.render))
+    }
     Tonic._maybePromise(this.connected && this.connected())
   }
 
