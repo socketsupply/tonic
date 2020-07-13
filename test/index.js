@@ -458,7 +458,7 @@ test('component composition', t => {
   t.end()
 })
 
-test('lifecycle events', t => {
+test('sync lifecycle events', t => {
   document.body.innerHTML = '<x-quxx></x-quxx>'
 
   class XBazz extends Tonic {
@@ -514,6 +514,44 @@ test('lifecycle events', t => {
   q.reRender({})
   t.equal(Tonic._refIds.length, refsLength, 'Cleanup, refs still correct count')
   t.end()
+})
+
+test('async lifecycle events', t => {
+  t.plan(1)
+  document.body.innerHTML = '<async-f></async-f>'
+
+  class AsyncF extends Tonic {
+    connected () {
+      const bar = this.querySelector('.bar')
+      t.ok(bar, 'body was ready')
+    }
+
+    async render () {
+      return '<div class="bar"></div>'
+    }
+  }
+
+  Tonic.add(AsyncF)
+})
+
+test('async-generator lifecycle events', t => {
+  t.plan(1)
+  document.body.innerHTML = '<async-g></async-g>'
+
+  class AsyncG extends Tonic {
+    connected () {
+      const bar = this.querySelector('.bar')
+      t.ok(bar, 'body was ready')
+    }
+
+    async * render () {
+      yield 'loading...'
+      yield 'something else....'
+      return '<div class="bar"></div>'
+    }
+  }
+
+  Tonic.add(AsyncG)
 })
 
 test('compose sugar (this.children)', t => {

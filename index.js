@@ -28,12 +28,6 @@ class Tonic extends window.HTMLElement {
     return `tonic${Tonic._index++}`
   }
 
-  static _maybePromise (p) {
-    if (p && typeof p.then === 'function' && typeof p.catch === 'function') {
-      p.catch(err => setTimeout(() => { throw err }, 0))
-    }
-  }
-
   static _splitName (s) {
     return s.match(/[A-Z][a-z]*/g).join('-')
   }
@@ -195,23 +189,20 @@ class Tonic extends window.HTMLElement {
   scheduleReRender (oldProps) {
     if (this.pendingReRender) return this.pendingReRender
 
-    this.pendingReRender = new Promise(resolve => {
-      window.setTimeout(() => {
-        const p = this._set(this.root, this.render)
-        this.pendingReRender = null
+    this.pendingReRender = new Promise(resolve => window.setTimeout(() => {
+      const p = this._set(this.root, this.render)
+      this.pendingReRender = null
 
-        if (p && p.then) {
-          Tonic._maybePromise(p.then(() => {
-            if (this.updated) this.updated(oldProps)
-            resolve()
-          }))
-          return
-        }
+      if (p && p.then) {
+        return p.then(() => {
+          if (this.updated) this.updated(oldProps)
+          resolve()
+        })
+      }
 
-        if (this.updated) this.updated(oldProps)
-        resolve()
-      }, 0)
-    })
+      if (this.updated) this.updated(oldProps)
+      resolve()
+    }, 0))
 
     return this.pendingReRender
   }
@@ -227,12 +218,11 @@ class Tonic extends window.HTMLElement {
   }
 
   handleEvent (e) {
-    Tonic._maybePromise(this[e.type](e))
+    this[e.type](e)
   }
 
   _drainIterator (target, iterator) {
-    const p = iterator.next()
-    return p.then((result) => {
+    return iterator.next().then((result) => {
       this._set(target, null, result.value)
       if (result.done) return
       return this._drainIterator(target, iterator)
@@ -249,19 +239,14 @@ class Tonic extends window.HTMLElement {
     }
 
     if (render instanceof Tonic.AsyncFunction) {
-      const promise = render.call(this) || ''
-      return promise.then((content) => {
-        return this._apply(target, content)
-      })
+      return render.call(this).then(content => this._apply(target, content))
     } else if (render instanceof Tonic.AsyncFunctionGenerator) {
-      const itr = render.call(this)
-      return this._drainIterator(target, itr)
+      return this._drainIterator(target, render.call(this))
+    } else if (render === null) {
+      this._apply(target, content)
     } else if (render instanceof Function) {
-      content = render.call(this) || ''
-      return this._apply(target, content)
+      this._apply(target, render.call(this) || '')
     }
-
-    return this._apply(target, content)
   }
 
   _apply (target, content) {
@@ -314,7 +299,7 @@ class Tonic extends window.HTMLElement {
     }
   }
 
-  connectedCallback () {
+  async connectedCallback () {
     this.root = this.shadowRoot || this
 
     if (this.wrap) {
@@ -354,6 +339,7 @@ class Tonic extends window.HTMLElement {
     this._id = this._id || Tonic._createId()
 
     this.willConnect && this.willConnect()
+
     if (!this.preventRenderOnReconnect) {
       if (!this._source) {
         this._source = this.innerHTML
@@ -361,13 +347,15 @@ class Tonic extends window.HTMLElement {
         this.innerHTML = this._source
       }
 
-      Tonic._maybePromise(this._set(this.root, this.render))
+      const p = this._set(this.root, this.render)
+      if (p && p.then) await p
     }
-    Tonic._maybePromise(this.connected && this.connected())
+
+    this.connected && this.connected()
   }
 
   disconnectedCallback () {
-    Tonic._maybePromise(this.disconnected && this.disconnected())
+    this.disconnected && this.disconnected()
     delete Tonic._data[this._id]
     delete Tonic._children[this._id]
   }
