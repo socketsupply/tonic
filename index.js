@@ -195,12 +195,12 @@ class Tonic extends window.HTMLElement {
 
       if (p && p.then) {
         return p.then(() => {
-          if (this.updated) this.updated(oldProps)
+          this.updated && this.updated(oldProps)
           resolve()
         })
       }
 
-      if (this.updated) this.updated(oldProps)
+      this.updated && this.updated(oldProps)
       resolve()
     }, 0))
 
@@ -299,7 +299,7 @@ class Tonic extends window.HTMLElement {
     }
   }
 
-  async connectedCallback () {
+  connectedCallback () {
     this.root = this.shadowRoot || this
 
     if (this.wrap) {
@@ -348,7 +348,7 @@ class Tonic extends window.HTMLElement {
       }
 
       const p = this._set(this.root, this.render)
-      if (p && p.then) await p
+      if (p && p.then) return p.then(() => this.connected && this.connected())
     }
 
     this.connected && this.connected()
