@@ -300,7 +300,7 @@ class Tonic extends window.HTMLElement {
   }
 
   connectedCallback () {
-    this.root = this.shadowRoot || this
+    this.root = this.shadowRoot || this // here for back compat
 
     if (this.wrap) {
       this.wrapped = this.render
