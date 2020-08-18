@@ -1,6 +1,6 @@
 {
   "name": "@optoolco/tonic",
-  "version": "12.0.4",
+  "version": "12.1.0",
   "description": "A composable component inspired by React.",
   "scripts": {
     "test": "npm run minify && browserify test/index.js | tape-puppet",
