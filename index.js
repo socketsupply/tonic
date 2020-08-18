@@ -190,13 +190,7 @@ class Tonic extends window.HTMLElement {
     if (this.pendingReRender) return this.pendingReRender
 
     this.pendingReRender = new Promise(resolve => window.setTimeout(() => {
-      /**
-       * this.root is sometimes undefined for no reason ...
-       * Use `this.root || this` to avoid uncaught exception.
-       *
-       * Something something, promises, async, setTimeout, race conditions.
-       */
-      const p = this._set(this.root || this, this.render)
+      const p = this._set(this.shadowRoot || this, this.render)
       this.pendingReRender = null
 
       if (p && p.then) {
@@ -353,7 +347,7 @@ class Tonic extends window.HTMLElement {
         this.innerHTML = this._source
       }
 
-      const p = this._set(this.root || this, this.render)
+      const p = this._set(this.shadowRoot || this, this.render)
       if (p && p.then) return p.then(() => this.connected && this.connected())
     }
 
