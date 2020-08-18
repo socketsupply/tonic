@@ -190,6 +190,7 @@ class Tonic extends window.HTMLElement {
     if (this.pendingReRender) return this.pendingReRender
 
     this.pendingReRender = new Promise(resolve => window.setTimeout(() => {
+      if (!this.isInDocument(this.shadowRoot || this)) return
       const p = this._set(this.shadowRoot || this, this.render)
       this.pendingReRender = null
 
@@ -340,18 +341,23 @@ class Tonic extends window.HTMLElement {
 
     this.willConnect && this.willConnect()
 
+    if (!this.isInDocument(this.root)) return
     if (!this.preventRenderOnReconnect) {
       if (!this._source) {
         this._source = this.innerHTML
       } else {
         this.innerHTML = this._source
       }
-
-      const p = this._set(this.shadowRoot || this, this.render)
+      const p = this._set(this.root, this.render)
       if (p && p.then) return p.then(() => this.connected && this.connected())
     }
 
     this.connected && this.connected()
+  }
+
+  isInDocument (target) {
+    const root = target.getRootNode()
+    return root === document || root.toString() === '[object ShadowRoot]'
   }
 
   disconnectedCallback () {
