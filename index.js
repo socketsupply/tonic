@@ -230,7 +230,10 @@ class Tonic extends window.HTMLElement {
   }
 
   _set (target, render, content = '') {
-    if (!document.body.contains(target)) return
+    const rootNode = target.getRootNode()
+    if (rootNode !== document && rootNode.toString() !== '[object ShadowRoot]') {
+      return
+    }
     for (const node of target.querySelectorAll(Tonic._tags)) {
       if (!node.isTonicComponent) continue
 
