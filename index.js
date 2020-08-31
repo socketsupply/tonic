@@ -214,10 +214,6 @@ class Tonic extends window.HTMLElement {
     return this.scheduleReRender(oldProps)
   }
 
-  getProps () {
-    return this.props
-  }
-
   handleEvent (e) {
     this[e.type](e)
   }

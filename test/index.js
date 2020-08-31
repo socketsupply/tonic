@@ -206,7 +206,7 @@ test('pass props', t => {
 
   const bb = document.getElementById('y')
   {
-    const props = bb.getProps()
+    const props = bb.props
     t.equal(props.fn(), 'hello, world', 'passed a function')
     t.equal(props.number, 42.42, 'float parsed properly')
   }
@@ -217,7 +217,7 @@ test('pass props', t => {
   const div2 = document.getElementById('x')
   t.ok(div2)
 
-  const props = div2.getProps()
+  const props = div2.props
   t.equal(props.testItem, 'true', 'correct props')
 
   t.end()
