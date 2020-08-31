@@ -17,7 +17,7 @@ test('sanity', t => {
 test('attach to dom', t => {
   class ComponentA extends Tonic {
     render () {
-      return '<div></div>'
+      return this.html`<div></div>`
     }
   }
 
@@ -234,7 +234,7 @@ test('get element by id and set properties via the api', t => {
     }
 
     render () {
-      return `<div>${this.props.number}</div>`
+      return this.html`<div>${String(this.props.number)}</div>`
     }
   }
 
@@ -259,7 +259,7 @@ test('get element by id and set properties via the api', t => {
 test('inheritance and super.render()', t => {
   class Stuff extends Tonic {
     render () {
-      return '<div>nice stuff</div>'
+      return this.html`<div>nice stuff</div>`
     }
   }
 
@@ -268,7 +268,7 @@ test('inheritance and super.render()', t => {
       return this.html`
         <div>
           <header>A header</header>
-          ${Tonic.raw(super.render())}
+          ${super.render()}
         </div>
       `
     }
@@ -335,7 +335,7 @@ test('construct from api', t => {
 
   class ComponentD extends Tonic {
     render () {
-      return `<div number="${this.props.number}"></div>`
+      return this.html`<div number="${String(this.props.number)}"></div>`
     }
   }
 
@@ -381,7 +381,7 @@ test('stylesheets and inline styles', t => {
     }
 
     render () {
-      return '<div styles="foo bar"></div>'
+      return this.html`<div styles="foo bar"></div>`
     }
   }
 
@@ -410,7 +410,7 @@ test('static stylesheet', t => {
     }
 
     render () {
-      return '<div>RED</div>'
+      return this.html`<div>RED</div>`
     }
   }
 
@@ -435,13 +435,13 @@ test('component composition', t => {
 
   class XFoo extends Tonic {
     render () {
-      return '<div class="foo"></div>'
+      return this.html`<div class="foo"></div>`
     }
   }
 
   class XBar extends Tonic {
     render () {
-      return `
+      return this.html`
         <div class="bar">
           <x-foo></x-foo>
           <x-foo></x-foo>
@@ -472,7 +472,7 @@ test('sync lifecycle events', t => {
     }
 
     render () {
-      return '<div class="bar"></div>'
+      return this.html`<div class="bar"></div>`
     }
   }
 
@@ -496,7 +496,7 @@ test('sync lifecycle events', t => {
 
     render () {
       t.ok(true, 'render event fired')
-      return '<div class="quxx"><x-bazz></x-bazz></div>'
+      return this.html`<div class="quxx"><x-bazz></x-bazz></div>`
     }
   }
 
@@ -527,7 +527,7 @@ test('async lifecycle events', t => {
     }
 
     async render () {
-      return '<div class="bar"></div>'
+      return this.html`<div class="bar"></div>`
     }
   }
 
@@ -547,7 +547,7 @@ test('async-generator lifecycle events', t => {
     async * render () {
       yield 'loading...'
       yield 'something else....'
-      return '<div class="bar"></div>'
+      return this.html`<div class="bar"></div>`
     }
   }
 
@@ -563,7 +563,7 @@ test('compose sugar (this.children)', t => {
 
   class ComponentH extends Tonic {
     render () {
-      return `<div class="child">${this.props.value}</div>`
+      return this.html`<div class="child">${this.props.value}</div>`
     }
   }
 
@@ -641,7 +641,7 @@ test('check that composed elements use (and re-use) their initial innerHTML corr
     render () {
       return this.html`<div class="i">
         <component-j>
-          <component-k value="${this.props.value}">
+          <component-k value="${String(this.props.value)}">
           </component-k>
         </component-j>
       </div>`
@@ -656,7 +656,7 @@ test('check that composed elements use (and re-use) their initial innerHTML corr
 
   class ComponentK extends Tonic {
     render () {
-      return `<div class="k">${this.props.value}</div>`
+      return this.html`<div class="k">${this.props.value}</div>`
     }
   }
 
@@ -706,7 +706,7 @@ test('mixed order declaration', t => {
 
   class ComponentAx extends Tonic {
     render () {
-      return '<div class="a">A</div>'
+      return this.html`<div class="a">A</div>`
     }
   }
 
@@ -724,7 +724,7 @@ test('mixed order declaration', t => {
 
   class ComponentDx extends Tonic {
     render () {
-      return '<div class="d">D</div>'
+      return this.html`<div class="d">D</div>`
     }
   }
 
@@ -993,7 +993,7 @@ test('default props', t => {
     }
 
     render () {
-      return `<div>${JSON.stringify(this.props)}</div>`
+      return this.html`<div>${JSON.stringify(this.props)}</div>`
     }
   }
 

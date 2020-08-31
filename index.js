@@ -1,6 +1,6 @@
-class TonicRaw {
+class TonicUnsafeString {
   constructor (rawText, templateStrings) {
-    this.isTonicRaw = true
+    this.isTonicUnsafeString = true
     this.rawText = rawText
     this.templateStrings = templateStrings
   }
@@ -136,14 +136,14 @@ class Tonic extends window.HTMLElement {
     return s.replace(Tonic.ESC, c => Tonic.MAP[c])
   }
 
-  static raw (s, templateStrings) {
-    return new TonicRaw(s, templateStrings)
+  static unsafeRawString (s, templateStrings) {
+    return new TonicUnsafeString(s, templateStrings)
   }
 
   html (strings, ...values) {
     const refs = o => {
       if (o && o.__children__) return this._placehold(o)
-      if (o && o.isTonicRaw) return o.rawText
+      if (o && o.isTonicUnsafeString) return o.rawText
       switch (Object.prototype.toString.call(o)) {
         case '[object HTMLCollection]':
         case '[object NodeList]': return this._placehold([...o])
@@ -183,7 +183,7 @@ class Tonic extends window.HTMLElement {
         else return ''
       }).filter(Boolean).join(' ')
     })
-    return Tonic.raw(htmlStr, strings)
+    return Tonic.unsafeRawString(htmlStr, strings)
   }
 
   scheduleReRender (oldProps) {
@@ -251,8 +251,10 @@ class Tonic extends window.HTMLElement {
   }
 
   _apply (target, content) {
-    if (content && content.isTonicRaw) {
+    if (content && content.isTonicUnsafeString) {
       content = content.rawText
+    } else if (typeof content === 'string') {
+      content = Tonic.escape(content)
     }
 
     if (typeof content === 'string') {
