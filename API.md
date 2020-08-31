@@ -23,7 +23,6 @@
 | Method | Description |
 | :--- | :--- |
 | <code>reRender(Object &#124; Function)</code> | Set the properties of a component instance. Can also take a function which will receive the current props as an argument. |
-| <code>setState(Object &#124; Function)</code> | Set the state of a component instance. Can also take a function which will receive the current props as an argument. |
 | html\`...\` | Interpolated HTML string (use as a [tagged template][2]). Provides...<br/> 1. Pass object references as properties.<br/> 2. Spread operator (ie `<a ...${object}></a>`) which turns ojbects into html properties.<br/> 3. Automatic string escaping.<br/> 4. Render `NamedNodeMap`, `HTMLElement`, `HTMLCollection`, or `NodeList` as html (ie `<a>${span}</a>`).<br/>|
 
 ## INSTANCE PROPERTIES
