@@ -13,6 +13,11 @@ We renamed a field from `isTonicRaw` to `isTonicTemplate` on
 the `TonicRaw` / `TonicTemplate` class. This is unlikely to break
 your app.
 
+We renamed the `Tonic.raw()` method to `Tonic.unsafeRawString()`.
+You will have to update all your callsites to use the new
+method name instead of `raw()`. The new method name reflects
+that your using an `unsafeRawString`.
+
 # Migrating from v11 to v12
 
 We made a breaking change where the `id` attribute is mandatory
