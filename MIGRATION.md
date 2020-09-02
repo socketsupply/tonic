@@ -1,3 +1,18 @@
+# Migration from v12 to v13
+
+We enabled escaping on strings returned by `render()`
+
+If your `render()` method returns a `'string'` or uses a plain
+template tag like "return \`<div></div>\`" then this will
+be escaped and rendered as text content.
+
+You will have to update your `render() {}` methods to use
+the `this.html` method for rendering.
+
+We renamed a field from `isTonicRaw` to `isTonicTemplate` on
+the `TonicRaw` / `TonicTemplate` class. This is unlikely to break
+your app.
+
 # Migrating from v11 to v12
 
 We made a breaking change where the `id` attribute is mandatory
