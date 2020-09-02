@@ -149,6 +149,10 @@ class Tonic extends window.HTMLElement {
         case '[object HTMLCollection]':
         case '[object NodeList]': return this._placehold([...o])
         case '[object Array]':
+          if (o.every(x => x.isTonicUnsafeString)) {
+            return Tonic.unsafeRawString(o.join('\n'))
+          }
+          return this._prop(o)
         case '[object Object]':
         case '[object Function]': return this._prop(o)
         case '[object NamedNodeMap]':
