@@ -3,7 +3,7 @@
 We enabled escaping on strings returned by `render()`
 
 If your `render()` method returns a `'string'` or uses a plain
-template tag like "return \`<div></div>\`" then this will
+template tag like "return \`&lt;div>&lt;/div>\`" then this will
 be escaped and rendered as text content.
 
 You will have to update your `render() {}` methods to use
