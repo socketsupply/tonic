@@ -77,6 +77,28 @@ test('Tonic escapes text', t => {
   t.end()
 })
 
+test('Tonic supports array of templates', t => {
+  class Comp1 extends Tonic {
+    render () {
+      const options = []
+      for (const o of ['one', 'two', 'three']) {
+        options.push(this.html`
+          <option value="${o}">${o}</option>
+        `)
+      }
+
+      return this.html`<select>${options}</select>`
+    }
+  }
+  const compName = `x-${uuid()}`
+  Tonic.add(Comp1, compName)
+
+  document.body.innerHTML = `<${compName}></${compName}>`
+  const options = document.body.querySelectorAll('option')
+  t.equal(options.length, 3)
+  t.end()
+})
+
 test('Tonic escapes attribute injection', t => {
   class Comp1 extends Tonic {
     render () {
