@@ -149,6 +149,10 @@ class Tonic extends window.HTMLElement {
         case '[object HTMLCollection]':
         case '[object NodeList]': return this._placehold([...o])
         case '[object Array]':
+          if (o.every(x => x.isTonicTemplate && !x.unsafe)) {
+            return new TonicTemplate(o.join('\n'), null, false)
+          }
+          return this._prop(o)
         case '[object Object]':
         case '[object Function]': return this._prop(o)
         case '[object NamedNodeMap]':
@@ -379,10 +383,10 @@ Object.assign(Tonic, {
   _index: 0,
   version: typeof require !== 'undefined' ? require('./package').version : null,
   SPREAD: /\.\.\.\s?(__\w+__\w+__)/g,
-  ESC: /["&'<>`]/g,
+  ESC: /["&'<>`/]/g,
   AsyncFunctionGenerator: async function * () {}.constructor,
   AsyncFunction: async function () {}.constructor,
-  MAP: { '"': '&quot;', '&': '&amp;', '\'': '&#x27;', '<': '&lt;', '>': '&gt;', '`': '&#x60;' }
+  MAP: { '"': '&quot;', '&': '&amp;', '\'': '&#x27;', '<': '&lt;', '>': '&gt;', '`': '&#x60;', '/': '&#x2F;' }
 })
 
 if (typeof module === 'object') module.exports = Tonic
