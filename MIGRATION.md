@@ -9,14 +9,23 @@ be escaped and rendered as text content.
 You will have to update your `render() {}` methods to use
 the `this.html` method for rendering.
 
+We've renamed the method `Tonic.raw` => `Tonic.unsafeRawString`.
+This makes it clear that the method is unsafe and exposes your
+application to security issues.
+
+We strongly recommend replacing all uses of `Tonic.raw` with
+`this.html` instead. For the use case of repeating templates
+you can pass an array of `TonicTemplate` objects returned
+from `this.html` into another `this.html`.
+
+If you truly do need an `unsafeRawString` that is assigned as
+raw HTML we recommend that you use `Tonic.escape()` to build
+that string and review it very carefully, add a comment explaining
+it too.
+
 We renamed a field from `isTonicRaw` to `isTonicTemplate` on
 the `TonicRaw` / `TonicTemplate` class. This is unlikely to break
 your app.
-
-We renamed the `Tonic.raw()` method to `Tonic.unsafeRawString()`.
-You will have to update all your callsites to use the new
-method name instead of `raw()`. The new method name reflects
-that your using an `unsafeRawString`.
 
 # Migrating from v11 to v12
 
