@@ -301,11 +301,6 @@ class Tonic extends window.HTMLElement {
   connectedCallback () {
     this.root = this.shadowRoot || this // here for back compat
 
-    if (this.wrap) {
-      this.wrapped = this.render
-      this.render = this.wrap
-    }
-
     if (super.id && !Tonic._refIds.includes(super.id)) {
       Tonic._refIds.push(super.id)
     }
