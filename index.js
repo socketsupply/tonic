@@ -143,6 +143,11 @@ class Tonic extends window.HTMLElement {
     return new TonicTemplate(s, templateStrings, true)
   }
 
+  dispatch (eventName, detail = null) {
+    const opts = { bubbles: true, detail }
+    this.dispatchEvent(new window.CustomEvent(eventName, opts))
+  }
+
   html (strings, ...values) {
     const refs = o => {
       if (o && o.__children__) return this._placehold(o)
