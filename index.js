@@ -123,6 +123,8 @@ class Tonic extends window.HTMLElement {
     if (c.stylesheet) {
       Tonic.registerStyles(c.stylesheet)
     }
+
+    return c
   }
 
   static registerStyles (stylesheetFn) {
