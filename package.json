@@ -17,7 +17,7 @@
     "esbuild": "^0.8.36",
     "raynos-tape-puppet": "0.1.7-raynos2",
     "standard": "14.3.1",
-    "tapzero": "^0.1.3",
+    "tapzero": "0.2.2",
     "uuid": "3.3.3"
   },
   "directories": {
