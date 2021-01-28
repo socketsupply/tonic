@@ -15,7 +15,6 @@
   "devDependencies": {
     "benchmark": "^2.1.4",
     "esbuild": "^0.8.36",
-    "raynos-tape-puppet": "0.1.7-raynos2",
     "standard": "14.3.1",
     "tapzero": "0.2.2",
     "uuid": "3.3.3"
@@ -30,5 +29,8 @@
   "bugs": {
     "url": "https://github.com/optoolco/tonic/issues"
   },
-  "homepage": "https://tonic.technology"
+  "homepage": "https://tonic.technology",
+  "dependencies": {
+    "tape-run": "^8.0.0"
+  }
 }
