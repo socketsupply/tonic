@@ -392,5 +392,3 @@ Object.assign(Tonic, {
   AsyncFunction: async function () {}.constructor,
   MAP: { '"': '&quot;', '&': '&amp;', '\'': '&#x27;', '<': '&lt;', '>': '&gt;', '`': '&#x60;', '/': '&#x2F;' }
 })
-
-export default Tonic
