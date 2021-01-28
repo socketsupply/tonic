@@ -7,11 +7,11 @@ async function main () {
   const p = path.join(root, 'src', 'index.js')
   const s = await fs.readFile(p, 'utf8')
 
-  const cjs = '\nif (typeof module === \'object\') module.exports = Tonic'
+  const cjs = '\nif (typeof module === \'object\') module.exports = Tonic\n'
 
   fs.writeFile(path.join(root, 'index.cjs'), s + cjs, { flags: 'a' })
 
-  const js = '\nexport default Tonic'
+  const js = '\nexport default Tonic\n'
 
   fs.writeFile(path.join(root, 'index.js'), s + js, { flags: 'a' })
 }
