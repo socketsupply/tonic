@@ -21,6 +21,13 @@
   "directories": {
     "test": "test"
   },
+  "exports": {
+    ".": {
+      "require": "./index.js",
+      "import": "./index.mjs"
+    },
+    "./": "./"
+  },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/optoolco/tonic.git"
