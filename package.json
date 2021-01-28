@@ -7,6 +7,7 @@
     "lint": "standard -v",
     "test": "npm run build && standard && esbuild --bundle test/index.js | tape-run",
     "test:open": "npm run build && esbuild --bundle test/index.js | tape-run --browser chrome --keep-open",
+    "prepare": "./scripts/build.js",
     "build": "./scripts/build.js && npm run minify:esm && npm run minify:cjs",
     "minify:esm": "esbuild index.js --keep-names --minify --outfile=dist/tonic.min.js",
     "minify:cjs": "esbuild index.cjs --keep-names --minify --outfile=dist/tonic.min.cjs"
