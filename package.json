@@ -1,6 +1,6 @@
 {
   "name": "@optoolco/tonic",
-  "version": "13.1.4",
+  "version": "13.2.0",
   "description": "A component framework.",
   "scripts": {
     "test": "npm run build && esbuild --bundle test/index.js | tape-puppet",
