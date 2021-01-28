@@ -514,6 +514,8 @@ test('sync lifecycle events', async t => {
   q.reRender({})
   t.equal(Tonic._refIds.length, refsLength, 'Cleanup, refs still correct count')
 
+  await sleep(0)
+
   t.ok(calledBazzCtor, 'calling bazz ctor')
   t.ok(calledQuxxCtor, 'calling quxx ctor')
   t.ok(disconnectedBazz, 'disconnected event fired')
@@ -540,12 +542,12 @@ test('async lifecycle events', async t => {
 })
 
 test('async-generator lifecycle events', async t => {
+  let bar
   document.body.innerHTML = '<async-g></async-g>'
 
   class AsyncG extends Tonic {
     connected () {
-      const bar = this.querySelector('.bar')
-      t.ok(bar, 'body was ready')
+      bar = this.querySelector('.bar')
     }
 
     async * render () {
@@ -556,6 +558,9 @@ test('async-generator lifecycle events', async t => {
   }
 
   Tonic.add(AsyncG)
+
+  await sleep(10)
+  t.ok(bar, 'body was ready')
 })
 
 test('compose sugar (this.children)', async t => {
