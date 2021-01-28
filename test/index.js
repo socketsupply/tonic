@@ -1,20 +1,18 @@
-const test = require('tape')
+const test = require('tapzero').test
 const uuid = require('uuid')
-const Tonic = require('..')
+const Tonic = require('../index.cjs')
 
-const sleep = t => new Promise(resolve => setTimeout(resolve, t))
+const sleep = async t => new Promise(resolve => setTimeout(resolve, t))
 
-test('sanity', t => {
+test('sanity', async t => {
   t.ok(true)
 
   const version = Tonic.version
   const parts = version.split('.')
   t.ok(parseInt(parts[0]) >= 10)
-
-  t.end()
 })
 
-test('attach to dom', t => {
+test('attach to dom', async t => {
   class ComponentA extends Tonic {
     render () {
       return this.html`<div></div>`
@@ -29,10 +27,9 @@ test('attach to dom', t => {
 
   const div = document.querySelector('div')
   t.ok(div, 'a div was created and attached')
-  t.end()
 })
 
-test('render-only component', t => {
+test('render-only component', async t => {
   function ComponentFun () {
     return this.html`
       <div>
@@ -48,10 +45,9 @@ test('render-only component', t => {
 
   const div = document.querySelector('div')
   t.ok(div, 'a div was created and attached')
-  t.end()
 })
 
-test('Tonic escapes text', t => {
+test('Tonic escapes text', async t => {
   class Comp extends Tonic {
     render () {
       const userInput = this.props.userInput
@@ -73,11 +69,9 @@ test('Tonic escapes text', t => {
   t.equal(div.childNodes[0].nodeType, 3)
   t.equal(div.innerHTML, '&lt;pre&gt;lol&lt;/pre&gt;')
   t.equal(div.childNodes[0].data, '<pre>lol</pre>')
-
-  t.end()
 })
 
-test('Tonic supports array of templates', t => {
+test('Tonic supports array of templates', async t => {
   class Comp1 extends Tonic {
     render () {
       const options = []
@@ -96,10 +90,9 @@ test('Tonic supports array of templates', t => {
   document.body.innerHTML = `<${compName}></${compName}>`
   const options = document.body.querySelectorAll('option')
   t.equal(options.length, 3)
-  t.end()
 })
 
-test('Tonic escapes attribute injection', t => {
+test('Tonic escapes attribute injection', async t => {
   class Comp1 extends Tonic {
     render () {
       const userInput2 = '" onload="console.log(42)'
@@ -152,11 +145,9 @@ test('Tonic escapes attribute injection', t => {
     t.equal(div.hasAttribute('onmouseover'), i === 2)
     t.equal(div.hasAttribute('onload'), i === 8)
   }
-
-  t.end()
 })
 
-test('attach to dom with shadow', t => {
+test('attach to dom with shadow', async t => {
   Tonic.add(class ShadowComponent extends Tonic {
     constructor (o) {
       super(o)
@@ -183,10 +174,9 @@ test('attach to dom with shadow', t => {
   t.ok(div, 'a div was created and attached to the shadow root')
   t.ok(div.hasAttribute('num'), 'attributes added correctly')
   t.ok(div.hasAttribute('str'), 'attributes added correctly')
-  t.end()
 })
 
-test('pass props', t => {
+test('pass props', async t => {
   Tonic.add(class ComponentBB extends Tonic {
     render () {
       return this.html`<div>${this.props.data[0].foo}</div>`
@@ -241,11 +231,9 @@ test('pass props', t => {
 
   const props = div2.props
   t.equal(props.testItem, 'true', 'correct props')
-
-  t.end()
 })
 
-test('get element by id and set properties via the api', t => {
+test('get element by id and set properties via the api', async t => {
   document.body.innerHTML = `
     <component-c number=1></component-c>
   `
@@ -272,13 +260,11 @@ test('get element by id and set properties via the api', t => {
   const div = document.getElementById('test')
   div.reRender({ number: 2 })
 
-  window.setTimeout(() => {
-    t.equal(div.textContent, '2', 'the value was changed by reRender')
-    t.end()
-  }, 0)
+  await sleep(1)
+  t.equal(div.textContent, '2', 'the value was changed by reRender')
 })
 
-test('inheritance and super.render()', t => {
+test('inheritance and super.render()', async t => {
   class Stuff extends Tonic {
     render () {
       return this.html`<div>nice stuff</div>`
@@ -311,11 +297,9 @@ test('inheritance and super.render()', t => {
   t.equal(first.childNodes[1].tagName, 'HEADER')
   t.equal(first.childNodes[3].tagName, 'DIV')
   t.equal(first.childNodes[3].textContent, 'nice stuff')
-
-  t.end()
 })
 
-test('Tonic#html returns raw string', t => {
+test('Tonic#html returns raw string', async t => {
   class Stuff extends Tonic {
     render () {
       return this.html`<div>nice stuff</div>`
@@ -348,11 +332,9 @@ test('Tonic#html returns raw string', t => {
   t.equal(first.childNodes[1].tagName, 'HEADER')
   t.equal(first.childNodes[3].tagName, 'DIV')
   t.equal(first.childNodes[3].textContent, 'nice stuff')
-
-  t.end()
 })
 
-test('construct from api', t => {
+test('construct from api', async t => {
   document.body.innerHTML = ''
 
   class ComponentD extends Tonic {
@@ -367,21 +349,18 @@ test('construct from api', t => {
 
   d.reRender({ number: 3 })
 
-  window.setTimeout(() => {
-    const div1 = document.body.querySelector('div')
-    t.equal(div1.getAttribute('number'), '3', 'attribute was set in component')
+  await sleep(1)
+  const div1 = document.body.querySelector('div')
+  t.equal(div1.getAttribute('number'), '3', 'attribute was set in component')
 
-    d.reRender({ number: 6 })
+  d.reRender({ number: 6 })
 
-    window.setTimeout(() => {
-      const div2 = document.body.querySelector('div')
-      t.equal(div2.getAttribute('number'), '6', 'attribute was set in component')
-      t.end()
-    }, 0)
-  }, 0)
+  await sleep(1)
+  const div2 = document.body.querySelector('div')
+  t.equal(div2.getAttribute('number'), '6', 'attribute was set in component')
 })
 
-test('stylesheets and inline styles', t => {
+test('stylesheets and inline styles', async t => {
   document.body.innerHTML = `
     <component-f number=1></component-f>
   `
@@ -416,11 +395,9 @@ test('stylesheets and inline styles', t => {
   const computed = window.getComputedStyle(div)
   t.equal(computed.color, 'rgb(255, 0, 0)', 'inline style was set')
   t.equal(computed.backgroundColor, 'rgb(255, 0, 0)', 'inline style was set')
-
-  t.end()
 })
 
-test('static stylesheet', t => {
+test('static stylesheet', async t => {
   document.body.innerHTML = `
     <component-static-styles>
     </component-static-styles>
@@ -443,10 +420,9 @@ test('static stylesheet', t => {
   const div = document.querySelector('component-static-styles div')
   const computed = window.getComputedStyle(div)
   t.equal(computed.color, 'rgb(255, 0, 0)', 'inline style was set')
-  t.end()
 })
 
-test('component composition', t => {
+test('component composition', async t => {
   document.body.innerHTML = `
     A Few
     <x-bar></x-bar>
@@ -477,20 +453,22 @@ test('component composition', t => {
 
   t.equal(document.body.querySelectorAll('.bar').length, 2, 'two bar divs')
   t.equal(document.body.querySelectorAll('.foo').length, 4, 'four foo divs')
-  t.end()
 })
 
-test('sync lifecycle events', t => {
+test('sync lifecycle events', async t => {
   document.body.innerHTML = '<x-quxx></x-quxx>'
+  let calledBazzCtor
+  let disconnectedBazz
+  let calledQuxxCtor
 
   class XBazz extends Tonic {
     constructor (p) {
       super(p)
-      t.ok(true, 'calling bazz ctor')
+      calledBazzCtor = true
     }
 
     disconnected () {
-      t.ok(true, 'disconnected event fired')
+      disconnectedBazz = true
     }
 
     render () {
@@ -501,12 +479,12 @@ test('sync lifecycle events', t => {
   class XQuxx extends Tonic {
     constructor (p) {
       super(p)
-      t.ok(true, 'calling quxx ctor')
+      calledQuxxCtor = true
     }
 
     willConnect () {
-      t.ok(true, 'willConnect event fired')
       const expectedRE = /<x-quxx><\/x-quxx>/
+      t.ok(true, 'willConnect event fired')
       t.ok(expectedRE.test(document.body.innerHTML), 'nothing added yet')
     }
 
@@ -535,17 +513,21 @@ test('sync lifecycle events', t => {
   // once again to check that the refs length is the same
   q.reRender({})
   t.equal(Tonic._refIds.length, refsLength, 'Cleanup, refs still correct count')
-  t.end()
+
+  await sleep(0)
+
+  t.ok(calledBazzCtor, 'calling bazz ctor')
+  t.ok(calledQuxxCtor, 'calling quxx ctor')
+  t.ok(disconnectedBazz, 'disconnected event fired')
 })
 
-test('async lifecycle events', t => {
-  t.plan(1)
+test('async lifecycle events', async t => {
+  let bar
   document.body.innerHTML = '<async-f></async-f>'
 
   class AsyncF extends Tonic {
     connected () {
-      const bar = this.querySelector('.bar')
-      t.ok(bar, 'body was ready')
+      bar = this.querySelector('.bar')
     }
 
     async render () {
@@ -554,16 +536,18 @@ test('async lifecycle events', t => {
   }
 
   Tonic.add(AsyncF)
+
+  await sleep(10)
+  t.ok(bar, 'body was ready')
 })
 
-test('async-generator lifecycle events', t => {
-  t.plan(1)
+test('async-generator lifecycle events', async t => {
+  let bar
   document.body.innerHTML = '<async-g></async-g>'
 
   class AsyncG extends Tonic {
     connected () {
-      const bar = this.querySelector('.bar')
-      t.ok(bar, 'body was ready')
+      bar = this.querySelector('.bar')
     }
 
     async * render () {
@@ -574,9 +558,12 @@ test('async-generator lifecycle events', t => {
   }
 
   Tonic.add(AsyncG)
+
+  await sleep(10)
+  t.ok(bar, 'body was ready')
 })
 
-test('compose sugar (this.children)', t => {
+test('compose sugar (this.children)', async t => {
   class ComponentG extends Tonic {
     render () {
       return this.html`<div class="parent">${this.children}</div>`
@@ -609,15 +596,13 @@ test('compose sugar (this.children)', t => {
     value: 'y'
   })
 
-  window.setTimeout(() => {
-    const childrenAfterSetProps = g.querySelectorAll('.child')
-    t.equal(childrenAfterSetProps.length, 1, 'child element was replaced')
-    t.equal(childrenAfterSetProps[0].innerHTML, 'y')
-    t.end()
-  }, 0)
+  await sleep(1)
+  const childrenAfterSetProps = g.querySelectorAll('.child')
+  t.equal(childrenAfterSetProps.length, 1, 'child element was replaced')
+  t.equal(childrenAfterSetProps[0].innerHTML, 'y')
 })
 
-test('ensure registration order does not affect rendering', t => {
+test('ensure registration order does not affect rendering', async t => {
   class ComposeA extends Tonic {
     render () {
       return this.html`
@@ -654,11 +639,9 @@ test('ensure registration order does not affect rendering', t => {
   const select = document.querySelectorAll('.a select')
   t.equal(select.length, 1, 'there is only one select')
   t.equal(select[0].children.length, 3, 'there are 3 options')
-
-  t.end()
 })
 
-test('check that composed elements use (and re-use) their initial innerHTML correctly', t => {
+test('check that composed elements use (and re-use) their initial innerHTML correctly', async t => {
   class ComponentI extends Tonic {
     render () {
       return this.html`<div class="i">
@@ -707,19 +690,17 @@ test('check that composed elements use (and re-use) their initial innerHTML corr
     value: 1
   })
 
-  window.setTimeout(() => {
-    const kTagsAfterSetProps = i.getElementsByTagName('component-k')
-    t.equal(kTagsAfterSetProps.length, 1, 'correct number of components rendered')
+  await sleep(1)
+  const kTagsAfterSetProps = i.getElementsByTagName('component-k')
+  t.equal(kTagsAfterSetProps.length, 1, 'correct number of components rendered')
 
-    const kClassesAfterSetProps = i.querySelectorAll('.k')
-    t.equal(kClassesAfterSetProps.length, 1, 'correct number of elements rendered')
-    const kTextAfterSetProps = kClassesAfterSetProps[0].textContent
-    t.equal(kTextAfterSetProps, '1', 'The text of the inner-most child was rendered correctly')
-    t.end()
-  }, 0)
+  const kClassesAfterSetProps = i.querySelectorAll('.k')
+  t.equal(kClassesAfterSetProps.length, 1, 'correct number of elements rendered')
+  const kTextAfterSetProps = kClassesAfterSetProps[0].textContent
+  t.equal(kTextAfterSetProps, '1', 'The text of the inner-most child was rendered correctly')
 })
 
-test('mixed order declaration', t => {
+test('mixed order declaration', async t => {
   class AppXx extends Tonic {
     render () {
       return this.html`<div class="app">${this.children}</div>`
@@ -794,11 +775,9 @@ test('mixed order declaration', t => {
     const div = document.querySelector('body .app .b .c .d')
     t.ok(div, 'a div was created and attached')
   }
-
-  t.end()
 })
 
-test('spread props', t => {
+test('spread props', async t => {
   class SpreadComponent extends Tonic {
     render () {
       return this.html`
@@ -845,7 +824,6 @@ test('spread props', t => {
   const span = document.querySelector('span:first-of-type')
   t.equal(div.attributes.length, 3, 'div also got expanded attributes')
   t.equal(span.attributes.length, 4, 'span got all attributes from div#el')
-  t.end()
 })
 
 test('async render', async t => {
@@ -876,7 +854,6 @@ test('async render', async t => {
 
   ar = document.body.querySelector('async-render')
   t.equal(ar.innerHTML.trim(), '<p>Some Data</p>')
-  t.end()
 })
 
 test('async generator render', async t => {
@@ -906,10 +883,9 @@ test('async generator render', async t => {
 
   ar = document.body.querySelector('async-generator-render')
   t.equal(ar.innerHTML, 'Y')
-  t.end()
 })
 
-test('pass in references to children', t => {
+test('pass in references to children', async t => {
   const cName = `x-${uuid()}`
   const dName = `x-${uuid()}`
 
@@ -959,11 +935,9 @@ test('pass in references to children', t => {
   t.equal(third.tagName, dName.toUpperCase())
   t.equal(third.className, 'right')
   t.equal(third.innerHTML, '<span>right</span>')
-
-  t.end()
 })
 
-test('pass comp as ref in props', t => {
+test('pass comp as ref in props', async t => {
   const pName = `x-${uuid()}`
   const cName = `x-${uuid()}`
 
@@ -1003,11 +977,9 @@ test('pass comp as ref in props', t => {
   t.ok(cElem)
 
   t.equal(cElem.innerHTML.trim(), '<div>hello</div>')
-
-  t.end()
 })
 
-test('default props', t => {
+test('default props', async t => {
   class InstanceProps extends Tonic {
     constructor () {
       super()
@@ -1031,10 +1003,9 @@ test('default props', t => {
   const expectedRE = /<instance-props str="0x"><div>{"num":100,"str":"0x"}<\/div><\/instance-props>/
 
   t.ok(expectedRE.test(actual), 'elements match')
-  t.end()
 })
 
-test('Tonic comp with null prop', t => {
+test('Tonic comp with null prop', async t => {
   class InnerComp extends Tonic {
     render () {
       return this.html`<div>${String(this.props.foo)}</div>`
@@ -1057,10 +1028,9 @@ test('Tonic comp with null prop', t => {
   t.ok(div)
 
   t.equal(div.textContent, 'null')
-  t.end()
 })
 
-test('re-render nested component', t => {
+test('re-render nested component', async t => {
   const pName = `x-${uuid()}`
   const cName = `x-${uuid()}`
   class ParentComponent extends Tonic {
@@ -1112,9 +1082,7 @@ test('re-render nested component', t => {
   const cElem = pElem.querySelector(cName)
   cElem.updateText('new text')
 
-  window.setTimeout(onUpdate, 0)
-
-  function onUpdate () {
+  async function onUpdate () {
     const label = pElem.querySelector('label')
     t.equal(label.textContent, 'initial')
 
@@ -1124,8 +1092,6 @@ test('re-render nested component', t => {
     pElem.reRender({
       message: 'new message'
     })
-
-    window.setTimeout(onReRender, 0)
   }
 
   function onReRender () {
@@ -1134,9 +1100,12 @@ test('re-render nested component', t => {
 
     const input = pElem.querySelector('input')
     t.equal(input.value, 'new text')
-
-    t.end()
   }
+
+  await sleep(1)
+  await onUpdate()
+  await sleep(1)
+  await onReRender()
 })
 
 test('async rendering component', async t => {
@@ -1160,8 +1129,6 @@ test('async rendering component', async t => {
 
   await cElem.reRender({ text: 'new text2' })
   t.equal(cElem.textContent, 'new text2')
-
-  t.end()
 })
 
 test('alternating component', async t => {
@@ -1253,11 +1220,8 @@ test('alternating component', async t => {
 
   t.equal(cElem.children[0], child1Ref)
   t.equal(cElem.children[1], child2Ref)
-
-  t.end()
 })
 
-test('cleanup, ensure exist', t => {
-  t.end()
+test('cleanup, ensure exist', async t => {
   document.body.classList.add('finished')
 })
