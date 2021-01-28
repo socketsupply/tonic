@@ -26,4 +26,4 @@ jobs:
         CI: true
     - name: Run tape tests
       run: |
-        xvfb-run --server-args="-screen 0 1920x1080x24" esbuild --bundle test/index.js | tape-run
+        xvfb-run --server-args="-screen 0 1920x1080x24" npm run ci:test:tape-run

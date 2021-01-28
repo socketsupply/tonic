@@ -3,7 +3,9 @@
   "version": "13.2.0",
   "description": "A component framework.",
   "scripts": {
+    "ci:test:tape-run": "esbuild --bundle test/index.js | tape-run",
     "test": "npm run build && esbuild --bundle test/index.js | tape-run",
+
     "test:open": "npm run build && esbuild --bundle test/index.js | tape-run --browser chrome --keep-open",
     "build": "./scripts/build.js && npm run minify:esm && npm run minify:cjs",
     "minify:esm": "esbuild index.js --keep-names --minify --outfile=dist/tonic.min.js",
