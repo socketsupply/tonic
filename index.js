@@ -393,4 +393,4 @@ Object.assign(Tonic, {
   MAP: { '"': '&quot;', '&': '&amp;', '\'': '&#x27;', '<': '&lt;', '>': '&gt;', '`': '&#x60;', '/': '&#x2F;' }
 })
 
-export default Tonic
+if (typeof module === 'object') module.exports = Tonic
