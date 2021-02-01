@@ -1,6 +1,6 @@
 const test = require('tapzero').test
 const uuid = require('uuid')
-const Tonic = require('../index.cjs')
+const Tonic = require('../index.js')
 
 const sleep = async t => new Promise(resolve => setTimeout(resolve, t))
 

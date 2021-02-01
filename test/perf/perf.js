@@ -1,5 +1,5 @@
 const Benchmark = require('benchmark')
-const Tonic = require('../../dist/tonic.min.cjs')
+const Tonic = require('../../dist/tonic.min.js')
 
 window.Benchmark = Benchmark
 const suite = new Benchmark.Suite()
