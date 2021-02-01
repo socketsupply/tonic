@@ -9,11 +9,11 @@ async function main () {
 
   const cjs = '\nif (typeof module === \'object\') module.exports = Tonic\n'
 
-  fs.writeFile(path.join(root, 'index.cjs'), s + cjs, { flags: 'a' })
+  fs.writeFile(path.join(root, 'index.js'), s + cjs, { flags: 'a' })
 
   const js = '\nexport default Tonic\n'
 
-  fs.writeFile(path.join(root, 'index.js'), s + js, { flags: 'a' })
+  fs.writeFile(path.join(root, 'index.esm.js'), s + js, { flags: 'a' })
 }
 
 main()
