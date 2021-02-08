@@ -104,7 +104,7 @@ class Tonic extends window.HTMLElement {
     }
 
     if (!htmlName) htmlName = Tonic._splitName(c.name).toLowerCase()
-    if (window.customElements.get(htmlName)) {
+    if (!Tonic.ssr && window.customElements.get(htmlName)) {
       throw new Error(`Cannot Tonic.add(${c.name}, '${htmlName}') twice`)
     }
 
