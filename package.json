@@ -1,6 +1,6 @@
 {
   "name": "@optoolco/tonic",
-  "version": "13.3.4",
+  "version": "13.3.5",
   "description": "A component framework.",
   "scripts": {
     "ci:test:tape-run": "esbuild --bundle test/index.js | tape-run",
