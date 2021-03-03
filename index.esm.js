@@ -30,7 +30,7 @@ class Tonic extends window.HTMLElement {
   }
 
   static _splitName (s) {
-    return s.match(/[A-Z][a-z]*/g).join('-')
+    return s.match(/[A-Z][a-z0-9]*/g).join('-')
   }
 
   static _normalizeAttrs (o, x = {}) {
