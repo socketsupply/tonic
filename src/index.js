@@ -11,13 +11,13 @@ class TonicTemplate {
 }
 
 class Tonic extends window.HTMLElement {
-  constructor () {
+  constructor (props) {
     super()
     const state = Tonic._states[super.id]
     delete Tonic._states[super.id]
     this._state = state || {}
     this.preventRenderOnReconnect = false
-    this.props = {}
+    this.props = props || {}
     this.elements = [...this.children]
     this.elements.__children__ = true
     this.nodes = [...this.childNodes]
