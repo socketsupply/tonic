@@ -47,6 +47,25 @@ test('render-only component', async t => {
   t.ok(div, 'a div was created and attached')
 })
 
+test('render-only component (non-contextual)', async t => {
+  function ComponentVeryFun (html, props) {
+    return html`
+      <div data-id="${props.id}">
+      </div>
+    `
+  }
+
+  document.body.innerHTML = `
+    <component-very-fun id="okokok"></component-very-fun>
+  `
+
+  Tonic.add(ComponentVeryFun)
+
+  const div = document.querySelector('div')
+  t.ok(div, 'a div was created and attached')
+  t.equal(div.dataset.id, 'okokok')
+})
+
 test('Tonic escapes text', async t => {
   class Comp extends Tonic {
     render () {

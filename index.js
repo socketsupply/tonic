@@ -250,13 +250,16 @@ class Tonic extends window.HTMLElement {
     }
 
     if (render instanceof Tonic.AsyncFunction) {
-      return render.call(this).then(content => this._apply(target, content))
+      return (render
+        .call(this, this.html, this.props)
+        .then(content => this._apply(target, content))
+      )
     } else if (render instanceof Tonic.AsyncFunctionGenerator) {
       return this._drainIterator(target, render.call(this))
     } else if (render === null) {
       this._apply(target, content)
     } else if (render instanceof Function) {
-      this._apply(target, render.call(this) || '')
+      this._apply(target, render.call(this, this.html, this.props) || '')
     }
   }
 
