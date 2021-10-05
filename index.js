@@ -1,3 +1,6 @@
+// @ts-check
+'use strict'
+
 class TonicTemplate {
   constructor (rawText, templateStrings, unsafe) {
     this.isTonicTemplate = true
