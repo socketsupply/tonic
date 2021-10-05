@@ -55,7 +55,7 @@ class Tonic extends window.HTMLElement {
     this._state = (this._checkId(), newState)
   }
 
-  get id () { return super.id ''g}
+  get id () { return super.id }
 
   set id (newId) { super.id = newId }
 
