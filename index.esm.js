@@ -1,3 +1,6 @@
+// @ts-check
+'use strict'
+
 class TonicTemplate {
   constructor (rawText, templateStrings, unsafe) {
     this.isTonicTemplate = true
@@ -54,10 +57,6 @@ class Tonic extends window.HTMLElement {
   set state (newState) {
     this._state = (this._checkId(), newState)
   }
-
-  get id () { return this._checkId() }
-
-  set id (newId) { super.id = newId }
 
   _events () {
     const hp = Object.getOwnPropertyNames(window.HTMLElement.prototype)
