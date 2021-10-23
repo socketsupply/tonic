@@ -1,7 +1,0 @@
-{
-  "version": 3,
-  "sources": ["../src/styles.css"],
-  "sourcesContent": ["html,\n* {\n  box-sizing: border-box;\n}\n\nbody {\n  overscroll-behavior: none;\n  margin: 0px;\n  padding: 0px;\n}\n\n.tldraw {\n  position: fixed;\n  top: 0px;\n  left: 0px;\n  right: 0px;\n  bottom: 0px;\n  width: 100%;\n  height: 100%;\n}\n"],
-  "mappings": ";AAAA;AAAA;AAEE;AAAA;AAGF;AACE;AACA;AACA;AAAA;AAGF;AACE;AACA;AACA;AACA;AACA;AACA;AACA;AAAA;",
-  "names": []
-}
