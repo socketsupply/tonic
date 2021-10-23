@@ -1,0 +1,10 @@
+{
+  "extends": "./tsconfig.json",
+  "exclude": ["node_modules", "dist"],
+  "compilerOptions": {
+    "composite": false,
+    "incremental": false,
+    "declarationMap": false,
+    "sourceMap": false
+  }
+}

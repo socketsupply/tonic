@@ -3,24 +3,30 @@
   "version": "13.3.7",
   "description": "A component framework.",
   "scripts": {
-    "ci:test:tape-run": "esbuild --bundle test/index.js | tape-run",
+    "ci:test:tape-run": "build --bundle test/index.js | tape-run",
     "lint": "standard -v",
-    "test": "npm run build && standard && esbuild --bundle test/index.js | tape-run",
-    "test:open": "npm run build && esbuild --bundle test/index.js | tape-run --browser chrome --keep-open",
-    "prepare": "./scripts/build.js",
-    "build": "./scripts/build.js && npm run minify:esm && npm run minify:cjs",
-    "minify:esm": "esbuild index.esm.js --keep-names --minify --outfile=dist/tonic.min.esm.js",
-    "minify:cjs": "esbuild index.js --keep-names --minify --outfile=dist/tonic.min.js"
+    "test": "node ./scripts/compile.js && node test/index.js | tape-run",
+    "test:open": "npm run build && build --bundle test/index.js | tape-run --browser chrome --keep-open",
+    "prepare": "node ./scripts/compile.js",
+    "compile": "node ./scripts/compile.js",
+    "dev": "node ./scripts/dev.js && tsc --watch",
+    "build": "node ./scripts/compile.js && tsc --project tsconfig.build.json"
   },
-  "main": "index.js",
+  "main": "./dist/cjs/index.js",
+  "module": "./dist/esm/index.js",
+  "types": "./dist/types/index.d.ts",
+  "typings": "./dist/types/index.d.ts",
   "author": "optoolco",
   "license": "MIT",
   "devDependencies": {
+    "@types/node": "16.11.4",
     "benchmark": "^2.1.4",
     "esbuild": "^0.8.36",
     "standard": "14.3.1",
     "tape-run": "^8.0.0",
     "tapzero": "0.2.2",
+    "ts-lib": "0.0.5",
+    "typescript": "4.4.4",
     "uuid": "3.3.3"
   },
   "standard": {

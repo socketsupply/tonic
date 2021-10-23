@@ -1,0 +1,50 @@
+Arguments: 
+  /opt/homebrew/Cellar/node@14/14.18.1/bin/node /opt/homebrew/Cellar/yarn/1.22.17/libexec/bin/yarn.js start
+
+PATH: 
+  /opt/homebrew/opt/node@14/bin:/opt/homebrew/opt/node@14/bin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin:/Library/Apple/usr/bin:/opt/homebrew/opt/node@14/bin:/opt/homebrew/bin:/opt/homebrew/sbin:/Users/steve/.cargo/bin:/Users/steve/Developer/flutter/bin:/Users/steve/Developer/flutter/bin
+
+Yarn version: 
+  1.22.17
+
+Node version: 
+  14.18.1
+
+Platform: 
+  darwin arm64
+
+Trace: 
+  SyntaxError: /Users/steve/Developer/Github/tonic/example/package.json: Unexpected token } in JSON at position 375
+      at JSON.parse (<anonymous>)
+      at /opt/homebrew/Cellar/yarn/1.22.17/libexec/lib/cli.js:1625:59
+      at Generator.next (<anonymous>)
+      at step (/opt/homebrew/Cellar/yarn/1.22.17/libexec/lib/cli.js:310:30)
+      at /opt/homebrew/Cellar/yarn/1.22.17/libexec/lib/cli.js:321:13
+
+npm manifest: 
+  {
+    "name": "dev",
+    "private": true,
+    "license": "MIT",
+    "scripts": {
+      "start": "node ./esbuild.config.mjs --dev tsc --watch"
+    },
+    "files": [
+      "src"
+    ],
+    "sideEffects": false,
+    "dependencies": {},
+    "devDependencies": {
+      "@types/node": "^14.14.35",
+      "concurrently": "6.0.1",
+      "create-serve": "1.0.1",
+      "esbuild": "^0.13.8",
+      "rimraf": "3.0.2",
+    }
+  }
+
+yarn manifest: 
+  No manifest
+
+Lockfile: 
+  No lockfile
