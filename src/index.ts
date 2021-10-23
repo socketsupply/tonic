@@ -129,7 +129,7 @@ abstract class Tonic<
     }
   }
 
-  private _prop(o: any) {
+  private _prop(o: string | Record<string, unknown>) {
     const id = this._id
     const p = `__${id}__${Tonic._createId()}__`
     Tonic._data[id] = Tonic._data[id] || {}
@@ -137,7 +137,7 @@ abstract class Tonic<
     return p
   }
 
-  private _placehold(r: any) {
+  private _placehold(r: Record<string, any>) {
     const id = this._id
     const ref = `placehold:${id}:${Tonic._createId()}__`
     Tonic._children[id] = Tonic._children[id] || {}
@@ -145,12 +145,12 @@ abstract class Tonic<
     return ref
   }
 
-  static match(el: Element | any, s: string) {
+  static match(el: Element | Record<string, any>, s: string) {
     if (!el.matches) el = el.parentElement
     return el.matches(s) ? el : el.closest(s)
   }
 
-  static getPropertyNames(proto: any) {
+  static getPropertyNames(proto: Tonic | Element | Record<string, any>) {
     const props = []
     while (proto && proto !== Tonic.prototype) {
       props.push(...Object.getOwnPropertyNames(proto))
@@ -305,7 +305,7 @@ abstract class Tonic<
 
     const walk = (
       node: Node,
-      fn: (node: Node, children: any, id: string) => void
+      fn: (node: Node, children: Element[], id: string) => void
     ) => {
       if (node.nodeType === 3) {
         const id = node.textContent?.trim() || ""
@@ -335,9 +335,24 @@ abstract class Tonic<
   }
 
   protected html(strings: TemplateStringsArray, ...values: any[]): TNode {
-    const refs = (o: any | any[]) => {
-      if (o && o.__children__) return this._placehold(o)
-      if (o && o.isTonicTemplate) return o.rawText
+    const refs = (
+      o:
+        | Tonic
+        | HTMLElement
+        | SVGElement
+        | HTMLCollection
+        | NodeList
+        | NamedNodeMap
+        | boolean
+        | string
+        | null
+        | ((...args: any[]) => any)
+        | Record<string, any>
+        | any[]
+        | any
+    ) => {
+      if (o && "__children__" in o) return this._placehold(o)
+      if (o && "isTonicTemplate" in o) return o.rawText
       switch (Object.prototype.toString.call(o)) {
         case "[object HTMLCollection]":
         case "[object NodeList]":

@@ -249,9 +249,9 @@ var _Tonic = class extends window.HTMLElement {
   }
   html(strings, ...values) {
     const refs = (o) => {
-      if (o && o.__children__)
+      if (o && "__children__" in o)
         return this._placehold(o);
-      if (o && o.isTonicTemplate)
+      if (o && "isTonicTemplate" in o)
         return o.rawText;
       switch (Object.prototype.toString.call(o)) {
         case "[object HTMLCollection]":

@@ -63,8 +63,8 @@ declare abstract class Tonic<P extends TProps = {}, S extends TState = {}> exten
     private _events;
     private _prop;
     private _placehold;
-    static match(el: Element | any, s: string): any;
-    static getPropertyNames(proto: any): string[];
+    static match(el: Element | Record<string, any>, s: string): any;
+    static getPropertyNames(proto: Tonic | Element | Record<string, any>): string[];
     static add(c: TLike): TLike;
     static add(c: Function, htmlName: string): Function;
     static registerStyles(stylesheetFn: () => string): void;
