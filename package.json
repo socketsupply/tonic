@@ -9,13 +9,13 @@
     "test:open": "npm run build && build --bundle test/index.js | tape-run --browser chrome --keep-open",
     "prepare": "node ./scripts/compile.js",
     "compile": "node ./scripts/compile.js",
-    "dev": "node ./scripts/dev.js && tsc --watch",
+    "dev": "node ./scripts/dev.js & tsc --project tsconfig.build.json --watch & cd example && yarn dev",
     "build": "node ./scripts/compile.js && tsc --project tsconfig.build.json"
   },
-  "main": "./dist/cjs/index.js",
-  "module": "./dist/esm/index.js",
-  "types": "./dist/types/index.d.ts",
-  "typings": "./dist/types/index.d.ts",
+  "main": "dist/index.js",
+  "module": "dist/index.esm.js",
+  "types": "dist/index.d.ts",
+  "typings": "dist/index.d.ts",
   "author": "optoolco",
   "license": "MIT",
   "devDependencies": {

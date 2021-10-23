@@ -15,12 +15,15 @@ async function main() {
     })
   }
 
-  esbuild.buildSync({
+  esbuild.build({
     entryPoints: [p],
-    outdir: "dist/cjs",
+    outdir: "./dist",
     minify: false,
     bundle: true,
-    format: "cjs",
+    format: "esm",
+    outExtension: {
+      ".js": ".esm.js",
+    },
     target: "esnext",
     tsconfig: "./tsconfig.json",
     incremental: true,

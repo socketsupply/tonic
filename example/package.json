@@ -3,7 +3,7 @@
   "private": true,
   "license": "MIT",
   "scripts": {
-    "start": "node ./esbuild.config.mjs --dev tsc --watch"
+    "dev": "node ./esbuild.config.mjs --dev tsc --watch"
   },
   "files": [
     "src"

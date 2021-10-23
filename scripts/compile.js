@@ -18,7 +18,7 @@ async function main() {
   try {
     esbuild.buildSync({
       entryPoints: [p],
-      outdir: "dist/cjs",
+      outdir: "./dist",
       minify: true,
       bundle: true,
       sourcemap: true,
@@ -29,11 +29,14 @@ async function main() {
 
     esbuild.buildSync({
       entryPoints: [p],
-      outdir: "dist/esm",
+      outdir: "./dist",
       minify: true,
       bundle: true,
       sourcemap: true,
       format: "esm",
+      outExtension: {
+        ".js": ".esm.js",
+      },
       target: "esnext",
       tsconfig: "./tsconfig.build.json",
     })

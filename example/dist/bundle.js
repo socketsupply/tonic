@@ -1,11 +1,11 @@
 (() => {
-  // ../dist/esm/index.js
+  // ../dist/index.esm.js
   "use strict";
-  var d = class {
-    constructor(t, e, i) {
-      this.rawText = t;
-      this.templateStrings = e;
-      this.unsafe = i;
+  var TonicTemplate = class {
+    constructor(rawText, templateStrings, unsafe) {
+      this.rawText = rawText;
+      this.templateStrings = templateStrings;
+      this.unsafe = unsafe;
       this.isTonicTemplate = true;
     }
     valueOf() {
@@ -15,7 +15,7 @@
       return this.rawText;
     }
   };
-  var s = class extends window.HTMLElement {
+  var _Tonic = class extends window.HTMLElement {
     constructor() {
       super();
       this._id = "";
@@ -26,228 +26,333 @@
       this.elements = [];
       this.nodes = [];
       this.pendingReRender = null;
-      this._set = (t2, e, i = "") => {
-        for (let o of Array.from(t2.querySelectorAll(s._tags))) {
-          if (!o.isTonicComponent)
+      this._set = (target, render, content = "") => {
+        for (const node of Array.from(target.querySelectorAll(_Tonic._tags))) {
+          if (!node.isTonicComponent)
             continue;
-          _(o);
-          let r = o.getAttribute("id");
-          !r || !s._refIds.includes(r) || (s._states[r] = o.state);
+          assertNodeIsTonic(node);
+          const id = node.getAttribute("id");
+          if (!id || !_Tonic._refIds.includes(id))
+            continue;
+          _Tonic._states[id] = node.state;
         }
-        if (e == null)
-          this._apply(t2, i);
-        else {
-          if (e.constructor.name === s.AsyncFunction)
-            return e.call(this, this.html, this.props).then((o) => this._apply(t2, o));
-          if (e.constructor.name === s.AsyncFunctionGenerator)
-            return this._drainIterator(t2, e.call(this));
-          e === null ? this._apply(t2, i) : e instanceof Function && this._apply(t2, e.call(this, this.html, this.props) || "");
+        if (render === void 0 || render === null) {
+          this._apply(target, content);
+        } else if (render.constructor.name === _Tonic.AsyncFunction) {
+          return render.call(this, this.html, this.props).then((content2) => this._apply(target, content2));
+        } else if (render.constructor.name === _Tonic.AsyncFunctionGenerator) {
+          return this._drainIterator(target, render.call(this));
+        } else if (render === null) {
+          this._apply(target, content);
+        } else if (render instanceof Function) {
+          this._apply(target, render.call(this, this.html, this.props) || "");
         }
+        return;
       };
-      this.scheduleReRender = (t2) => this.pendingReRender ? this.pendingReRender : (this.pendingReRender = new Promise((e) => setTimeout(() => {
-        if (!this.isInDocument(this.shadowRoot || this))
+      this.scheduleReRender = (oldProps) => {
+        if (this.pendingReRender)
+          return this.pendingReRender;
+        this.pendingReRender = new Promise((resolve) => setTimeout(() => {
+          if (!this.isInDocument(this.shadowRoot || this))
+            return;
+          const p = this._set(this.shadowRoot || this, this.render);
+          this.pendingReRender = null;
+          if (p && p.then) {
+            return p.then(() => {
+              this.updated?.(oldProps);
+              resolve();
+            });
+          }
+          this.updated && this.updated(oldProps);
+          resolve();
           return;
-        let i = this._set(this.shadowRoot || this, this.render);
-        if (this.pendingReRender = null, i && i.then)
-          return i.then(() => {
-            this.updated?.(t2), e();
-          });
-        this.updated && this.updated(t2), e();
-      }, 0)), this.pendingReRender);
-      this.reRender = (t2 = this.props) => {
-        let e = { ...this.props };
-        return this._props = typeof t2 == "function" ? t2(e) : t2, this.scheduleReRender(e);
+        }, 0));
+        return this.pendingReRender;
       };
-      this.handleEvent = (t2) => {
-        this[t2.type]?.(t2);
+      this.reRender = (o = this.props) => {
+        const oldProps = { ...this.props };
+        this._props = typeof o === "function" ? o(oldProps) : o;
+        return this.scheduleReRender(oldProps);
       };
-      let t = s._states[super.id];
-      delete s._states[super.id], this._state = t || {}, this.preventRenderOnReconnect = false, this.elements = [...Array.from(this.children)], this.elements.__children__ = true, this.nodes = [...Array.from(this.childNodes)], this.nodes.__children__ = true, this._events();
+      this.handleEvent = (e) => {
+        const handler = this[e.type];
+        handler?.(e);
+      };
+      const state = _Tonic._states[super.id];
+      delete _Tonic._states[super.id];
+      this._state = state || {};
+      this.preventRenderOnReconnect = false;
+      this.elements = [...Array.from(this.children)];
+      this.elements.__children__ = true;
+      this.nodes = [...Array.from(this.childNodes)];
+      this.nodes.__children__ = true;
+      this._events();
     }
     static _createId() {
-      return `tonic${s._index++}`;
+      return `tonic${_Tonic._index++}`;
     }
-    static _splitName(t) {
-      return t.match(/[A-Z][a-z0-9]*/g).join("-");
+    static _splitName(s) {
+      return s.match(/[A-Z][a-z0-9]*/g).join("-");
     }
-    static _normalizeAttrs(t, e = {}) {
-      return [...t].forEach((i) => e[i.name] = i.value), e;
+    static _normalizeAttrs(o, x = {}) {
+      ;
+      [...o].forEach((o2) => x[o2.name] = o2.value);
+      return x;
     }
     _checkId() {
-      let t = super.id;
-      if (!t) {
-        let e = this.outerHTML.replace(this.innerHTML, "...");
-        throw new Error(`Component: ${e} has no id`);
+      const _id = super.id;
+      if (!_id) {
+        const html = this.outerHTML.replace(this.innerHTML, "...");
+        throw new Error(`Component: ${html} has no id`);
       }
-      return t;
+      return _id;
     }
     _events() {
-      let t = Object.getOwnPropertyNames(window.HTMLElement.prototype);
-      for (let e of this.__props)
-        t.indexOf("on" + e) !== -1 && this.addEventListener(e, this);
+      const hp = Object.getOwnPropertyNames(window.HTMLElement.prototype);
+      for (const p of this.__props) {
+        if (hp.indexOf("on" + p) === -1)
+          continue;
+        this.addEventListener(p, this);
+      }
     }
-    _prop(t) {
-      let e = this._id, i = `__${e}__${s._createId()}__`;
-      return s._data[e] = s._data[e] || {}, s._data[e][i] = t, i;
+    _prop(o) {
+      const id = this._id;
+      const p = `__${id}__${_Tonic._createId()}__`;
+      _Tonic._data[id] = _Tonic._data[id] || {};
+      _Tonic._data[id][p] = o;
+      return p;
     }
-    _placehold(t) {
-      let e = this._id, i = `placehold:${e}:${s._createId()}__`;
-      return s._children[e] = s._children[e] || {}, s._children[e][i] = t, i;
+    _placehold(r) {
+      const id = this._id;
+      const ref = `placehold:${id}:${_Tonic._createId()}__`;
+      _Tonic._children[id] = _Tonic._children[id] || {};
+      _Tonic._children[id][ref] = r;
+      return ref;
     }
-    static match(t, e) {
-      return t.matches || (t = t.parentElement), t.matches(e) ? t : t.closest(e);
+    static match(el, s) {
+      if (!el.matches)
+        el = el.parentElement;
+      return el.matches(s) ? el : el.closest(s);
     }
-    static getPropertyNames(t) {
-      let e = [];
-      for (; t && t !== s.prototype; )
-        e.push(...Object.getOwnPropertyNames(t)), t = Object.getPrototypeOf(t);
-      return e;
+    static getPropertyNames(proto) {
+      const props = [];
+      while (proto && proto !== _Tonic.prototype) {
+        props.push(...Object.getOwnPropertyNames(proto));
+        proto = Object.getPrototypeOf(proto);
+      }
+      return props;
     }
-    static add(t, e) {
-      let i = t instanceof s ? t.constructor.name : t.name;
-      if (e || (e = s._splitName(i).toLowerCase()), !(e && e.length > 1))
+    static add(c, htmlName) {
+      const name = c instanceof _Tonic ? c.constructor.name : c.name;
+      if (!htmlName) {
+        htmlName = _Tonic._splitName(name).toLowerCase();
+      }
+      const hasValidName = htmlName && htmlName.length > 1;
+      if (!hasValidName) {
         throw Error("Mangling. https://bit.ly/2TkJ6zP");
-      if (!s.ssr && window.customElements.get(e) && console.warn(`Replacing Tonic.add(${i}, '${e}')`), !("isTonicTemplate" in t)) {
-        let r = { [t.name]: class extends s {
-        } }[t.name];
-        r.prototype.render = t, t = r;
       }
-      return t.prototype.__props = s.getPropertyNames(t.prototype), s._reg[e] = t, s._tags = Object.keys(s._reg).join(), window.customElements.define(e, t), t instanceof s && typeof t.stylesheet == "function" && s.registerStyles(t.stylesheet), t;
+      if (!_Tonic.ssr && window.customElements.get(htmlName)) {
+        console.warn(`Replacing Tonic.add(${name}, '${htmlName}')`);
+      }
+      if (!("isTonicTemplate" in c)) {
+        const tmp = {
+          [c.name]: class extends _Tonic {
+          }
+        }[c.name];
+        tmp.prototype.render = c;
+        c = tmp;
+      }
+      ;
+      c.prototype.__props = _Tonic.getPropertyNames(c.prototype);
+      _Tonic._reg[htmlName] = c;
+      _Tonic._tags = Object.keys(_Tonic._reg).join();
+      window.customElements.define(htmlName, c);
+      if (c instanceof _Tonic && typeof c.stylesheet === "function") {
+        _Tonic.registerStyles(c.stylesheet);
+      }
+      return c;
     }
-    static registerStyles(t) {
-      if (s._stylesheetRegistry.includes(t))
+    static registerStyles(stylesheetFn) {
+      if (_Tonic._stylesheetRegistry.includes(stylesheetFn))
         return;
-      s._stylesheetRegistry.push(t);
-      let e = document.createElement("style");
-      s.nonce && e.setAttribute("nonce", s.nonce), e.appendChild(document.createTextNode(t())), document.head && document.head.appendChild(e);
+      _Tonic._stylesheetRegistry.push(stylesheetFn);
+      const styleNode = document.createElement("style");
+      if (_Tonic.nonce)
+        styleNode.setAttribute("nonce", _Tonic.nonce);
+      styleNode.appendChild(document.createTextNode(stylesheetFn()));
+      if (document.head)
+        document.head.appendChild(styleNode);
     }
-    static escape(t) {
-      return t.replace(s.ESC, (e) => s.MAP[e]);
+    static escape(s) {
+      return s.replace(_Tonic.ESC, (c) => _Tonic.MAP[c]);
     }
-    static unsafeRawString(t, e) {
-      return new d(t, e, true);
+    static unsafeRawString(s, templateStrings) {
+      return new TonicTemplate(s, templateStrings, true);
     }
-    async _drainIterator(t, e) {
-      let i = await e.next();
-      if (this._set(t, void 0, i.value), !i.done)
-        return this._drainIterator(t, e);
+    async _drainIterator(target, iterator) {
+      const result = await iterator.next();
+      this._set(target, void 0, result.value);
+      if (result.done)
+        return;
+      return this._drainIterator(target, iterator);
     }
-    _apply(t, e) {
-      if (typeof e == "string")
-        e = s.escape(e);
-      else if (e instanceof d)
-        e = e.rawText;
-      else {
-        t.innerHTML = "", t.appendChild(e.cloneNode(true));
+    _apply(target, content) {
+      if (typeof content === "string") {
+        content = _Tonic.escape(content);
+      } else if (content instanceof TonicTemplate) {
+        content = content.rawText;
+      } else {
+        target.innerHTML = "";
+        target.appendChild(content.cloneNode(true));
         return;
       }
-      if (y(e), this.stylesheet && (e = `<style nonce=${s.nonce || ""}>${this.stylesheet()}</style>${e}`), t.innerHTML = e, this.styles) {
-        let r = this.styles();
-        for (let n of Array.from(t.querySelectorAll("[styles]"))) {
-          let c = n.getAttribute("styles");
-          if (!!c)
-            for (let l of c.split(/\s+/))
-              Object.assign(n.style, r[l.trim()]);
+      assertContentIsString(content);
+      if (this.stylesheet) {
+        content = `<style nonce=${_Tonic.nonce || ""}>${this.stylesheet()}</style>${content}`;
+      }
+      target.innerHTML = content;
+      if (this.styles) {
+        const styles = this.styles();
+        for (const node of Array.from(target.querySelectorAll("[styles]"))) {
+          const nodeStyles = node.getAttribute("styles");
+          if (!nodeStyles)
+            continue;
+          for (const s of nodeStyles.split(/\s+/)) {
+            Object.assign(node.style, styles[s.trim()]);
+          }
         }
       }
-      let i = s._children[this._id] || {}, o = (r, n) => {
-        if (r.nodeType === 3) {
-          let l = r.textContent?.trim() || "";
-          i[l] && n(r, i[l], l);
+      const tChildren = _Tonic._children[this._id] || {};
+      const walk = (node, fn) => {
+        if (node.nodeType === 3) {
+          const id = node.textContent?.trim() || "";
+          if (tChildren[id])
+            fn(node, tChildren[id], id);
         }
-        let c = r.childNodes;
-        if (!!c)
-          for (let l = 0; l < c.length; l++)
-            o(c[l], n);
+        const childNodes = node.childNodes;
+        if (!childNodes)
+          return;
+        for (let i = 0; i < childNodes.length; i++) {
+          walk(childNodes[i], fn);
+        }
       };
-      o(t, (r, n, c) => {
-        for (let l of n)
-          r.parentNode?.insertBefore(l, r);
-        delete s._children[this._id][c], r.parentNode?.removeChild(r);
+      walk(target, (node, children, id) => {
+        for (const child of children) {
+          node.parentNode?.insertBefore(child, node);
+        }
+        delete _Tonic._children[this._id][id];
+        node.parentNode?.removeChild(node);
       });
     }
-    dispatch(t, e = null) {
-      let i = { bubbles: true, detail: e };
-      this.dispatchEvent(new window.CustomEvent(t, i));
+    dispatch(eventName, detail = null) {
+      const opts = { bubbles: true, detail };
+      this.dispatchEvent(new window.CustomEvent(eventName, opts));
     }
-    html(t, ...e) {
-      let i = (n) => {
-        if (n && n.__children__)
-          return this._placehold(n);
-        if (n && n.isTonicTemplate)
-          return n.rawText;
-        switch (Object.prototype.toString.call(n)) {
+    html(strings, ...values) {
+      const refs = (o) => {
+        if (o && o.__children__)
+          return this._placehold(o);
+        if (o && o.isTonicTemplate)
+          return o.rawText;
+        switch (Object.prototype.toString.call(o)) {
           case "[object HTMLCollection]":
           case "[object NodeList]":
-            return this._placehold([...n]);
+            return this._placehold([...o]);
           case "[object Array]":
-            return n.every((c) => c.isTonicTemplate && !c.unsafe) ? new d(n.join(`
-`), null, false) : this._prop(n);
+            if (o.every((x) => x.isTonicTemplate && !x.unsafe)) {
+              return new TonicTemplate(o.join("\n"), null, false);
+            }
+            return this._prop(o);
           case "[object Object]":
           case "[object Function]":
-            return this._prop(n);
+            return this._prop(o);
           case "[object NamedNodeMap]":
-            return this._prop(s._normalizeAttrs(n));
+            return this._prop(_Tonic._normalizeAttrs(o));
           case "[object Number]":
-            return `${n}__float`;
+            return `${o}__float`;
           case "[object String]":
-            return s.escape(n);
+            return _Tonic.escape(o);
           case "[object Boolean]":
-            return `${n}__boolean`;
+            return `${o}__boolean`;
           case "[object Null]":
-            return `${n}__null`;
+            return `${o}__null`;
           case "[object HTMLElement]":
-            return this._placehold([n]);
+            return this._placehold([o]);
         }
-        return typeof n == "object" && n && n.nodeType === 1 && typeof n.cloneNode == "function" ? this._placehold([n]) : n;
-      }, o = [];
-      for (let n = 0; n < t.length - 1; n++)
-        o.push(t[n], i(e[n]));
-      o.push(t[t.length - 1]);
-      let r = o.join("").replace(s.SPREAD, (n, c) => {
-        let l = s._data[c.split("__")[1]][c];
-        return Object.entries(l).map(([f, h]) => {
-          let u = f.replace(/([a-z])([A-Z])/g, "$1-$2").toLowerCase();
-          return h === true ? u : h ? `${u}="${s.escape(String(h))}"` : "";
+        if (typeof o === "object" && o && o.nodeType === 1 && typeof o.cloneNode === "function") {
+          return this._placehold([o]);
+        }
+        return o;
+      };
+      const out = [];
+      for (let i = 0; i < strings.length - 1; i++) {
+        out.push(strings[i], refs(values[i]));
+      }
+      out.push(strings[strings.length - 1]);
+      const htmlStr = out.join("").replace(_Tonic.SPREAD, (_, p) => {
+        const o = _Tonic._data[p.split("__")[1]][p];
+        return Object.entries(o).map(([key, value]) => {
+          const k = key.replace(/([a-z])([A-Z])/g, "$1-$2").toLowerCase();
+          if (value === true)
+            return k;
+          else if (value)
+            return `${k}="${_Tonic.escape(String(value))}"`;
+          else
+            return "";
         }).filter(Boolean).join(" ");
       });
-      return new d(r, t, false);
+      return new TonicTemplate(htmlStr, strings, false);
     }
     connectedCallback() {
-      this.root = this.shadowRoot || this, super.id && !s._refIds.includes(super.id) && s._refIds.push(super.id);
-      let t = (e) => e.replace(/-(.)/g, (i, o) => o.toUpperCase());
-      for (let { name: e, value: i } of Array.from(this.attributes)) {
-        let o = t(e), r = i;
-        if (this._props[o] = i, /__\w+__\w+__/.test(r)) {
-          let { 1: n } = r.split("__");
-          this._props[o] = s._data[n][r];
-        } else if (/\d+__float/.test(r))
-          this._props[o] = parseFloat(r);
-        else if (r === "null__null")
-          this._props[o] = null;
-        else if (/\w+__boolean/.test(r))
-          this._props[o] = r.includes("true");
-        else if (/placehold:\w+:\w+__/.test(r)) {
-          let { 1: n } = r.split(":");
-          this._props[o] = s._children[n][r][0];
+      this.root = this.shadowRoot || this;
+      if (super.id && !_Tonic._refIds.includes(super.id)) {
+        _Tonic._refIds.push(super.id);
+      }
+      const cc = (s) => s.replace(/-(.)/g, (_, m) => m.toUpperCase());
+      for (const { name: _name, value } of Array.from(this.attributes)) {
+        const name = cc(_name);
+        const p = value;
+        this._props[name] = value;
+        if (/__\w+__\w+__/.test(p)) {
+          const { 1: root } = p.split("__");
+          this._props[name] = _Tonic._data[root][p];
+        } else if (/\d+__float/.test(p)) {
+          this._props[name] = parseFloat(p);
+        } else if (p === "null__null") {
+          this._props[name] = null;
+        } else if (/\w+__boolean/.test(p)) {
+          this._props[name] = p.includes("true");
+        } else if (/placehold:\w+:\w+__/.test(p)) {
+          const { 1: root } = p.split(":");
+          this._props[name] = _Tonic._children[root][p][0];
         }
       }
-      if (this._props = Object.assign(this.defaults ? this.defaults() : {}, this._props), this._id = this._id ?? s._createId(), this.willConnect?.(), !!this.isInDocument(this.root)) {
-        if (!this.preventRenderOnReconnect) {
-          this._source ? this.innerHTML = this._source : this._source = this.innerHTML;
-          let e = this._set(this.root, this.render);
-          if (e && e.then)
-            return e.then(() => this.connected?.());
+      this._props = Object.assign(this.defaults ? this.defaults() : {}, this._props);
+      this._id = this._id ?? _Tonic._createId();
+      this.willConnect?.();
+      if (!this.isInDocument(this.root))
+        return;
+      if (!this.preventRenderOnReconnect) {
+        if (!this._source) {
+          this._source = this.innerHTML;
+        } else {
+          this.innerHTML = this._source;
         }
-        this.connected && this.connected();
+        const p = this._set(this.root, this.render);
+        if (p && p.then)
+          return p.then(() => this.connected?.());
       }
+      this.connected && this.connected();
+      return;
     }
-    isInDocument(t) {
-      let e = t.getRootNode();
-      return e === document || e.toString() === "[object ShadowRoot]";
+    isInDocument(target) {
+      const root = target.getRootNode();
+      return root === document || root.toString() === "[object ShadowRoot]";
     }
     disconnectedCallback() {
-      this.disconnected?.(), delete s._data[this._id], delete s._children[this._id];
+      this.disconnected?.();
+      delete _Tonic._data[this._id];
+      delete _Tonic._children[this._id];
     }
     get props() {
       return this._props;
@@ -255,26 +360,51 @@
     get state() {
       return this._checkId(), this._state;
     }
-    set state(t) {
-      this._state = (this._checkId(), t);
+    set state(newState) {
+      this._state = (this._checkId(), newState);
     }
   };
-  var a = s;
-  a.isTonicTemplate = true, a._tags = "", a._refIds = [], a._data = {}, a._states = {}, a._children = {}, a._reg = {}, a._stylesheetRegistry = [], a._index = 0, a.SPREAD = /\.\.\.\s?(__\w+__\w+__)/g, a.ESC = /["&'<>`/]/g, a.AsyncFunctionGenerator = async function* () {
-  }.constructor.name, a.AsyncFunction = async function() {
-  }.constructor.name, a.MAP = { '"': "&quot;", "&": "&amp;", "'": "&#x27;", "<": "&lt;", ">": "&gt;", "`": "&#x60;", "/": "&#x2F;" }, a.ssr = false, a.nonce = Math.random().toString();
-  function y(p) {
-    if (typeof p != "string")
+  var Tonic = _Tonic;
+  Tonic.isTonicTemplate = true;
+  Tonic._tags = "";
+  Tonic._refIds = [];
+  Tonic._data = {};
+  Tonic._states = {};
+  Tonic._children = {};
+  Tonic._reg = {};
+  Tonic._stylesheetRegistry = [];
+  Tonic._index = 0;
+  Tonic.SPREAD = /\.\.\.\s?(__\w+__\w+__)/g;
+  Tonic.ESC = /["&'<>`/]/g;
+  Tonic.AsyncFunctionGenerator = async function* () {
+  }.constructor.name;
+  Tonic.AsyncFunction = async function() {
+  }.constructor.name;
+  Tonic.MAP = {
+    '"': "&quot;",
+    "&": "&amp;",
+    "'": "&#x27;",
+    "<": "&lt;",
+    ">": "&gt;",
+    "`": "&#x60;",
+    "/": "&#x2F;"
+  };
+  Tonic.ssr = false;
+  Tonic.nonce = Math.random().toString();
+  function assertContentIsString(content) {
+    if (typeof content !== "string") {
       throw Error("content is not a string");
+    }
   }
-  function _(p) {
-    if (!p.isTonicComponent)
+  function assertNodeIsTonic(node) {
+    if (!node.isTonicComponent) {
       throw Error("node is not a tonic component");
+    }
   }
-  var m = a;
+  var src_default = Tonic;
 
   // src/index.ts
-  var ParentComponent = class extends m {
+  var ParentComponent = class extends src_default {
     render() {
       return this.html`
       <div class="parent">
@@ -284,8 +414,8 @@
     `;
     }
   };
-  m.add(ParentComponent);
-  var ChildComponent = class extends m {
+  src_default.add(ParentComponent);
+  var ChildComponent = class extends src_default {
     render() {
       return this.html`
       <div class="child">
@@ -294,8 +424,8 @@
     `;
     }
   };
-  m.add(ChildComponent);
-  var TonicDialog = class extends m {
+  src_default.add(ChildComponent);
+  var TonicDialog = class extends src_default {
     constructor() {
       super();
       this.show = () => {
@@ -469,8 +599,8 @@
               resolve({});
           };
           const listener = (event) => {
-            const close = m.match(event.target, ".tonic--dialog--close");
-            const value = m.match(event.target, "[value]");
+            const close = src_default.match(event.target, ".tonic--dialog--close");
+            const value = src_default.match(event.target, "[value]");
             if (close || value) {
               that.removeEventListener(eventName, listener);
               document.removeEventListener("keyup", resolver);
@@ -488,7 +618,7 @@
       };
     }
     click(e) {
-      if (m.match(e.target, ".tonic--dialog--close")) {
+      if (src_default.match(e.target, ".tonic--dialog--close")) {
         this.hide();
       }
     }
@@ -501,10 +631,10 @@
     `;
     }
   };
-  m.add(TonicDialog);
-  var DialogInner = class extends m {
+  src_default.add(TonicDialog);
+  var DialogInner = class extends src_default {
     async click(e) {
-      return m.match(e.target, "tonic-button");
+      return src_default.match(e.target, "tonic-button");
     }
     render() {
       return this.html`
@@ -518,7 +648,7 @@
     `;
     }
   };
-  m.add(DialogInner);
+  src_default.add(DialogInner);
   document.getElementById("root").innerHTML = `
 <div>
   <tonic-dialog id="dialog-default">

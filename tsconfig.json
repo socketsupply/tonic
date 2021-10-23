@@ -29,7 +29,7 @@
     "target": "es6",
     "typeRoots": ["node_modules/@types"],
     "types": ["node"],
-    "outDir": "./dist/types"
+    "outDir": "./dist"
   },
   "include": ["src"],
   "exclude": ["node_modules", "dist", "docs"]
