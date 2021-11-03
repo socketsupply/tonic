@@ -64,7 +64,7 @@ Basically just add the `id` attributes.
 # Migrating from v10 to v11
 
 The implementation of HTML escaping changed between v10 and v11
-of `@optoolco/tonic`.
+of `@operatortc/tonic`.
 
 The main takeaway is that v10 had a potential XSS injection as
 we only escaped strings that exist on `this.props.someKey`,
@@ -125,11 +125,11 @@ git grep -C10 '${' | grep ')}'
 
 The fix is to add `this.html` calls in various places.
 
-We have updated `@optoolco/components` and you will have to
+We have updated `@operatortc/components` and you will have to
 update to version `7.4.0` as well
 
 ```sh
-npm install @optoolco/components@^7.4.0 -ES
+npm install @operatortc/components@^7.4.0 -ES
 ```
 
 There are other situations in which the increased escaping from

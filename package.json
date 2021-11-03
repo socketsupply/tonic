@@ -1,5 +1,5 @@
 {
-  "name": "@optoolco/tonic",
+  "name": "@operatortc/tonic",
   "version": "13.3.7",
   "description": "A component framework.",
   "scripts": {
@@ -13,7 +13,7 @@
     "minify:cjs": "esbuild index.js --keep-names --minify --outfile=dist/tonic.min.js"
   },
   "main": "index.js",
-  "author": "optoolco",
+  "author": "operatortc",
   "license": "MIT",
   "devDependencies": {
     "benchmark": "^2.1.4",
@@ -34,10 +34,10 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/optoolco/tonic.git"
+    "url": "git+https://github.com/operatortc/tonic.git"
   },
   "bugs": {
-    "url": "https://github.com/optoolco/tonic/issues"
+    "url": "https://github.com/operatortc/tonic/issues"
   },
   "homepage": "https://tonic.technology",
   "dependencies": {}
