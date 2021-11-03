@@ -1,6 +1,6 @@
 {
   "name": "@operatortc/tonic",
-  "version": "13.3.7",
+  "version": "14.0.0",
   "description": "A component framework.",
   "scripts": {
     "ci:test:tape-run": "esbuild --bundle test/index.js | tape-run",
