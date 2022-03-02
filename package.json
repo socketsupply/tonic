@@ -10,7 +10,8 @@
     "prepare": "./scripts/build.js",
     "build": "./scripts/build.js && npm run minify:esm && npm run minify:cjs",
     "minify:esm": "esbuild index.esm.js --keep-names --minify --outfile=dist/tonic.min.esm.js",
-    "minify:cjs": "esbuild index.js --keep-names --minify --outfile=dist/tonic.min.js"
+    "minify:cjs": "esbuild index.js --keep-names --minify --outfile=dist/tonic.min.js",
+    "pub": "npm pub && npm publish --registry https://npm.pkg.github.com"
   },
   "main": "index.js",
   "author": "socketsupply",
