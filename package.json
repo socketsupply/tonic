@@ -1,6 +1,6 @@
 {
   "name": "@socketsupply/tonic",
-  "version": "14.1.2",
+  "version": "14.1.3",
   "description": "A component framework.",
   "scripts": {
     "ci:test:tape-run": "esbuild --bundle test/index.js | tape-run",
