@@ -240,6 +240,7 @@ class Tonic extends window.HTMLElement {
   }
 
   _set (target, render, content = '') {
+    this.willRender && this.willRender()
     for (const node of target.querySelectorAll(Tonic._tags)) {
       if (!node.isTonicComponent) continue
 
