@@ -32,10 +32,6 @@ class Tonic extends window.HTMLElement {
     return `tonic${Tonic._index++}`
   }
 
-  static _splitName (s) {
-    return s.match(/[A-Z][a-z0-9]*/g).join('-')
-  }
-
   static _normalizeAttrs (o, x = {}) {
     [...o].forEach(o => (x[o.name] = o.value))
     return x
@@ -106,7 +102,7 @@ class Tonic extends window.HTMLElement {
       throw Error('Mangling. https://bit.ly/2TkJ6zP')
     }
 
-    if (!htmlName) htmlName = Tonic._splitName(c.name).toLowerCase()
+    if (!htmlName) htmlName = Tonic.getTagName(c.name)
     if (!Tonic.ssr && window.customElements.get(htmlName)) {
       throw new Error(`Cannot Tonic.add(${c.name}, '${htmlName}') twice`)
     }
