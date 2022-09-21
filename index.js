@@ -87,6 +87,10 @@ class Tonic extends window.HTMLElement {
     return el.matches(s) ? el : el.closest(s)
   }
 
+  static getTagName (camelName) {
+    return camelName.match(/[A-Z][a-z0-9]*/g).join('-').toLowerCase()
+  }
+
   static getPropertyNames (proto) {
     const props = []
     while (proto && proto !== Tonic.prototype) {
