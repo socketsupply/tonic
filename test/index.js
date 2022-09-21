@@ -14,8 +14,9 @@ test('sanity', async t => {
 
 test('get kebab case from camel case', t => {
   const kebab = Tonic.getTagName('MyExample')
-  t.equal(typeof kebab, 'string', 'should a string')
+  t.equal(typeof kebab, 'string', 'should return a string')
   t.equal(kebab, 'my-example', 'should create kebab case given camel case')
+
   class MyExample extends Tonic {
     render () {
       return this.html`<div>example</div>`
