@@ -240,6 +240,7 @@ class Tonic extends window.HTMLElement {
   }
 
   _set (target, render, content = '') {
+    this.willRender && this.willRender()
     for (const node of target.querySelectorAll(Tonic._tags)) {
       if (!node.isTonicComponent) continue
 
@@ -387,7 +388,7 @@ Object.assign(Tonic, {
   _reg: {},
   _stylesheetRegistry: [],
   _index: 0,
-  version: typeof require !== 'undefined' ? require('./package').version : null,
+  version: typeof require !== 'undefined' ? require('./package.json').version : null,
   SPREAD: /\.\.\.\s?(__\w+__\w+__)/g,
   ESC: /["&'<>`/]/g,
   AsyncFunctionGenerator: async function * () {}.constructor,
