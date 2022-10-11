@@ -21,12 +21,12 @@ export class Tonic extends window.HTMLElement {
   static _stylesheetRegistry = []
   static _index = 0
   // eslint-disable-next-line no-undef
-  static version = VERSION ?? null
-  static SPREAD = /\.\.\.\s?(__\w+__\w+__)/g
-  static ESC = /["&'<>`/]/g
-  static AsyncFunctionGenerator = async function * () {}.constructor
-  static AsyncFunction = async function () {}.constructor
-  static MAP = { '"': '&quot;', '&': '&amp;', '\'': '&#x27;', '<': '&lt;', '>': '&gt;', '`': '&#x60;', '/': '&#x2F;' }
+  static get version () { return VERSION ?? null }
+  static get SPREAD () { return /\.\.\.\s?(__\w+__\w+__)/g }
+  static get ESC () { return /["&'<>`/]/g }
+  static get AsyncFunctionGenerator () { return async function * () {}.constructor }
+  static get AsyncFunction () { return async function () {}.constructor }
+  static get MAP () { return { '"': '&quot;', '&': '&amp;', '\'': '&#x27;', '<': '&lt;', '>': '&gt;', '`': '&#x60;', '/': '&#x2F;' } }
 
   constructor () {
     super()
