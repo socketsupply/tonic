@@ -18,11 +18,11 @@
   "license": "MIT",
   "devDependencies": {
     "benchmark": "^2.1.4",
-    "esbuild": "^0.15.5",
+    "esbuild": "^0.15.10",
     "standard": "17.0.0",
     "tape-run": "^10.0.0",
     "tapzero": "0.6.1",
-    "uuid": "8.3.2"
+    "uuid": "9.0.0"
   },
   "standard": {
     "ignore": [
