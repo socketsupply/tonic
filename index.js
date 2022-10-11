@@ -21,14 +21,26 @@ export class Tonic extends window.HTMLElement {
   static _reg = {};
   static _stylesheetRegistry = [];
   static _index = 0;
-  static version = "14.3.0";
-  static SPREAD = /\.\.\.\s?(__\w+__\w+__)/g;
-  static ESC = /["&'<>`/]/g;
-  static AsyncFunctionGenerator = async function* () {
-  }.constructor;
-  static AsyncFunction = async function() {
-  }.constructor;
-  static MAP = { '"': "&quot;", "&": "&amp;", "'": "&#x27;", "<": "&lt;", ">": "&gt;", "`": "&#x60;", "/": "&#x2F;" };
+  static get version() {
+    return "14.3.0";
+  }
+  static get SPREAD() {
+    return /\.\.\.\s?(__\w+__\w+__)/g;
+  }
+  static get ESC() {
+    return /["&'<>`/]/g;
+  }
+  static get AsyncFunctionGenerator() {
+    return async function* () {
+    }.constructor;
+  }
+  static get AsyncFunction() {
+    return async function() {
+    }.constructor;
+  }
+  static get MAP() {
+    return { '"': "&quot;", "&": "&amp;", "'": "&#x27;", "<": "&lt;", ">": "&gt;", "`": "&#x60;", "/": "&#x2F;" };
+  }
   constructor() {
     super();
     const state = Tonic._states[super.id];
@@ -162,7 +174,7 @@ export class Tonic extends window.HTMLElement {
           return this._placehold([...o]);
         case "[object Array]": {
           if (o.every((x) => x.isTonicTemplate && !x.unsafe)) {
-            return new TonicTemplate(o.join(""), null, false);
+            return new TonicTemplate(o.join("\n"), null, false);
           }
           return this._prop(o);
         }
@@ -242,6 +254,7 @@ export class Tonic extends window.HTMLElement {
     });
   }
   _set(target, render, content = "") {
+    this.willRender && this.willRender();
     for (const node of target.querySelectorAll(Tonic._tags)) {
       if (!node.isTonicComponent)
         continue;
