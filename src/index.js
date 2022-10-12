@@ -1,6 +1,4 @@
 // @ts-check
-'use strict'
-
 class TonicTemplate {
   constructor (rawText, templateStrings, unsafe) {
     this.isTonicTemplate = true
@@ -13,7 +11,23 @@ class TonicTemplate {
   toString () { return this.rawText }
 }
 
-class Tonic extends window.HTMLElement {
+export class Tonic extends window.HTMLElement {
+  static _tags = ''
+  static _refIds = []
+  static _data = {}
+  static _states = {}
+  static _children = {}
+  static _reg = {}
+  static _stylesheetRegistry = []
+  static _index = 0
+  // eslint-disable-next-line no-undef
+  static get version () { return VERSION ?? null }
+  static get SPREAD () { return /\.\.\.\s?(__\w+__\w+__)/g }
+  static get ESC () { return /["&'<>`/]/g }
+  static get AsyncFunctionGenerator () { return async function * () {}.constructor }
+  static get AsyncFunction () { return async function () {}.constructor }
+  static get MAP () { return { '"': '&quot;', '&': '&amp;', '\'': '&#x27;', '<': '&lt;', '>': '&gt;', '`': '&#x60;', '/': '&#x2F;' } }
+
   constructor () {
     super()
     const state = Tonic._states[super.id]
@@ -26,6 +40,10 @@ class Tonic extends window.HTMLElement {
     this.nodes = [...this.childNodes]
     this.nodes.__children__ = true
     this._events()
+  }
+
+  get isTonicComponent () {
+    return true
   }
 
   static _createId () {
@@ -156,11 +174,12 @@ class Tonic extends window.HTMLElement {
       switch (Object.prototype.toString.call(o)) {
         case '[object HTMLCollection]':
         case '[object NodeList]': return this._placehold([...o])
-        case '[object Array]':
+        case '[object Array]': {
           if (o.every(x => x.isTonicTemplate && !x.unsafe)) {
             return new TonicTemplate(o.join('\n'), null, false)
           }
           return this._prop(o)
+        }
         case '[object Object]':
         case '[object Function]': return this._prop(o)
         case '[object NamedNodeMap]':
@@ -210,12 +229,12 @@ class Tonic extends window.HTMLElement {
       if (p && p.then) {
         return p.then(() => {
           this.updated && this.updated(oldProps)
-          resolve()
+          resolve(this)
         })
       }
 
       this.updated && this.updated(oldProps)
-      resolve()
+      resolve(this)
     }, 0))
 
     return this.pendingReRender
@@ -377,21 +396,4 @@ class Tonic extends window.HTMLElement {
   }
 }
 
-Tonic.prototype.isTonicComponent = true
-
-Object.assign(Tonic, {
-  _tags: '',
-  _refIds: [],
-  _data: {},
-  _states: {},
-  _children: {},
-  _reg: {},
-  _stylesheetRegistry: [],
-  _index: 0,
-  version: typeof require !== 'undefined' ? require('./package.json').version : null,
-  SPREAD: /\.\.\.\s?(__\w+__\w+__)/g,
-  ESC: /["&'<>`/]/g,
-  AsyncFunctionGenerator: async function * () {}.constructor,
-  AsyncFunction: async function () {}.constructor,
-  MAP: { '"': '&quot;', '&': '&amp;', '\'': '&#x27;', '<': '&lt;', '>': '&gt;', '`': '&#x60;', '/': '&#x2F;' }
-})
+export default Tonic

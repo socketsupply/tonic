@@ -1,6 +1,6 @@
-const test = require('tapzero').test
-const uuid = require('uuid')
-const Tonic = require('../index.js')
+import { test } from 'tapzero'
+import { v4 as uuid } from 'uuid'
+import Tonic from '../index.js'
 
 const sleep = async t => new Promise(resolve => setTimeout(resolve, t))
 
@@ -133,8 +133,10 @@ test('Tonic escapes attribute injection', async t => {
       const userInput3 = 'a" onmouseover="alert(1)"'
 
       const input = this.props.input === 'script'
-        ? userInput : this.props.input === 'space'
-          ? userInput3 : userInput2
+        ? userInput
+        : this.props.input === 'space'
+          ? userInput3
+          : userInput2
 
       if (this.props.spread) {
         return this.html`

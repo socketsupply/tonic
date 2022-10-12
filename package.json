@@ -4,29 +4,29 @@
   "description": "A component framework.",
   "scripts": {
     "ci:test:tape-run": "esbuild --bundle test/index.js | tape-run",
-    "lint": "standard -v",
+    "lint": "standard src/index.js",
     "test": "npm run build && standard && esbuild --bundle test/index.js | tape-run",
     "test:open": "npm run build && esbuild --bundle test/index.js | tape-run --browser chrome --keep-open",
-    "prepare": "./scripts/build.js",
-    "build": "./scripts/build.js && npm run minify:esm && npm run minify:cjs",
-    "minify:esm": "esbuild index.esm.js --keep-names --minify --outfile=dist/tonic.min.esm.js",
-    "minify:cjs": "esbuild index.js --keep-names --minify --outfile=dist/tonic.min.js",
-    "pub": "npm pub && npm publish --registry https://npm.pkg.github.com"
+    "build:base": "esbuild src/index.js --define:VERSION=\\\"$npm_package_version\\\" --outfile=index.js",
+    "build:minify": "esbuild index.js --keep-names --minify --outfile=dist/tonic.min.js",
+    "build": "npm run build:base && npm run build:minify",
+    "pub": "npm run build && npm run test && npm publish --registry=https://registry.npmjs.org && npm publish --registry https://npm.pkg.github.com"
   },
   "main": "index.js",
+  "type": "module",
   "author": "socketsupply",
   "license": "MIT",
   "devDependencies": {
     "benchmark": "^2.1.4",
-    "esbuild": "^0.8.36",
-    "standard": "14.3.1",
+    "esbuild": "^0.15.10",
+    "standard": "17.0.0",
     "tape-run": "^10.0.0",
-    "tapzero": "0.2.2",
-    "uuid": "3.3.3"
+    "tapzero": "0.6.1",
+    "uuid": "9.0.0"
   },
   "standard": {
     "ignore": [
-      "dist/*",
+      "index.js",
       "test/fixtures/*"
     ]
   },
