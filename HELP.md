@@ -2,6 +2,14 @@
 
 ### Class Name Mangling
 
+To avoid class name mangling issues, we recommend using the second parameter in `Tonic.add` method:
+
+```js
+Tonic.add(MyComponent, 'my-component')
+```
+
+---
+
 If you are using Uglify (or something similar), it will mangle your class names.
 To fix this, just pass the `keep_fnames` option babel-minify has something
 similar.
