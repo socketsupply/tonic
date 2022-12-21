@@ -1,3 +1,13 @@
+# Migration from v13 or v14 to v15
+
+In version 15 we've migrated to ES modules and dropped support for CommonJS.
+You still can use CommonJS if you want with the help of bundlers like esbuild,
+Webpack or Rollup.
+
+There's a few breaking changes in this release: `Tonic.version`, `Tonic.SPREAD`, `Tonic.ESC`, `Tonic.AsyncFunctionGenerator`, `AsyncFunction` and `Tonic.MAP` are getters now. This change shouldn't affect most of developers.
+
+Bundle size was reduced as we don't bundle `package.json` anymore and set the version on a build step.
+
 # Migration from v12 to v13
 
 We enabled escaping on strings returned by `render()`
