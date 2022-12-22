@@ -1,3 +1,5 @@
 *.png
 .source.*
 .github/
+!index.js
+
