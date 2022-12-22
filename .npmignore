@@ -2,4 +2,5 @@
 .source.*
 .github/
 !index.js
+!dist/*
 
