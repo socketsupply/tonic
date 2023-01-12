@@ -46,6 +46,6 @@ After adding your Javascript to your HTML, you can use your component anywhere.
 - [API](./API.md)
 - [Troubleshooting](./HELP.md)
 
-Copyright (c) 2022 Socket Supply Co.
+Copyright (c) 2023 Socket Supply Co.
 
 MIT License
