@@ -3,9 +3,9 @@
   "version": "15.0.0",
   "description": "A component framework.",
   "scripts": {
-    "ci:test:tape-run": "esbuild --bundle test/index.js | tape-run",
     "lint": "standard .",
-    "test": "npm run build && standard && esbuild --bundle test/index.js | tape-run",
+    "test": "npm run build && npm run lint && npm run build:test | tape-run",
+    "ci:test:tape-run": "esbuild --bundle test/index.js | tape-run",
     "test:open": "npm run build && esbuild --bundle test/index.js | tape-run --browser chrome --keep-open",
     "build:base": "esbuild src/index.js --define:VERSION=\\\"$npm_package_version\\\" --outfile=index.js",
     "build:minify": "esbuild index.js --keep-names --minify --outfile=dist/tonic.min.js",
@@ -19,7 +19,7 @@
   "license": "MIT",
   "devDependencies": {
     "benchmark": "^2.1.4",
-    "esbuild": "^0.15.10",
+    "esbuild": "^0.16.17",
     "standard": "17.0.0",
     "tape-run": "^10.0.0",
     "tapzero": "0.6.1",
