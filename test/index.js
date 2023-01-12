@@ -236,7 +236,10 @@ test('pass props', async t => {
           id="y"
           data=${test}
           number=${42.42}
-          fn=${() => 'hello, world'}>
+          fn=${() => 'hello, world'}
+          set=${new Set(['foo'])}
+          map=${new Map([['bar', 'bar']])}
+          weakmap=${new WeakMap([[document, 'baz']])}>
         </component-b-b>
       `
     }
@@ -256,6 +259,9 @@ test('pass props', async t => {
     const props = bb.props
     t.equal(props.fn(), 'hello, world', 'passed a function')
     t.equal(props.number, 42.42, 'float parsed properly')
+    t.equal(props.set.has('foo'), true, 'set parsed properly')
+    t.equal(props.map.get('bar'), 'bar', 'map parsed properly')
+    t.equal(props.weakmap.get(document), 'baz', 'weak map parsed properly')
   }
 
   const div1 = document.getElementsByTagName('div')[0]

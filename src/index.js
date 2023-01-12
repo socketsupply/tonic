@@ -181,7 +181,10 @@ export class Tonic extends window.HTMLElement {
           return this._prop(o)
         }
         case '[object Object]':
-        case '[object Function]': return this._prop(o)
+        case '[object Function]':
+        case '[object Set]':
+        case '[object Map]':
+        case '[object WeakMap]': return this._prop(o)
         case '[object NamedNodeMap]':
           return this._prop(Tonic._normalizeAttrs(o))
         case '[object Number]': return `${o}__float`
