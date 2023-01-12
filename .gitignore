@@ -1,6 +1,5 @@
 /node_modules
+/dist
+/index.js
 package-lock.json
 .source.*
-index.js
-dist
-

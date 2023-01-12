@@ -1,6 +1,6 @@
 *.png
 .source.*
 .github/
+test/
 !index.js
 !dist/*
-

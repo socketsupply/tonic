@@ -4,7 +4,7 @@
   "description": "A component framework.",
   "scripts": {
     "ci:test:tape-run": "esbuild --bundle test/index.js | tape-run",
-    "lint": "standard src/index.js",
+    "lint": "standard .",
     "test": "npm run build && standard && esbuild --bundle test/index.js | tape-run",
     "test:open": "npm run build && esbuild --bundle test/index.js | tape-run --browser chrome --keep-open",
     "build:base": "esbuild src/index.js --define:VERSION=\\\"$npm_package_version\\\" --outfile=index.js",
@@ -27,7 +27,6 @@
   },
   "standard": {
     "ignore": [
-      "index.js",
       "test/fixtures/*"
     ]
   },
