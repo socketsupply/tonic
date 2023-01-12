@@ -27,7 +27,7 @@
   },
   "standard": {
     "ignore": [
-      "index.js",
+      "./index.js",
       "test/fixtures/*"
     ]
   },
