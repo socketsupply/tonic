@@ -1,4 +1,4 @@
-import { test } from 'tapzero'
+import { test } from '@socketsupply/tapzero'
 import { v4 as uuid } from 'uuid'
 import Tonic from '../index.js'
 

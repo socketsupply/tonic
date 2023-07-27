@@ -4,7 +4,7 @@
   "description": "A component framework.",
   "scripts": {
     "lint": "standard .",
-    "test": "npm run build && npm run lint && npm run build:test | tape-run",
+    "test": "npm run build && npm run lint && esbuild --bundle test/index.js | tape-run",
     "ci:test:tape-run": "esbuild --bundle test/index.js | tape-run",
     "test:open": "npm run build && esbuild --bundle test/index.js | tape-run --browser chrome --keep-open",
     "build:base": "esbuild src/index.js --define:VERSION=\\\"$npm_package_version\\\" --outfile=index.js",
@@ -19,11 +19,11 @@
   "license": "MIT",
   "devDependencies": {
     "benchmark": "^2.1.4",
-    "esbuild": "^0.16.17",
-    "standard": "17.0.0",
+    "esbuild": "^0.18.1",
+    "standard": "^17.0.0",
     "tape-run": "^10.0.0",
-    "tapzero": "0.6.1",
-    "uuid": "9.0.0"
+    "@socketsupply/tapzero": "^0.7.1",
+    "uuid": "^9.0.0"
   },
   "standard": {
     "ignore": [
