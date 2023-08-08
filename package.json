@@ -19,7 +19,7 @@
   "license": "MIT",
   "devDependencies": {
     "benchmark": "^2.1.4",
-    "esbuild": "^0.18.1",
+    "esbuild": "^0.19.0",
     "standard": "^17.0.0",
     "tape-run": "^10.0.0",
     "@socketsupply/tapzero": "^0.7.1",
