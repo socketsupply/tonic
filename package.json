@@ -22,7 +22,7 @@
     "esbuild": "^0.19.0",
     "standard": "^17.0.0",
     "tape-run": "^11.0.0",
-    "@socketsupply/tapzero": "^0.7.1",
+    "@socketsupply/tapzero": "^0.8.0",
     "uuid": "^9.0.0"
   },
   "standard": {
