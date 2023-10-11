@@ -12,6 +12,45 @@ test('sanity', async t => {
   t.ok(parseInt(parts[0]) >= 10)
 })
 
+test('pass an async function as an event handler', t => {
+  t.plan(1)
+
+  class TheApp extends Tonic {
+    async clicker (msg) {
+      t.equal(msg, 'hello', 'should get the event')
+    }
+
+    render () {
+      return this.html`<div>
+        <fn-example onbtnclick=${this.clicker.bind(this)}></fn-example>
+      </div>`
+    }
+  }
+
+  class FnExample extends Tonic {
+    click (ev) {
+      ev.preventDefault()
+      this.props.onbtnclick('hello')
+    }
+
+    render () {
+      return this.html`<div id="fn-test">
+        example
+        <button id="btn">clicker</button>
+      </div>`
+    }
+  }
+
+  document.body.innerHTML = `
+    <the-app></the-app>
+  `
+
+  Tonic.add(FnExample)
+  Tonic.add(TheApp)
+
+  document.getElementById('btn').click()
+})
+
 test('get kebab case from camel case', t => {
   const kebab = Tonic.getTagName('MyExample')
   t.equal(typeof kebab, 'string', 'should return a string')
