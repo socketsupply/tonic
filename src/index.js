@@ -182,6 +182,7 @@ export class Tonic extends window.HTMLElement {
         }
         case '[object Object]':
         case '[object Function]':
+        case '[object AsyncFunction]':
         case '[object Set]':
         case '[object Map]':
         case '[object WeakMap]': return this._prop(o)
