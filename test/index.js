@@ -12,6 +12,30 @@ test('sanity', async t => {
   t.ok(parseInt(parts[0]) >= 10)
 })
 
+test.only('multiple class names', t => {
+  t.plan(1)
+
+  class TextTest extends Tonic {
+    render () {
+      const className = 'hello world'
+      return this.html`<button id="text" class=${className}>
+        hello
+      </button>`
+    }
+  }
+
+  Tonic.add(TextTest)
+
+  document.body.innerHTML = `
+    <text-test>hello</text-test>
+  `
+
+  const el = document.getElementById('text')
+  console.log('classes', el.classList)
+  t.deepEqual(Array.from(el.classList), ['hello', 'world'],
+    'should have the right content')
+})
+
 test('pass an async function as an event handler', t => {
   t.plan(1)
 
