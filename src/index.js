@@ -206,6 +206,9 @@ export class Tonic extends window.HTMLElement {
 
     const out = []
     for (let i = 0; i < strings.length - 1; i++) {
+      if (strings[i].endsWith('class=')) {
+        out.push(strings[i], `"${refs(values[i])}"`)
+      }
       out.push(strings[i], refs(values[i]))
     }
     out.push(strings[strings.length - 1])

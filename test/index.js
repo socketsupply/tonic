@@ -12,7 +12,7 @@ test('sanity', async t => {
   t.ok(parseInt(parts[0]) >= 10)
 })
 
-test.only('multiple class names', t => {
+test('multiple class names', t => {
   t.plan(1)
 
   class TextTest extends Tonic {
@@ -31,7 +31,6 @@ test.only('multiple class names', t => {
   `
 
   const el = document.getElementById('text')
-  console.log('classes', el.classList)
   t.deepEqual(Array.from(el.classList), ['hello', 'world'],
     'should have the right content')
 })
