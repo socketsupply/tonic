@@ -1,4 +1,8 @@
-![tonic](https://raw.githubusercontent.com/socketsupply/tonic/master/readme-tonic.png)
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/socketsupply/tonic/bret/dark-mode-logo/readme-tonic-dark.png">
+  <source media="(prefers-color-scheme: light)" srcset="https://raw.githubusercontent.com/socketsupply/tonic/master/readme-tonic.png">
+  <img alt="tonic" src="https://raw.githubusercontent.com/socketsupply/tonic/master/readme-tonic.png">
+</picture>
 
 <p align="center">
   https://tonicframework.dev
