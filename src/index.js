@@ -185,7 +185,9 @@ export class Tonic extends window.HTMLElement {
         case '[object AsyncFunction]':
         case '[object Set]':
         case '[object Map]':
-        case '[object WeakMap]': return this._prop(o)
+        case '[object WeakMap]':
+        case '[object File]':
+          return this._prop(o)
         case '[object NamedNodeMap]':
           return this._prop(Tonic._normalizeAttrs(o))
         case '[object Number]': return `${o}__float`
