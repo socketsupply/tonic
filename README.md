@@ -21,13 +21,31 @@ npm install @socketsupply/tonic
 
 ```js
 import Tonic from '@socketsupply/tonic'
+```
 
+You can use functions as components. They can be async or even an async generator function.
+
+```js
+async function MyGreeting () {
+  const data = await (await fetch('https://example.com/data')).text()
+  return this.html`<h1>Hello, ${data}</h1>`
+}
+```
+
+Or you can use classes. Every class must have a render method.
+
+``js
 class MyGreeting extends Tonic {
-  render () {
-    return this.html`<div>Hello, World.</div>`
+  async * render () {
+    yield this.html`<div>Loading...</div>`
+
+    const data = await (await fetch('https://example.com/data')).text()
+    return this.html`<div>Hello, ${data}.</div>`
   }
 }
+```
 
+```js
 Tonic.add(MyGreeting, 'my-greeting')
 ```
 
