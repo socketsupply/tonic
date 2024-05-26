@@ -34,7 +34,7 @@ async function MyGreeting () {
 
 Or you can use classes. Every class must have a render method.
 
-``js
+```js
 class MyGreeting extends Tonic {
   async * render () {
     yield this.html`<div>Loading...</div>`
